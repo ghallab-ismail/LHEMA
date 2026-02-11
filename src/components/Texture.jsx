@@ -44,9 +44,11 @@ const Texture = () => {
         <section className="bg-lhema-cream py-32 md:py-40">
             <div className="mx-auto max-w-4xl px-6">
                 <div className="mb-12 text-center text-lhema-black">
-                    <h2 className="font-serif text-3xl md:text-4xl">The Texture</h2>
+                    <h2 className="font-serif text-3xl md:text-4xl">La Silhouette Modeste</h2>
                     <p className="mt-4 font-sans text-xs uppercase tracking-widest text-lhema-black/60">
-                        Material: 100% Virgin Wool / Silk Lining
+                        Conçue pour chaque femme. Idéalement adaptée pour le Hijab.
+                        <br />
+                        <span className="opacity-50">100% Laine Vierge / Doublure Soie</span>
                     </p>
                 </div>
 
@@ -93,7 +95,7 @@ const Texture = () => {
                         ))}
                     </div>
                     <p className="mt-4 text-center text-[10px] uppercase tracking-widest text-lhema-black/40">
-                        Swipe to examine
+                        Glissez pour examiner
                     </p>
                 </div>
 

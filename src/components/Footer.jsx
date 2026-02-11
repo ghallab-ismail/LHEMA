@@ -4,7 +4,7 @@ const Footer = () => {
     return (
         <footer className="w-full bg-lhema-cream py-12 text-center">
             <p className="font-sans text-[10px] uppercase tracking-[0.3em] text-lhema-black/40">
-                Maison Lhema. Casablanca, 1952. All Rights Reserved.
+                Maison Lhema. Casablanca, 1952. Tous droits réservés.
             </p>
         </footer>
     );

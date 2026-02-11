@@ -16,10 +16,10 @@ const Lookbook = () => {
     const x = useTransform(scrollYProgress, [0, 1], ["1%", "-65%"]);
 
     const images = [
-        { src: imageFrontFull, title: "The Silhouette" },
-        { src: imageBackFull, title: "The Structure" },
-        { src: imageFront, title: "The Detail" },
-        { src: imageBack, title: "The Heritage" },
+        { src: imageFrontFull, title: "La Silhouette" },
+        { src: imageBackFull, title: "La Structure" },
+        { src: imageFront, title: "Le Détail" },
+        { src: imageBack, title: "L'Héritage" },
     ];
 
     return (
@@ -27,9 +27,9 @@ const Lookbook = () => {
             {/* Mobile Layout: Native Horizontal Snap Scroll */}
             <section className="block md:hidden bg-lhema-cream py-24">
                 <div className="mb-12 px-6">
-                    <h2 className="font-serif text-3xl text-lhema-black">The Campaign</h2>
+                    <h2 className="font-serif text-3xl text-lhema-black">La Campagne</h2>
                     <p className="font-sans text-[10px] uppercase tracking-widest text-lhema-black/60">
-                        Winter 2025 Lookbook
+                        Lookbook Hiver 2025
                     </p>
                 </div>
 
@@ -48,7 +48,7 @@ const Lookbook = () => {
                     ))}
                 </div>
                 <p className="mt-4 text-center text-[10px] uppercase tracking-widest text-lhema-black/40">
-                    Swipe to explore
+                    Glissez pour explorer
                 </p>
             </section>
 
@@ -59,11 +59,11 @@ const Lookbook = () => {
                         {/* Intro Text Card */}
                         <div className="flex h-[70vh] w-[40vw] flex-col justify-center gap-8 md:w-[25vw]">
                             <h2 className="font-serif text-4xl text-lhema-black md:text-6xl">
-                                The Campaign
+                                La Campagne
                             </h2>
                             <p className="font-sans text-xs uppercase tracking-widest text-lhema-black/60">
-                                Winter 2025 Lookbook <br />
-                                Captured in Casablanca
+                                Lookbook Hiver 2025 <br />
+                                Capturé à Casablanca
                             </p>
                         </div>
 

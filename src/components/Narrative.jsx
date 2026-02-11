@@ -19,9 +19,9 @@ const Narrative = () => {
     const opacity3 = useTransform(scrollYProgress, [0.75, 0.85, 1, 1], [0, 1, 1, 1]); // Late entry
 
     const narrativeText = [
-        "Not designed. Engineered.",
-        "Restored from the 1952 Casablanca Archives.",
-        "Sculpted from Italian Virgin Wool."
+        "Non pas dessiné. Mais architecturé.",
+        "Restauré des Archives de Casablanca 1952.",
+        "Sculpté dans une Laine Vierge Italienne."
     ];
 
     return (

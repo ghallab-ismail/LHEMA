@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { X, Search } from 'lucide-react';
 
 const Menu = ({ onClose }) => {
-    const primaryLinks = ["HIGHLIGHTS", "WOMEN", "MEN", "SL PRODUCTIONS"];
-    const secondaryLinks = ["LA MAISON", "STORES", "SERVICES", "LOGIN"];
+    const primaryLinks = ["COLLECTION", "FEMME", "HOMME", "ATELIER"];
+    const secondaryLinks = ["LA MAISON", "BOUTIQUES", "SERVICES", "COMPTE"];
 
     return (
         <motion.div

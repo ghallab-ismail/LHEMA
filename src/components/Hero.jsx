@@ -41,7 +41,7 @@ const Hero = () => {
                 transition={{ delay: 3.2, duration: 1.5 }} // Delays until after Loader finishes
             >
                 <p className="font-sans text-xs uppercase tracking-[0.2em] text-lhema-cream/90">
-                    Volume 01: The Sovereign Cape
+                    Volume 01 : La Cape Souveraine
                 </p>
             </motion.div>
         </section>
