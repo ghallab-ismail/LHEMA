@@ -9,12 +9,12 @@ const Narrative = () => {
         offset: ["start start", "end end"]
     });
 
-    // Adjusted timings:
-    // 1. Text 1 starts after 25% (Giving the "Void").
-    // 2. Text 3 stays visible until the very end (1.0) to "take its time".
-    const opacity1 = useTransform(scrollYProgress, [0.25, 0.35, 0.45, 0.5], [0, 1, 1, 0]);
-    const opacity2 = useTransform(scrollYProgress, [0.5, 0.6, 0.65, 0.75], [0, 1, 1, 0]);
-    const opacity3 = useTransform(scrollYProgress, [0.75, 0.85, 1, 1], [0, 1, 1, 1]); // Holds until end
+    // Adjusted timings for "The Long Read":
+    // 1. Height is now 600vh.
+    // 2. Text 3 fades in at 70% and holds until 100%. (30% of 600vh = 180vh of visibility).
+    const opacity1 = useTransform(scrollYProgress, [0.15, 0.25, 0.35, 0.45], [0, 1, 1, 0]);
+    const opacity2 = useTransform(scrollYProgress, [0.45, 0.55, 0.65, 0.75], [0, 1, 1, 0]);
+    const opacity3 = useTransform(scrollYProgress, [0.75, 0.85, 1, 1], [0, 1, 1, 1]); // Long hold
 
     const narrativeText = [
         "Not designed. Engineered.",
@@ -25,7 +25,7 @@ const Narrative = () => {
     return (
         <>
             {/* MOBILE LAYOUT: Scroll-Jacked / Pinned Narrative */}
-            <section ref={mobileContainerRef} className="relative block h-[400vh] md:hidden">
+            <section ref={mobileContainerRef} className="relative block h-[600vh] md:hidden">
                 <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
                     {/* Background Image (Darkened) */}
                     <img
