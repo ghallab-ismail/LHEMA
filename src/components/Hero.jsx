@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import videoBg from '../assets/video.MOV';
+// import { motion } from 'framer-motion';
+import videoBg from '../assets/video-optimized.mp4';
+import imageBg from '../assets/imagebackfull.jpeg';
 
 const Hero = () => {
     const videoRef = useRef(null);
@@ -21,6 +23,7 @@ const Hero = () => {
                 <video
                     ref={videoRef}
                     src={videoBg}
+                    poster={imageBg}
                     autoPlay
                     loop
                     muted
