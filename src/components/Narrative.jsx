@@ -9,9 +9,12 @@ const Narrative = () => {
         offset: ["start start", "end end"]
     });
 
-    const opacity1 = useTransform(scrollYProgress, [0.05, 0.2, 0.35], [0, 1, 0]);
-    const opacity2 = useTransform(scrollYProgress, [0.4, 0.5, 0.65], [0, 1, 0]);
-    const opacity3 = useTransform(scrollYProgress, [0.7, 0.85, 0.95], [0, 1, 0]);
+    // Adjusted timings:
+    // 1. Text 1 starts after 25% (Giving the "Void").
+    // 2. Text 3 stays visible until the very end (1.0) to "take its time".
+    const opacity1 = useTransform(scrollYProgress, [0.25, 0.35, 0.45, 0.5], [0, 1, 1, 0]);
+    const opacity2 = useTransform(scrollYProgress, [0.5, 0.6, 0.65, 0.75], [0, 1, 1, 0]);
+    const opacity3 = useTransform(scrollYProgress, [0.75, 0.85, 1, 1], [0, 1, 1, 1]); // Holds until end
 
     const narrativeText = [
         "Not designed. Engineered.",
@@ -22,7 +25,7 @@ const Narrative = () => {
     return (
         <>
             {/* MOBILE LAYOUT: Scroll-Jacked / Pinned Narrative */}
-            <section ref={mobileContainerRef} className="relative block h-[350vh] md:hidden">
+            <section ref={mobileContainerRef} className="relative block h-[400vh] md:hidden">
                 <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
                     {/* Background Image (Darkened) */}
                     <img
