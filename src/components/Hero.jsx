@@ -1,13 +1,25 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import videoBg from '../assets/video.MOV';
 
 const Hero = () => {
+    const videoRef = useRef(null);
+
+    useEffect(() => {
+        if (videoRef.current) {
+            videoRef.current.playbackRate = 0.8; // Slow down slightly for luxury feel
+            videoRef.current.play().catch(error => {
+                console.log("Video autoplay failed:", error);
+            });
+        }
+    }, []);
+
     return (
         <section className="relative h-screen w-full overflow-hidden bg-lhema-black">
             {/* Background Video */}
             <div className="absolute inset-0">
                 <video
+                    ref={videoRef}
                     src={videoBg}
                     autoPlay
                     loop
