@@ -10,40 +10,75 @@ const Narrative = () => {
     ];
 
     return (
-        <section className="relative min-h-[200vh] bg-lhema-cream py-40">
-            <div className="mx-auto flex max-w-7xl flex-col lg:flex-row">
-
-                {/* Left: Static Image (Sticky) */}
-                <div className="h-[50vh] w-full lg:sticky lg:top-32 lg:h-[80vh] lg:w-1/2 p-8">
-                    <div className="h-full w-full overflow-hidden">
-                        <img
-                            src={imageFront}
-                            alt="The Sovereign Cape - Front View"
-                            className="h-full w-full object-cover grayscale contrast-125"
-                        />
-                    </div>
+        <>
+            {/* MOBILE LAYOUT: Immersive Sticky Background */}
+            <section className="relative block md:hidden">
+                {/* Sticky Background Image */}
+                <div className="sticky top-0 h-screen w-full overflow-hidden">
+                    <img
+                        src={imageFront}
+                        alt="The Sovereign Cape"
+                        className="h-full w-full object-cover grayscale brightness-75"
+                    />
+                    <div className="absolute inset-0 bg-black/20" />
                 </div>
 
-                {/* Right: Scrolling Text */}
-                <div className="flex w-full flex-col justify-center space-y-40 px-8 py-20 lg:w-1/2 lg:py-0">
+                {/* Scrolling Text Overlay */}
+                <div className="relative z-10 -mt-[100vh]">
                     {narrativeText.map((text, index) => (
-                        <motion.div
-                            key={index}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, margin: "-20%" }}
-                            transition={{ duration: 1.2, ease: "easeOut" }}
-                            className="flex min-h-[30vh] items-center"
-                        >
-                            <p className="font-serif text-3xl leading-tight text-lhema-black md:text-5xl lg:text-6xl">
+                        <div key={index} className="flex h-screen items-center justify-center px-8">
+                            <motion.p
+                                initial={{ opacity: 0, y: 50, filter: 'blur(10px)' }}
+                                whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                                viewport={{ margin: "-40%", once: false }} // Re-animates on scroll
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className="text-center font-serif text-3xl font-light leading-snug text-lhema-cream drop-shadow-lg"
+                            >
                                 {text}
-                            </p>
-                        </motion.div>
+                            </motion.p>
+                        </div>
                     ))}
+                    {/* Extra padding at bottom to allow full scroll of last item */}
+                    <div className="h-[20vh]" />
                 </div>
+            </section>
 
-            </div>
-        </section>
+            {/* DESKTOP LAYOUT: Split Screen Sticky (Original) */}
+            <section className="relative hidden min-h-[200vh] bg-lhema-cream py-40 md:block">
+                <div className="mx-auto flex max-w-7xl flex-row">
+
+                    {/* Left: Static Image (Sticky) */}
+                    <div className="sticky top-32 h-[80vh] w-1/2 p-8">
+                        <div className="h-full w-full overflow-hidden">
+                            <img
+                                src={imageFront}
+                                alt="The Sovereign Cape - Front View"
+                                className="h-full w-full object-cover grayscale contrast-125"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Right: Scrolling Text */}
+                    <div className="flex w-1/2 flex-col justify-center space-y-40 py-0">
+                        {narrativeText.map((text, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-20%" }}
+                                transition={{ duration: 1.2, ease: "easeOut" }}
+                                className="flex min-h-[30vh] items-center px-12"
+                            >
+                                <p className="font-serif text-5xl leading-tight text-lhema-black lg:text-6xl">
+                                    {text}
+                                </p>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                </div>
+            </section>
+        </>
     );
 };
 
