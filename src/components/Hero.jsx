@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import videoBg from '../assets/video-optimized.mp4';
 import imageBg from '../assets/imagebackfull.jpeg';
 
-const Hero = () => {
+const Hero = (props) => {
     const videoRef = useRef(null);
 
     useEffect(() => {
@@ -47,7 +47,10 @@ const Hero = () => {
                         The Signature Cape:<br className="hidden md:block" /> Effortless Elegance
                     </h1>
 
-                    <button className="hidden md:inline-block border border-lhema-cream/30 px-12 py-4 text-xs uppercase tracking-[0.2em] text-lhema-cream hover:bg-lhema-cream hover:text-lhema-black transition-all duration-500">
+                    <button
+                        onClick={props.onReserve}
+                        className="hidden md:inline-block border border-lhema-cream/30 px-12 py-4 text-xs uppercase tracking-[0.2em] text-lhema-cream hover:bg-lhema-cream hover:text-lhema-black transition-all duration-500"
+                    >
                         Reserve My Piece
                     </button>
                 </motion.div>

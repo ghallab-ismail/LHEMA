@@ -12,9 +12,12 @@ import Texture from '../components/Texture';
 // import Acquisition from '../components/Acquisition';
 import NoiseOverlay from '../components/NoiseOverlay';
 import Footer from '../components/Footer';
+import CheckoutModal from '../components/CheckoutModal';
+import CheckoutModal from '../components/CheckoutModal';
 
 const LandingPage = () => {
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     return (
         <main className="relative min-h-screen w-full bg-lhema-cream">
@@ -26,7 +29,7 @@ const LandingPage = () => {
                     <Navbar />
 
                     {/* Phase 2: The Hero Section */}
-                    <Hero />
+                    <Hero onReserve={() => setIsModalOpen(true)} />
 
                     {/* Phase 3: Social Proof */}
                     <SocialProof />
@@ -41,10 +44,17 @@ const LandingPage = () => {
                     <Footer />
 
                     {/* Mobile Conversion */}
-                    <StickyCTA />
+                    <StickyCTA onReserve={() => setIsModalOpen(true)} />
 
                     {/* Global Effects */}
                     <NoiseOverlay />
+
+                    {/* Modal */}
+                    <CheckoutModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        product={{ name: "The Signature Cape" }}
+                    />
 
                     {/* Preserved components for future use if needed:
                     <Lookbook />

@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 
 const CheckoutModal = ({ isOpen, onClose, product }) => {
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({ name: '', whatsapp: '' });
+    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'Standard' });
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -75,6 +75,36 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                             value={formData.whatsapp}
                                             onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                                         />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-500">
+                                                City
+                                            </label>
+                                            <input
+                                                type="text"
+                                                required
+                                                className="w-full bg-transparent border-b border-stone-300 py-2 focus:outline-none focus:border-black transition-colors font-serif"
+                                                value={formData.city}
+                                                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-500">
+                                                Size
+                                            </label>
+                                            <select
+                                                className="w-full bg-transparent border-b border-stone-300 py-2 focus:outline-none focus:border-black transition-colors font-serif bg-white/0"
+                                                value={formData.size}
+                                                onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                                            >
+                                                <option value="Standard">Standard</option>
+                                                <option value="Petite">Petite</option>
+                                                <option value="Tall">Tall</option>
+                                                <option value="Custom">Custom</option>
+                                            </select>
+                                        </div>
                                     </div>
 
                                     <div className="pt-4">

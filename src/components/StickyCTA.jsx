@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const StickyCTA = () => {
+const StickyCTA = ({ onReserve }) => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -27,7 +27,10 @@ const StickyCTA = () => {
                     exit={{ y: 100 }}
                     className="fixed bottom-0 left-0 z-50 w-full bg-lhema-cream border-t border-lhema-black/10 p-4 md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.05)]"
                 >
-                    <button className="w-full bg-lhema-black text-lhema-cream py-4 uppercase tracking-widest text-xs font-sans">
+                    <button
+                        onClick={onReserve}
+                        className="w-full bg-lhema-black text-lhema-cream py-4 uppercase tracking-widest text-xs font-sans"
+                    >
                         Reserve Your Piece
                     </button>
                 </motion.div>
