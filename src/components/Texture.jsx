@@ -74,10 +74,11 @@ const Texture = () => {
                     </div>
 
                     {/* Mobile Carousel - Peeking */}
-                    <div className="md:hidden order-1 w-full overflow-x-scroll snap-x snap-mandatory pb-6 hide-scrollbar">
-                        <div className="flex gap-4 px-4 w-max">
+                    <div className="md:hidden order-1 w-full overflow-x-scroll snap-x snap-mandatory pb-6 hide-scrollbar flex items-center">
+                        {/* Added generous padding to start so it doesn't feel stuck to the edge */}
+                        <div className="flex gap-4 px-6 w-max">
                             {images.map((img, idx) => (
-                                <div key={idx} className="w-[85vw] snap-center relative aspect-[4/5] bg-gray-100 overflow-hidden">
+                                <div key={idx} className="w-[75vw] snap-center relative aspect-[4/5] bg-gray-100 overflow-hidden shadow-sm transition-transform">
                                     <img
                                         src={img}
                                         alt={`Fabric Detail ${idx + 1}`}

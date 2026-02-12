@@ -60,3 +60,13 @@ body {
   background-color: var(--color-lhema-gold);
   border-radius: 20px;
 }
+
+/* Utility to hide scrollbar for clean carousel */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
