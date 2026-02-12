@@ -37,14 +37,21 @@ const CustomCursor = () => {
         };
     }, []);
 
+    // Hide on mobile / touch devices
+    if (typeof window !== 'undefined' && window.matchMedia("(pointer: coarse)").matches) {
+        return null;
+    }
+
     return (
         <>
             <style>{`
-                body { cursor: none; }
-                a, button, .cursor-pointer { cursor: none; }
+                @media (hover: hover) {
+                    body { cursor: none; }
+                    a, button, .cursor-pointer { cursor: none; }
+                }
             `}</style>
             <motion.div
-                className="pointer-events-none fixed top-0 left-0 z-[9999] h-4 w-4 rounded-full bg-white mix-blend-difference"
+                className="pointer-events-none fixed top-0 left-0 z-[9999] hidden md:block h-4 w-4 rounded-full bg-white mix-blend-difference"
                 animate={{
                     x: mousePosition.x - 8,
                     y: mousePosition.y - 8,

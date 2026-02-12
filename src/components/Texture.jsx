@@ -45,8 +45,8 @@ const Texture = () => {
                         </motion.div>
                     </div>
 
-                    {/* Image Column - Right */}
-                    <div className="order-1 md:order-2">
+                    {/* Image Column - Right (Desktop) */}
+                    <div className="hidden md:block order-1 md:order-2">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
@@ -71,6 +71,24 @@ const Texture = () => {
                                 ))}
                             </div>
                         </motion.div>
+                    </div>
+
+                    {/* Mobile Carousel - Peeking */}
+                    <div className="md:hidden order-1 w-full overflow-x-scroll snap-x snap-mandatory pb-6 hide-scrollbar">
+                        <div className="flex gap-4 px-4 w-max">
+                            {images.map((img, idx) => (
+                                <div key={idx} className="w-[85vw] snap-center relative aspect-[4/5] bg-gray-100 overflow-hidden">
+                                    <img
+                                        src={img}
+                                        alt={`Fabric Detail ${idx + 1}`}
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute bottom-4 left-4 bg-black/20 text-white text-[10px] px-2 py-1 uppercase tracking-widest backdrop-blur-sm">
+                                        {idx + 1} / {images.length}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                 </div>
