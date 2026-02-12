@@ -6,99 +6,74 @@ import detail3 from '../assets/Gemini_Generated_Image_dfosyqdfosyqdfos.png';
 import detail4 from '../assets/Gemini_Generated_Image_za2jslza2jslza2j.png';
 
 const Texture = () => {
-    const [zoomStyle, setZoomStyle] = useState({ display: 'none' });
     const [activeImage, setActiveImage] = useState(detail1);
-    const imageRef = useRef(null);
 
     const images = [detail1, detail2, detail3, detail4];
 
-    const handleMouseMove = (e) => {
-        const { left, top, width, height } = imageRef.current.getBoundingClientRect();
-        const x = e.clientX - left;
-        const y = e.clientY - top;
-
-        // Check if within bounds
-        if (x < 0 || y < 0 || x > width || y > height) {
-            setZoomStyle({ display: 'none' });
-            return;
-        }
-
-        const posX = (x / width) * 100;
-        const posY = (y / height) * 100;
-
-        setZoomStyle({
-            display: 'block',
-            backgroundImage: `url('${activeImage}')`,
-            backgroundPosition: `${posX}% ${posY}%`,
-            backgroundSize: '300%', // 3x zoom
-            left: `${x - 75}px`, // Center the 150px circle
-            top: `${y - 75}px`,
-        });
-    };
-
-    const handleMouseLeave = () => {
-        setZoomStyle({ display: 'none' });
-    };
-
     return (
-        <section className="bg-lhema-cream py-32 md:py-40">
-            <div className="mx-auto max-w-4xl px-6">
-                <div className="mb-12 text-center text-lhema-black">
-                    <h2 className="font-serif text-3xl md:text-4xl">La Silhouette Modeste</h2>
-                    <p className="mt-4 font-sans text-xs uppercase tracking-widest text-lhema-black/60">
-                        Conçue pour chaque femme. Idéalement adaptée pour le Hijab.
-                        <br />
-                        <span className="opacity-50">100% Laine Vierge / Doublure Soie</span>
-                    </p>
-                </div>
+        <section className="bg-lhema-cream py-24 md:py-48">
+            <div className="mx-auto max-w-6xl px-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-32 items-center">
 
-                {/* Desktop Magnifier */}
-                <div className="hidden md:block">
-                    <div
-                        className="relative cursor-none overflow-hidden"
-                        onMouseMove={handleMouseMove}
-                        onMouseLeave={handleMouseLeave}
-                    >
-                        <img
-                            ref={imageRef}
-                            src={activeImage}
-                            alt="Wool Texture Zoom"
-                            className="w-full object-cover"
-                        />
-                        {/* Magnifying Glass Lens */}
-                        <div
-                            className="pointer-events-none absolute h-36 w-36 rounded-full border-2 border-lhema-gold shadow-2xl"
-                            style={zoomStyle}
-                        />
-                    </div>
-                    {/* Visual Selector */}
-                    <div className="mt-8 flex justify-center gap-4">
-                        {images.map((img, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => setActiveImage(img)}
-                                className={`h-16 w-16 overflow-hidden border transition-all ${activeImage === img ? 'border-lhema-black opacity-100' : 'border-transparent opacity-50 hover:opacity-100'}`}
-                            >
-                                <img src={img} alt={`Texture ${idx}`} className="h-full w-full object-cover" />
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Mobile Carousel (Simple Horizontal Scroll) */}
-                <div className="md:hidden">
-                    <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4">
-                        {images.map((img, i) => (
-                            <div key={i} className="min-w-[85vw] snap-center">
-                                <img src={img} alt={`Detail ${i + 1}`} className="h-96 w-full object-cover" />
+                    {/* Text Column - Left */}
+                    <div className="order-2 md:order-1">
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8 }}
+                        >
+                            <h2 className="font-serif text-3xl md:text-5xl text-lhema-black mb-6 md:mb-8 leading-tight">
+                                100% Virgin Wool.<br />
+                                Silk Lining.
+                            </h2>
+                            <p className="font-sans text-sm md:text-base leading-relaxed text-lhema-black/70 mb-8 max-w-md">
+                                Meticulously sourced for unrivaled softness and warmth.
+                                The dual-texture composition offers a tactile experience
+                                that whispers luxury rather than shouting it.
+                            </p>
+                            <div className="flex gap-8 border-t border-lhema-black/10 pt-8">
+                                <div>
+                                    <span className="block font-serif text-2xl text-lhema-black">100%</span>
+                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/50">Natural</span>
+                                </div>
+                                <div>
+                                    <span className="block font-serif text-2xl text-lhema-black">Zero</span>
+                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/50">Synthetic Blend</span>
+                                </div>
                             </div>
-                        ))}
+                        </motion.div>
                     </div>
-                    <p className="mt-4 text-center text-[10px] uppercase tracking-widest text-lhema-black/40">
-                        Glissez pour examiner
-                    </p>
-                </div>
 
+                    {/* Image Column - Right */}
+                    <div className="order-1 md:order-2">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1 }}
+                            className="relative aspect-[4/5] overflow-hidden bg-gray-100"
+                        >
+                            <img
+                                src={activeImage}
+                                alt="Fabric Detail"
+                                className="w-full h-full object-cover"
+                            />
+
+                            {/* Simple Image Selector Overlay */}
+                            <div className="absolute bottom-6 left-6 flex gap-2">
+                                {images.map((img, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setActiveImage(img)}
+                                        className={`w-2 h-2 rounded-full transition-all ${activeImage === img ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80'}`}
+                                    />
+                                ))}
+                            </div>
+                        </motion.div>
+                    </div>
+
+                </div>
             </div>
         </section>
     );
