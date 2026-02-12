@@ -13,7 +13,6 @@ import Texture from '../components/Texture';
 import NoiseOverlay from '../components/NoiseOverlay';
 import Footer from '../components/Footer';
 import CheckoutModal from '../components/CheckoutModal';
-import CheckoutModal from '../components/CheckoutModal';
 
 const LandingPage = () => {
     const [loading, setLoading] = useState(true);
