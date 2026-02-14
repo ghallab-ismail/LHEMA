@@ -31,7 +31,7 @@ const StickyCTA = ({ onReserve }) => {
                         onClick={onReserve}
                         className="w-full bg-lhema-black text-lhema-cream py-4 uppercase tracking-widest text-xs font-sans"
                     >
-                        Reserve Your Piece
+                        Réserver Votre Pièce
                     </button>
                 </motion.div>
             )}

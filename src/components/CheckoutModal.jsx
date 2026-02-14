@@ -44,16 +44,16 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
 
                         {step === 1 ? (
                             <div className="text-center">
-                                <h3 className="font-serif text-2xl mb-2 text-black">Concierge Request</h3>
+                                <h3 className="font-serif text-2xl mb-2 text-black">Demande de Conciergerie</h3>
                                 <p className="font-sans text-xs text-stone-600 mb-8 tracking-wide">
-                                    To acquire "{product?.name}", please provide your details.
-                                    Our private client team will contact you.
+                                    Pour acquérir "{product?.name}", veuillez renseigner vos coordonnées.
+                                    Notre équipe privée vous contactera.
                                 </p>
 
                                 <form onSubmit={handleSubmit} className="space-y-6 text-left">
                                     <div>
                                         <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
-                                            Full Name
+                                            Nom Complet
                                         </label>
                                         <input
                                             type="text"
@@ -66,7 +66,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
 
                                     <div>
                                         <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
-                                            WhatsApp Number
+                                            Numéro WhatsApp
                                         </label>
                                         <input
                                             type="tel"
@@ -80,7 +80,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                     <div className="grid grid-cols-2 gap-6">
                                         <div>
                                             <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
-                                                City
+                                                Ville
                                             </label>
                                             <input
                                                 type="text"
@@ -92,7 +92,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                         </div>
                                         <div>
                                             <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
-                                                Size
+                                                Taille
                                             </label>
                                             <div className="relative">
                                                 <select
@@ -103,7 +103,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                                     <option value="Standard">Standard</option>
                                                     <option value="Petite">Petite</option>
                                                     <option value="Tall">Tall</option>
-                                                    <option value="Custom">Custom</option>
+                                                    <option value="Custom">Sur Mesure</option>
                                                 </select>
                                                 {/* Custom Chevron for cleaner look */}
                                                 <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400 text-[10px]">
@@ -115,21 +115,21 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
 
                                     <div className="pt-4">
                                         <p className="text-[10px] text-stone-500 text-center mb-6 font-sans italic">
-                                            Payment linked upon personal delivery.
+                                            Paiement à la livraison.
                                         </p>
 
                                         <button type="submit" className="w-full bg-black text-white py-4 text-xs tracking-[0.2em] uppercase hover:bg-stone-800 transition-colors shadow-lg">
-                                            Request Acquisition
+                                            Demander l'Acquisition
                                         </button>
                                     </div>
                                 </form>
                             </div>
                         ) : (
                             <div className="text-center py-12">
-                                <h3 className="font-serif text-2xl mb-4 text-black">Request Received</h3>
+                                <h3 className="font-serif text-2xl mb-4 text-black">Demande Reçue</h3>
                                 <p className="font-sans text-sm text-stone-600 leading-relaxed">
-                                    Thank you, {formData.name}. <br />
-                                    A private client advisor will reach out shortly on WhatsApp.
+                                    Merci, {formData.name}. <br />
+                                    Un conseiller privé vous contactera bientôt sur WhatsApp.
                                 </p>
                             </div>
                         )}

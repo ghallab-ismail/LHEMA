@@ -13,11 +13,11 @@ const SocialProof = () => {
         <section className="bg-lhema-cream py-16">
             <div className="mx-auto max-w-6xl px-6 text-center">
                 <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-lhema-black/40 mb-8">
-                    Featured In
+                    Vu Dans
                 </p>
                 <div className="flex flex-wrap justify-center gap-12 md:gap-24 items-center">
                     {publications.map((pub, index) => (
-                        <motion.span 
+                        <motion.span
                             key={index}
                             initial={{ opacity: 0, y: 10 }}
                             whileInView={{ opacity: 1, y: 0 }}

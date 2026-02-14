@@ -21,7 +21,7 @@ const ProductCard = ({ product }) => {
                 </h3>
 
                 <p className="font-sans text-[10px] tracking-[0.2em] uppercase text-stone-500">
-                    Archive {product.archive_year} {product.is_limited_edition && "— Edition 01/10"}
+                    Archives {product.archive_year} {product.is_limited_edition && "— Édition 01/10"}
                 </p>
 
                 <span className="font-sans text-xs tracking-wide text-primary-text mt-1">

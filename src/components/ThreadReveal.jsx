@@ -35,7 +35,7 @@ const ThreadReveal = () => {
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 2, ease: "easeOut" }}
                 >
-                    TIMLESS
+                    INTEMPOREL
                 </motion.h2>
                 <motion.div
                     className="mt-8 h-px w-0 bg-lhema-gold mx-auto"
@@ -48,7 +48,7 @@ const ThreadReveal = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1.5, delay: 1.5 }}
                 >
-                    The Thread of History
+                    Le Fil de l'Histoire
                 </motion.p>
             </div>
         </section>

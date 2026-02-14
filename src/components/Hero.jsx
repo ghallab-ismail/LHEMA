@@ -17,7 +17,7 @@ const Hero = (props) => {
     }, []);
 
     return (
-        <section className="relative h-[80vh] md:h-screen w-full overflow-hidden bg-lhema-black">
+        <section className="relative h-screen w-full overflow-hidden bg-lhema-black">
             {/* Background Video */}
             <div className="absolute inset-0">
                 <video
@@ -44,14 +44,14 @@ const Hero = (props) => {
                         Volume 01 : La Cape Souveraine
                     </p>
                     <h1 className="font-serif text-4xl md:text-7xl text-lhema-cream mb-8 md:mb-12 leading-tight">
-                        The Signature Cape:<br className="hidden md:block" /> Effortless Elegance
+                        La Cape Signature :<br className="hidden md:block" /> Élégance Naturelle
                     </h1>
 
                     <button
                         onClick={props.onReserve}
                         className="hidden md:inline-block border border-lhema-cream/30 px-12 py-4 text-xs uppercase tracking-[0.2em] text-lhema-cream hover:bg-lhema-cream hover:text-lhema-black transition-all duration-500"
                     >
-                        Reserve My Piece
+                        Réserver Ma Pièce
                     </button>
                 </motion.div>
             </div>

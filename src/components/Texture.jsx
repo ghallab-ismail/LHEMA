@@ -24,22 +24,22 @@ const Texture = () => {
                             transition={{ duration: 0.8 }}
                         >
                             <h2 className="font-serif text-3xl md:text-5xl text-lhema-black mb-6 md:mb-8 leading-tight">
-                                100% Virgin Wool.<br />
-                                Silk Lining.
+                                100% Laine Vierge.<br />
+                                Doublure en Soie.
                             </h2>
                             <p className="font-sans text-sm md:text-base leading-relaxed text-lhema-black/70 mb-8 max-w-md">
-                                Meticulously sourced for unrivaled softness and warmth.
-                                The dual-texture composition offers a tactile experience
-                                that whispers luxury rather than shouting it.
+                                Méticuleusement sourcée pour une douceur et une chaleur inégalées.
+                                La composition double texture offre une expérience tactile
+                                qui murmure le luxe plutôt que de le crier.
                             </p>
                             <div className="flex gap-8 border-t border-lhema-black/10 pt-8">
                                 <div>
                                     <span className="block font-serif text-2xl text-lhema-black">100%</span>
-                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/50">Natural</span>
+                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/50">Naturel</span>
                                 </div>
                                 <div>
-                                    <span className="block font-serif text-2xl text-lhema-black">Zero</span>
-                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/50">Synthetic Blend</span>
+                                    <span className="block font-serif text-2xl text-lhema-black">Zéro</span>
+                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/50">Synthétique</span>
                                 </div>
                             </div>
                         </motion.div>
