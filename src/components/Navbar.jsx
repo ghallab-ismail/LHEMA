@@ -59,13 +59,13 @@ const Navbar = () => {
                 {/* Right: Actions */}
                 <div className="flex items-center gap-6">
                     <Search strokeWidth={1} className={clsx("w-5 h-5 cursor-pointer hover:scale-110 transition-transform duration-500", isScrolled ? "text-lhema-black" : "text-lhema-cream")} />
-                    <button className="relative">
+                    {/* <button className="relative">
                         <ShoppingBag strokeWidth={1} className={clsx("w-5 h-5 cursor-pointer hover:scale-110 transition-transform duration-500", isScrolled ? "text-lhema-black" : "text-lhema-cream")} />
                         <span className="absolute -top-1 -right-1 flex h-2 w-2">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lhema-gold opacity-75"></span>
                             <span className="relative inline-flex rounded-full h-2 w-2 bg-lhema-gold"></span>
                         </span>
-                    </button>
+                    </button> */}
                 </div>
             </nav>
         </>

@@ -1,9 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { X, Search } from 'lucide-react';
 
 const Menu = ({ onClose }) => {
-    const primaryLinks = ["COLLECTION", "FEMME", "HOMME", "ATELIER"];
+    const primaryLinks = [
+        { name: "COLLECTION", path: "/" },
+        { name: "FEMME", path: "/femme" },
+        { name: "HOMME", path: "/homme" },
+        { name: "ATELIER", path: "/atelier" }
+    ];
     const secondaryLinks = ["LA MAISON", "BOUTIQUES", "SERVICES", "COMPTE"];
 
     return (
@@ -30,16 +36,20 @@ const Menu = ({ onClose }) => {
                 {/* Primary Links (Top Half) */}
                 <div className="flex flex-col items-center space-y-6 text-center">
                     {primaryLinks.map((link, index) => (
-                        <motion.a
-                            key={link}
-                            href="#"
-                            className="font-serif text-3xl font-medium tracking-wide transition-colors hover:text-lhema-gold md:text-5xl"
+                        <motion.div
+                            key={link.name}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 * index, duration: 0.8 }}
                         >
-                            {link}
-                        </motion.a>
+                            <Link
+                                to={link.path}
+                                onClick={onClose}
+                                className="font-serif text-3xl font-medium tracking-wide transition-colors hover:text-lhema-gold md:text-5xl"
+                            >
+                                {link.name}
+                            </Link>
+                        </motion.div>
                     ))}
                 </div>
 
