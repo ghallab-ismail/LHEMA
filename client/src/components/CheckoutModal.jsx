@@ -4,17 +4,37 @@ import { X } from 'lucide-react';
 
 const CheckoutModal = ({ isOpen, onClose, product }) => {
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'Standard' });
+    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'M (42-45)' });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // In a real app, this would send data to backend
-        setStep(2);
-        setTimeout(() => {
-            onClose(); // Close after success message
-            setStep(1);
-            setFormData({ name: '', whatsapp: '' });
-        }, 3000);
+
+        try {
+            const response = await fetch('http://localhost:5000/api/inquiries', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    productName: product?.name || "The Signature Cape"
+                }),
+            });
+
+            if (response.ok) {
+                setStep(2);
+                setTimeout(() => {
+                    onClose(); // Close after success message
+                    setStep(1);
+                    setFormData({ name: '', whatsapp: '', city: '', size: 'M (42-45)' });
+                }, 3000);
+            } else {
+                console.error('Submission failed');
+                // You might want to handle error state here
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+        }
     };
 
     return (
@@ -100,10 +120,11 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                                     value={formData.size}
                                                     onChange={(e) => setFormData({ ...formData, size: e.target.value })}
                                                 >
-                                                    <option value="Standard">Standard</option>
-                                                    <option value="Petite">Petite</option>
-                                                    <option value="Tall">Tall</option>
-                                                    <option value="Custom">Sur Mesure</option>
+                                                    <option value="M (42-45)">M (42-45)</option>
+                                                    <option value="L (46-49)">L (46-49)</option>
+                                                    <option value="XL (50-53)">XL (50-53)</option>
+                                                    <option value="XXL (54-57)">XXL (54-57)</option>
+                                                    <option value="Sur Mesure">Sur Mesure</option>
                                                 </select>
                                                 {/* Custom Chevron for cleaner look */}
                                                 <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400 text-[10px]">

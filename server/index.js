@@ -17,7 +17,8 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // Routes
 // app.use('/api/products', require('./routes/products'));
-// app.use('/api/inquiries', require('./routes/inquiries'));
+app.use('/api/inquiries', require('./routes/inquiries'));
+app.use('/api/admin', require('./routes/admin'));
 
 app.get('/', (req, res) => {
     res.send('Maison Lhema API Running');
