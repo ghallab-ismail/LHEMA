@@ -12,6 +12,7 @@ import Texture from '../components/Texture';
 // import Acquisition from '../components/Acquisition';
 import NoiseOverlay from '../components/NoiseOverlay';
 import Footer from '../components/Footer';
+import Packaging from '../components/Packaging';
 import CheckoutModal from '../components/CheckoutModal';
 
 const LandingPage = () => {
@@ -36,7 +37,10 @@ const LandingPage = () => {
                     {/* Phase 4: Fabric Details (Formerly Texture) */}
                     <Texture />
 
-                    {/* Phase 5: Styling Guide */}
+                    {/* Phase 5: Packaging Showcase */}
+                    <Packaging />
+
+                    {/* Phase 6: Styling Guide */}
                     <StylingGuide />
 
                     {/* Footer Sign-off */}

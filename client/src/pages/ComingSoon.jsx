@@ -7,7 +7,7 @@ import NoiseOverlay from '../components/NoiseOverlay';
 const ComingSoon = () => {
     return (
         <main className="relative min-h-screen w-full bg-lhema-cream text-lhema-black flex flex-col">
-            <Navbar />
+            <Navbar theme="dark" />
             <NoiseOverlay />
 
             <div className="flex-1 flex flex-col items-center justify-center text-center px-6">

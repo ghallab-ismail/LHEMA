@@ -17,7 +17,7 @@ const ProductDetail = () => {
 
     return (
         <div className="bg-primary-bg min-h-screen text-primary-text">
-            <Navbar />
+            <Navbar theme="dark" />
             <CheckoutModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} product={product} />
 
             <div className="flex flex-col lg:flex-row min-h-screen">

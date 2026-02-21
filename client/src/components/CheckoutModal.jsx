@@ -5,10 +5,56 @@ import { X } from 'lucide-react';
 const CheckoutModal = ({ isOpen, onClose, product }) => {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'M (42-45)' });
+    const [errors, setErrors] = useState({});
+    const [submitting, setSubmitting] = useState(false);
+
+    const validate = () => {
+        const newErrors = {};
+
+        if (!formData.name.trim()) {
+            newErrors.name = 'Le nom est obligatoire.';
+        } else if (formData.name.trim().length < 2) {
+            newErrors.name = 'Le nom doit contenir au moins 2 caractères.';
+        }
+
+        const cleanedPhone = formData.whatsapp.replace(/\s/g, '');
+        if (!cleanedPhone) {
+            newErrors.whatsapp = 'Le numéro WhatsApp est obligatoire.';
+        } else if (!/^\+?\d{8,15}$/.test(cleanedPhone)) {
+            newErrors.whatsapp = 'Numéro invalide. Entrez 8 à 15 chiffres (ex: 0612345678).';
+        }
+
+        if (!formData.city.trim()) {
+            newErrors.city = 'La ville est obligatoire.';
+        }
+
+        return newErrors;
+    };
+
+    const handleFieldChange = (field, value) => {
+        setFormData({ ...formData, [field]: value });
+        if (errors[field]) {
+            setErrors({ ...errors, [field]: '' });
+        }
+    };
+
+    const handleCloseModal = () => {
+        onClose();
+        setStep(1);
+        setFormData({ name: '', whatsapp: '', city: '', size: 'M (42-45)' });
+        setErrors({});
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const validationErrors = validate();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        setSubmitting(true);
         try {
             const response = await fetch('http://localhost:5000/api/inquiries', {
                 method: 'POST',
@@ -23,19 +69,24 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
 
             if (response.ok) {
                 setStep(2);
+                setErrors({});
                 setTimeout(() => {
-                    onClose(); // Close after success message
-                    setStep(1);
-                    setFormData({ name: '', whatsapp: '', city: '', size: 'M (42-45)' });
+                    handleCloseModal();
+                    setSubmitting(false);
                 }, 3000);
             } else {
                 console.error('Submission failed');
-                // You might want to handle error state here
+                setSubmitting(false);
             }
         } catch (error) {
             console.error('Error submitting form:', error);
+            setSubmitting(false);
         }
     };
+
+    const inputClass = (field) =>
+        `w-full bg-transparent border-b py-2 text-black focus:outline-none transition-colors font-serif placeholder-stone-300 ${errors[field] ? 'border-red-400 focus:border-red-500' : 'border-stone-300 focus:border-black'
+        }`;
 
     return (
         <AnimatePresence>
@@ -45,7 +96,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        onClick={onClose}
+                        onClick={handleCloseModal}
                         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                     />
 
@@ -56,7 +107,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                         className="relative bg-white w-full max-w-md p-8 md:p-12 shadow-2xl border border-stone-100"
                     >
                         <button
-                            onClick={onClose}
+                            onClick={handleCloseModal}
                             className="absolute top-4 right-4 text-stone-400 hover:text-black transition-colors"
                         >
                             <X className="w-5 h-5" />
@@ -70,18 +121,22 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                     Notre équipe privée vous contactera.
                                 </p>
 
-                                <form onSubmit={handleSubmit} className="space-y-6 text-left">
+                                <form onSubmit={handleSubmit} noValidate className="space-y-6 text-left">
                                     <div>
                                         <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
                                             Nom Complet
                                         </label>
                                         <input
                                             type="text"
-                                            required
-                                            className="w-full bg-transparent border-b border-stone-300 py-2 text-black focus:outline-none focus:border-black transition-colors font-serif placeholder-stone-300"
+                                            className={inputClass('name')}
                                             value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            onChange={(e) => handleFieldChange('name', e.target.value)}
                                         />
+                                        {errors.name && (
+                                            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-[10px] mt-1.5 font-sans">
+                                                {errors.name}
+                                            </motion.p>
+                                        )}
                                     </div>
 
                                     <div>
@@ -90,11 +145,16 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                         </label>
                                         <input
                                             type="tel"
-                                            required
-                                            className="w-full bg-transparent border-b border-stone-300 py-2 text-black focus:outline-none focus:border-black transition-colors font-serif placeholder-stone-300"
+                                            placeholder="ex: 0612345678"
+                                            className={inputClass('whatsapp')}
                                             value={formData.whatsapp}
-                                            onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                                            onChange={(e) => handleFieldChange('whatsapp', e.target.value)}
                                         />
+                                        {errors.whatsapp && (
+                                            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-[10px] mt-1.5 font-sans">
+                                                {errors.whatsapp}
+                                            </motion.p>
+                                        )}
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-6">
@@ -104,11 +164,15 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                             </label>
                                             <input
                                                 type="text"
-                                                required
-                                                className="w-full bg-transparent border-b border-stone-300 py-2 text-black focus:outline-none focus:border-black transition-colors font-serif placeholder-stone-300"
+                                                className={inputClass('city')}
                                                 value={formData.city}
-                                                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                                onChange={(e) => handleFieldChange('city', e.target.value)}
                                             />
+                                            {errors.city && (
+                                                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-[10px] mt-1.5 font-sans">
+                                                    {errors.city}
+                                                </motion.p>
+                                            )}
                                         </div>
                                         <div>
                                             <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
@@ -118,7 +182,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                                 <select
                                                     className="w-full bg-transparent border-b border-stone-300 py-2 text-black focus:outline-none focus:border-black transition-colors font-serif appearance-none cursor-pointer"
                                                     value={formData.size}
-                                                    onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                                                    onChange={(e) => handleFieldChange('size', e.target.value)}
                                                 >
                                                     <option value="M (42-45)">M (42-45)</option>
                                                     <option value="L (46-49)">L (46-49)</option>
@@ -126,7 +190,6 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                                     <option value="XXL (54-57)">XXL (54-57)</option>
                                                     <option value="Sur Mesure">Sur Mesure</option>
                                                 </select>
-                                                {/* Custom Chevron for cleaner look */}
                                                 <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400 text-[10px]">
                                                     ▼
                                                 </div>
@@ -139,8 +202,12 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                             Paiement à la livraison.
                                         </p>
 
-                                        <button type="submit" className="w-full bg-black text-white py-4 text-xs tracking-[0.2em] uppercase hover:bg-stone-800 transition-colors shadow-lg">
-                                            Demander l'Acquisition
+                                        <button
+                                            type="submit"
+                                            disabled={submitting}
+                                            className="w-full bg-black text-white py-4 text-xs tracking-[0.2em] uppercase hover:bg-stone-800 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {submitting ? 'Envoi en cours...' : "Demander l'Acquisition"}
                                         </button>
                                     </div>
                                 </form>

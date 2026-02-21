@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 const Femme = () => {
     return (
         <main className="relative min-h-screen w-full bg-lhema-cream text-lhema-black">
-            <Navbar />
+            <Navbar theme="dark" />
             <NoiseOverlay />
 
             <section className="pt-40 px-6 pb-20 max-w-7xl mx-auto min-h-[80vh]">

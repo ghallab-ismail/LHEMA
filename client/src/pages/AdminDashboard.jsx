@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
     Search,
@@ -9,14 +10,59 @@ import {
     Clock,
     CheckCircle2,
     XCircle,
+    X,
     MessageCircle,
-    Menu
+    Menu,
+    LogOut,
+    ChevronDown,
+    ChevronLeft,
+    ChevronRight
 } from 'lucide-react';
 
 const AdminDashboard = () => {
     const [inquiries, setInquiries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeMenu, setActiveMenu] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [showFilterMenu, setShowFilterMenu] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const navigate = useNavigate();
+
+    // Filtered inquiries based on search + status filter
+    const filteredInquiries = useMemo(() => {
+        return inquiries.filter((inq) => {
+            if (statusFilter !== 'all' && inq.status !== statusFilter) return false;
+            if (searchQuery.trim()) {
+                const q = searchQuery.toLowerCase();
+                return (
+                    inq.name?.toLowerCase().includes(q) ||
+                    inq.whatsapp?.toLowerCase().includes(q) ||
+                    inq.productName?.toLowerCase().includes(q) ||
+                    inq.city?.toLowerCase().includes(q)
+                );
+            }
+            return true;
+        });
+    }, [inquiries, searchQuery, statusFilter]);
+
+    // Pagination
+    const totalPages = Math.max(1, Math.ceil(filteredInquiries.length / rowsPerPage));
+    const paginatedInquiries = useMemo(() => {
+        const start = (currentPage - 1) * rowsPerPage;
+        return filteredInquiries.slice(start, start + rowsPerPage);
+    }, [filteredInquiries, currentPage, rowsPerPage]);
+
+    // Reset to page 1 when search/filter/rowsPerPage changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, statusFilter, rowsPerPage]);
+
+    const handleLogout = () => {
+        localStorage.removeItem('adminToken');
+        navigate('/admin/login');
+    };
 
     useEffect(() => {
         fetchInquiries();
@@ -24,7 +70,7 @@ const AdminDashboard = () => {
 
     // Close menu when clicking outside
     useEffect(() => {
-        const handleClickOutside = () => setActiveMenu(null);
+        const handleClickOutside = () => { setActiveMenu(null); setShowFilterMenu(false); };
         window.addEventListener('click', handleClickOutside);
         return () => window.removeEventListener('click', handleClickOutside);
     }, []);
@@ -77,6 +123,8 @@ const AdminDashboard = () => {
             case 'pending': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
             case 'contacted': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
             case 'completed': return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+            case 'no answer': return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+            case 'wrong number': return 'bg-violet-500/10 text-violet-400 border-violet-500/20';
             case 'cancelled': return 'bg-red-500/10 text-red-500 border-red-500/20';
             default: return 'bg-stone-500/10 text-stone-500 border-stone-500/20';
         }
@@ -90,7 +138,7 @@ const AdminDashboard = () => {
             className="absolute right-0 mt-2 w-40 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
         >
-            {['pending', 'contacted', 'completed', 'cancelled'].map((status) => (
+            {['pending', 'contacted', 'no answer', 'wrong number', 'completed', 'cancelled'].map((status) => (
                 <button
                     key={status}
                     onClick={(e) => handleStatusUpdate(e, id, status)}
@@ -116,13 +164,26 @@ const AdminDashboard = () => {
                         <LayoutDashboard className="w-5 h-5" />
                     </button>
                 </div>
+                <div className="mt-auto">
+                    <button
+                        onClick={handleLogout}
+                        className="p-3 rounded-xl text-stone-500 hover:bg-red-500/10 hover:text-red-400 transition-all hover:scale-105"
+                        title="Déconnexion"
+                    >
+                        <LogOut className="w-5 h-5" />
+                    </button>
+                </div>
             </nav>
 
             {/* Mobile Header */}
             <header className="md:hidden flex items-center justify-between p-6 border-b border-white/5 sticky top-0 bg-[#0a0a0a]/90 backdrop-blur-md z-40">
                 <div className="w-8 h-8 bg-white rounded-full opacity-90" />
-                <button className="p-2 text-white">
-                    <Menu className="w-6 h-6" />
+                <button
+                    onClick={handleLogout}
+                    className="p-2 text-stone-500 hover:text-red-400 transition-colors"
+                    title="Déconnexion"
+                >
+                    <LogOut className="w-5 h-5" />
                 </button>
             </header>
 
@@ -155,13 +216,65 @@ const AdminDashboard = () => {
                                 <input
                                     type="text"
                                     placeholder="Search request..."
-                                    className="w-full md:w-64 bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full md:w-64 bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-10 text-sm text-white focus:outline-none focus:border-white/20 transition-colors"
                                 />
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => setSearchQuery('')}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-white transition-colors"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                )}
                             </div>
-                            <button className="flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-full text-sm font-medium hover:bg-stone-200 transition-colors w-full md:w-auto">
-                                <Filter className="w-4 h-4" />
-                                Filter
-                            </button>
+                            <div className="relative w-full md:w-auto">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setShowFilterMenu(!showFilterMenu); }}
+                                    className={`flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-colors w-full md:w-auto ${statusFilter !== 'all'
+                                        ? 'bg-white text-black hover:bg-stone-200'
+                                        : 'bg-white/5 text-stone-300 border border-white/10 hover:bg-white/10'
+                                        }`}
+                                >
+                                    <Filter className="w-4 h-4" />
+                                    {statusFilter === 'all' ? 'Filter' : statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}
+                                    <ChevronDown className={`w-3 h-3 transition-transform ${showFilterMenu ? 'rotate-180' : ''}`} />
+                                </button>
+                                <AnimatePresence>
+                                    {showFilterMenu && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                                            transition={{ duration: 0.15 }}
+                                            className="absolute right-0 mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            {['all', 'pending', 'contacted', 'no answer', 'wrong number', 'completed', 'cancelled'].map((status) => (
+                                                <button
+                                                    key={status}
+                                                    onClick={() => { setStatusFilter(status); setShowFilterMenu(false); }}
+                                                    className={`w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider hover:bg-white/5 transition-colors flex items-center gap-3
+                                                        ${statusFilter === status ? 'text-white bg-white/5' : 'text-stone-400'}
+                                                    `}
+                                                >
+                                                    {status !== 'all' && (
+                                                        <span className={`w-2 h-2 rounded-full ${status === 'pending' ? 'bg-amber-500' :
+                                                            status === 'contacted' ? 'bg-blue-500' :
+                                                                status === 'no answer' ? 'bg-orange-400' :
+                                                                    status === 'wrong number' ? 'bg-violet-400' :
+                                                                        status === 'completed' ? 'bg-emerald-500' :
+                                                                            'bg-red-500'
+                                                            }`} />
+                                                    )}
+                                                    {status === 'all' ? 'All Statuses' : status}
+                                                </button>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </div>
                     </div>
 
@@ -213,7 +326,13 @@ const AdminDashboard = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
-                                    {inquiries.map((inquiry, i) => (
+                                    {paginatedInquiries.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="7" className="py-16 text-center text-stone-500 text-sm">
+                                                {searchQuery || statusFilter !== 'all' ? 'No requests match your search or filter.' : 'No requests yet.'}
+                                            </td>
+                                        </tr>
+                                    ) : paginatedInquiries.map((inquiry, i) => (
                                         <motion.tr
                                             key={inquiry._id}
                                             initial={{ opacity: 0 }}
@@ -277,9 +396,75 @@ const AdminDashboard = () => {
                         </div>
                     </motion.div>
 
+                    {/* Pagination Controls (Desktop) */}
+                    {filteredInquiries.length > 0 && (
+                        <div className="hidden md:flex items-center justify-between mt-6 px-2">
+                            <div className="flex items-center gap-3">
+                                <span className="text-stone-500 text-xs">Rows per page:</span>
+                                <select
+                                    value={rowsPerPage}
+                                    onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                                    className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-white/20 cursor-pointer appearance-none"
+                                    style={{ backgroundImage: 'none' }}
+                                >
+                                    {[5, 10, 25, 50].map(n => (
+                                        <option key={n} value={n} className="bg-[#1a1a1a] text-white">{n}</option>
+                                    ))}
+                                </select>
+                                <span className="text-stone-600 text-xs">
+                                    {(currentPage - 1) * rowsPerPage + 1}–{Math.min(currentPage * rowsPerPage, filteredInquiries.length)} of {filteredInquiries.length}
+                                </span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    className="p-2 rounded-lg text-stone-500 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </button>
+                                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                    .filter(page => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
+                                    .reduce((acc, page, idx, arr) => {
+                                        if (idx > 0 && page - arr[idx - 1] > 1) acc.push('...');
+                                        acc.push(page);
+                                        return acc;
+                                    }, [])
+                                    .map((page, idx) =>
+                                        page === '...' ? (
+                                            <span key={`dots-${idx}`} className="px-2 text-stone-600 text-xs">…</span>
+                                        ) : (
+                                            <button
+                                                key={page}
+                                                onClick={() => setCurrentPage(page)}
+                                                className={`min-w-[32px] h-8 rounded-lg text-xs font-medium transition-colors ${currentPage === page
+                                                    ? 'bg-white text-black'
+                                                    : 'text-stone-500 hover:text-white hover:bg-white/5'
+                                                    }`}
+                                            >
+                                                {page}
+                                            </button>
+                                        )
+                                    )
+                                }
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="p-2 rounded-lg text-stone-500 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                >
+                                    <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Mobile Card View */}
                     <div className="md:hidden space-y-4">
-                        {inquiries.map((inquiry, i) => (
+                        {paginatedInquiries.length === 0 ? (
+                            <div className="text-center py-12 text-stone-500 text-sm">
+                                {searchQuery || statusFilter !== 'all' ? 'No requests match your search or filter.' : 'No requests yet.'}
+                            </div>
+                        ) : paginatedInquiries.map((inquiry, i) => (
                             <motion.div
                                 key={inquiry._id}
                                 initial={{ opacity: 0, y: 20 }}
@@ -341,6 +526,48 @@ const AdminDashboard = () => {
                             </motion.div>
                         ))}
                     </div>
+
+                    {/* Pagination Controls (Mobile) */}
+                    {filteredInquiries.length > 0 && (
+                        <div className="md:hidden flex flex-col gap-4 mt-6">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-stone-500 text-xs">Show:</span>
+                                    <select
+                                        value={rowsPerPage}
+                                        onChange={(e) => setRowsPerPage(Number(e.target.value))}
+                                        className="bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none"
+                                    >
+                                        {[5, 10, 25, 50].map(n => (
+                                            <option key={n} value={n} className="bg-[#1a1a1a] text-white">{n}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <span className="text-stone-600 text-xs">
+                                    {(currentPage - 1) * rowsPerPage + 1}–{Math.min(currentPage * rowsPerPage, filteredInquiries.length)} of {filteredInquiries.length}
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-center gap-2">
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    className="p-2 rounded-lg text-stone-500 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-30"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                </button>
+                                <span className="text-xs text-stone-300 min-w-[80px] text-center">
+                                    Page {currentPage} / {totalPages}
+                                </span>
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="p-2 rounded-lg text-stone-500 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-30"
+                                >
+                                    <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
         </div>

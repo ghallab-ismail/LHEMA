@@ -9,10 +9,17 @@ import AdminLogin from './pages/AdminLogin';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProductDetail from './pages/ProductDetail';
 import PublicLayout from './layouts/PublicLayout';
+import ScrollToTop from './components/ScrollToTop';
+
+import LegalPrivacy from './pages/LegalPrivacy';
+import LegalExchange from './pages/LegalExchange';
+import LegalDelivery from './pages/LegalDelivery';
+import LegalWarranty from './pages/LegalWarranty';
 
 function App() {
     return (
         <Router>
+            <ScrollToTop />
             <Routes>
                 {/* Public Routes with Custom Cursor & WhatsApp */}
                 <Route element={<PublicLayout />}>
@@ -21,6 +28,12 @@ function App() {
                     <Route path="/homme" element={<ComingSoon />} />
                     <Route path="/atelier" element={<Atelier />} />
                     <Route path="/product/:id" element={<ProductDetail />} />
+
+                    {/* Legal Routes */}
+                    <Route path="/legal/privacy" element={<LegalPrivacy />} />
+                    <Route path="/legal/exchange" element={<LegalExchange />} />
+                    <Route path="/legal/delivery" element={<LegalDelivery />} />
+                    <Route path="/legal/warranty" element={<LegalWarranty />} />
                 </Route>
 
                 {/* Admin Routes (Clean UI) */}
