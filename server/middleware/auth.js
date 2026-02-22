@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+
 const auth = (req, res, next) => {
     // Get token from header
     const token = req.header('x-auth-token');
@@ -9,11 +11,9 @@ const auth = (req, res, next) => {
 
     // Verify token
     try {
-        if (token === 'admin-authorized-session') {
-            next();
-        } else {
-            res.status(401).json({ msg: 'Token is not valid' });
-        }
+        const decoded = jwt.verify(token, process.env.ADMIN_PASSWORD);
+        req.user = decoded; // add user to payload
+        next();
     } catch (err) {
         res.status(401).json({ msg: 'Token is not valid' });
     }
