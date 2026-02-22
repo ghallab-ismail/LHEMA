@@ -1,8 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 const Inquiry = require('../models/Inquiry');
 const auth = require('../middleware/auth');
+
+// Force IPv4 to prevent ENETUNREACH error on Render's IPv6 network
+dns.setDefaultResultOrder('ipv4first');
 
 // --- Email transporter setup ---
 const transporter = nodemailer.createTransport({
