@@ -19,7 +19,9 @@ const transporter = nodemailer.createTransport({
     },
     tls: {
         rejectUnauthorized: false
-    }
+    },
+    // Force Node's socket to resolve IPv4
+    family: 4
 });
 
 const sendNotificationEmail = (inquiry) => {
