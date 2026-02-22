@@ -14,6 +14,7 @@ app.use(cors({
     origin: [process.env.FRONTEND_URL, 'http://localhost:5173', 'https://lhema.vercel.app', /\.vercel\.app$/],
     credentials: true,
 }));
+app.set('trust proxy', 1); // Enable trusting the reverse proxy (Vercel) for rate limiting
 app.use(express.json());
 
 // Rate Limiting (apply to all requests or specific routes)
