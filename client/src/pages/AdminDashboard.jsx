@@ -230,43 +230,7 @@ const AdminDashboard = () => {
         }
     };
 
-    const StatusMenu = ({ id, currentStatus }) => (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute right-0 mt-2 w-40 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-        >
-            {['pending', 'contacted', 'no answer', 'wrong number', 'completed', 'cancelled'].map((status) => (
-                <button
-                    key={status}
-                    onClick={(e) => handleStatusUpdate(e, id, status)}
-                    className={`w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider hover:bg-white/5 transition-colors
-                        ${currentStatus === status ? 'text-white bg-white/5' : 'text-stone-400'}
-                    `}
-                >
-                    {status}
-                </button>
-            ))}
-
-            <div className="border-t border-white/5 my-1" />
-
-            <button
-                onClick={(e) => { e.stopPropagation(); openEditModal(inquiries.find(i => i._id === id)); }}
-                className="w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-stone-400 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
-            >
-                <Edit2 className="w-3 h-3" /> Edit Details
-            </button>
-
-            <button
-                onClick={(e) => { e.stopPropagation(); openDeleteModal(inquiries.find(i => i._id === id)); }}
-                className="w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-red-500 hover:bg-red-500/10 transition-colors flex items-center gap-2"
-            >
-                <Trash2 className="w-3 h-3" /> Delete
-            </button>
-        </motion.div>
-    );
+    // StatusMenu was removed here to be inlined below to prevent React identity re-render crashes
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-stone-200 font-sans selection:bg-white/20">
@@ -465,27 +429,27 @@ const AdminDashboard = () => {
                                             <td className="py-6 px-8">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-stone-700 to-stone-800 flex items-center justify-center text-white font-serif">
-                                                        {inquiry.name.charAt(0)}
+                                                        {inquiry?.name ? inquiry.name.charAt(0) : '?'}
                                                     </div>
                                                     <div>
-                                                        <p className="text-white font-medium">{inquiry.name}</p>
+                                                        <p className="text-white font-medium">{inquiry?.name || 'Unknown'}</p>
                                                         <p className="text-stone-500 text-xs mt-1 flex items-center gap-2">
                                                             <MessageCircle className="w-3 h-3" />
-                                                            {inquiry.whatsapp}
+                                                            {inquiry?.whatsapp || 'No status'}
                                                         </p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="py-6 px-8">
-                                                <span className="text-stone-300">{inquiry.productName}</span>
+                                                <span className="text-stone-300">{inquiry?.productName || 'Unknown'}</span>
                                             </td>
                                             <td className="py-6 px-8">
                                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/5 text-stone-300 border border-white/10">
-                                                    {inquiry.size}
+                                                    {inquiry?.size || 'N/A'}
                                                 </span>
                                             </td>
                                             <td className="py-6 px-8">
-                                                <span className="text-stone-400">{inquiry.city}</span>
+                                                <span className="text-stone-400">{inquiry?.city || 'Unknown'}</span>
                                             </td>
                                             <td className="py-6 px-8">
                                                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(inquiry.status)}`}>
@@ -507,7 +471,38 @@ const AdminDashboard = () => {
                                                 </button>
                                                 <AnimatePresence>
                                                     {activeMenu === inquiry._id && (
-                                                        <StatusMenu id={inquiry._id} currentStatus={inquiry.status} />
+                                                        <motion.div
+                                                            initial={{ opacity: 0, scale: 0.95 }}
+                                                            animate={{ opacity: 1, scale: 1 }}
+                                                            exit={{ opacity: 0, scale: 0.95 }}
+                                                            className="absolute right-0 mt-2 w-40 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            {['pending', 'contacted', 'no answer', 'wrong number', 'completed', 'cancelled'].map((status) => (
+                                                                <button
+                                                                    key={status}
+                                                                    onClick={(e) => handleStatusUpdate(e, inquiry._id, status)}
+                                                                    className={`w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider hover:bg-white/5 transition-colors
+                                                                        ${inquiry.status === status ? 'text-white bg-white/5' : 'text-stone-400'}
+                                                                    `}
+                                                                >
+                                                                    {status}
+                                                                </button>
+                                                            ))}
+                                                            <div className="border-t border-white/5 my-1" />
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); openEditModal(inquiries.find(i => i._id === inquiry._id)); }}
+                                                                className="w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-stone-400 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+                                                            >
+                                                                <Edit2 className="w-3 h-3" /> Edit Details
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); openDeleteModal(inquiries.find(i => i._id === inquiry._id)); }}
+                                                                className="w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-red-500 hover:bg-red-500/10 transition-colors flex items-center gap-2"
+                                                            >
+                                                                <Trash2 className="w-3 h-3" /> Delete
+                                                            </button>
+                                                        </motion.div>
                                                     )}
                                                 </AnimatePresence>
                                             </td>
@@ -597,13 +592,13 @@ const AdminDashboard = () => {
                                 <div className="flex justify-between items-start mb-4 relative">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-stone-700 to-stone-800 flex items-center justify-center text-white font-serif">
-                                            {inquiry.name.charAt(0)}
+                                            {inquiry?.name ? inquiry.name.charAt(0) : '?'}
                                         </div>
                                         <div>
-                                            <p className="text-white font-medium">{inquiry.name}</p>
+                                            <p className="text-white font-medium">{inquiry?.name || 'Unknown'}</p>
                                             <p className="text-stone-500 text-xs flex items-center gap-1">
                                                 <MessageCircle className="w-3 h-3" />
-                                                {inquiry.whatsapp}
+                                                {inquiry?.whatsapp || 'No status'}
                                             </p>
                                         </div>
                                     </div>
@@ -616,7 +611,38 @@ const AdminDashboard = () => {
                                         </button>
                                         <AnimatePresence>
                                             {activeMenu === inquiry._id && (
-                                                <StatusMenu id={inquiry._id} currentStatus={inquiry.status} />
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 0.95 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    exit={{ opacity: 0, scale: 0.95 }}
+                                                    className="absolute right-0 mt-2 w-40 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    {['pending', 'contacted', 'no answer', 'wrong number', 'completed', 'cancelled'].map((status) => (
+                                                        <button
+                                                            key={status}
+                                                            onClick={(e) => handleStatusUpdate(e, inquiry._id, status)}
+                                                            className={`w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider hover:bg-white/5 transition-colors
+                                                                ${inquiry.status === status ? 'text-white bg-white/5' : 'text-stone-400'}
+                                                            `}
+                                                        >
+                                                            {status}
+                                                        </button>
+                                                    ))}
+                                                    <div className="border-t border-white/5 my-1" />
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); openEditModal(inquiries.find(i => i._id === inquiry._id)); }}
+                                                        className="w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-stone-400 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+                                                    >
+                                                        <Edit2 className="w-3 h-3" /> Edit Details
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); openDeleteModal(inquiries.find(i => i._id === inquiry._id)); }}
+                                                        className="w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-red-500 hover:bg-red-500/10 transition-colors flex items-center gap-2"
+                                                    >
+                                                        <Trash2 className="w-3 h-3" /> Delete
+                                                    </button>
+                                                </motion.div>
                                             )}
                                         </AnimatePresence>
                                     </div>
@@ -625,15 +651,15 @@ const AdminDashboard = () => {
                                 <div className="space-y-3">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-stone-500">Product</span>
-                                        <span className="text-stone-300 text-right">{inquiry.productName}</span>
+                                        <span className="text-stone-300 text-right">{inquiry?.productName || 'Unknown'}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-stone-500">Size</span>
-                                        <span className="text-stone-300">{inquiry.size}</span>
+                                        <span className="text-stone-300">{inquiry?.size || 'N/A'}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-stone-500">Location</span>
-                                        <span className="text-stone-300">{inquiry.city}</span>
+                                        <span className="text-stone-300">{inquiry?.city || 'Unknown'}</span>
                                     </div>
                                     <div className="flex justify-between text-sm items-center pt-2 border-t border-white/5 mt-3">
                                         <div className="flex items-center gap-2 text-stone-500 text-xs">
