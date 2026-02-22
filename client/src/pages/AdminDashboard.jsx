@@ -16,8 +16,13 @@ import {
     LogOut,
     ChevronDown,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Plus,
+    Edit2,
+    Trash2
 } from 'lucide-react';
+import InquiryModal from '../components/InquiryModal';
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 
 const AdminDashboard = () => {
     const [inquiries, setInquiries] = useState([]);
@@ -28,6 +33,14 @@ const AdminDashboard = () => {
     const [showFilterMenu, setShowFilterMenu] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    // CRUD Modal States
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState('create'); // 'create' or 'edit'
+    const [selectedInquiry, setSelectedInquiry] = useState(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [inquiryToDelete, setInquiryToDelete] = useState(null);
+
     const navigate = useNavigate();
 
     // Filtered inquiries based on search + status filter
@@ -120,6 +133,86 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleCreateInquiry = async (formData) => {
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries/admin`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                fetchInquiries();
+                setIsModalOpen(false);
+            }
+        } catch (err) {
+            console.error('Error creating inquiry:', err);
+        }
+    };
+
+    const handleUpdateInquiry = async (formData) => {
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries/${selectedInquiry._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                fetchInquiries();
+                setIsModalOpen(false);
+            }
+        } catch (err) {
+            console.error('Error updating inquiry:', err);
+        }
+    };
+
+    const handleDeleteInquiry = async () => {
+        if (!inquiryToDelete) return;
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries/${inquiryToDelete._id}`, {
+                method: 'DELETE',
+                headers: { 'x-auth-token': token }
+            });
+
+            if (response.ok) {
+                setInquiries(prev => prev.filter(inq => inq._id !== inquiryToDelete._id));
+                setIsDeleteModalOpen(false);
+                setInquiryToDelete(null);
+            }
+        } catch (err) {
+            console.error('Error deleting inquiry:', err);
+        }
+    };
+
+    const openCreateModal = () => {
+        setModalMode('create');
+        setSelectedInquiry(null);
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (inquiry) => {
+        setModalMode('edit');
+        setSelectedInquiry(inquiry);
+        setIsModalOpen(true);
+        setActiveMenu(null);
+    };
+
+    const openDeleteModal = (inquiry) => {
+        setInquiryToDelete(inquiry);
+        setIsDeleteModalOpen(true);
+        setActiveMenu(null);
+    };
+
     const toggleMenu = (e, id) => {
         e.stopPropagation();
         setActiveMenu(activeMenu === id ? null : id);
@@ -156,6 +249,22 @@ const AdminDashboard = () => {
                     {status}
                 </button>
             ))}
+
+            <div className="border-t border-white/5 my-1" />
+
+            <button
+                onClick={(e) => { e.stopPropagation(); openEditModal(inquiries.find(i => i._id === id)); }}
+                className="w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-stone-400 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-2"
+            >
+                <Edit2 className="w-3 h-3" /> Edit Details
+            </button>
+
+            <button
+                onClick={(e) => { e.stopPropagation(); openDeleteModal(inquiries.find(i => i._id === id)); }}
+                className="w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider text-red-500 hover:bg-red-500/10 transition-colors flex items-center gap-2"
+            >
+                <Trash2 className="w-3 h-3" /> Delete
+            </button>
         </motion.div>
     );
 
@@ -282,6 +391,12 @@ const AdminDashboard = () => {
                                     )}
                                 </AnimatePresence>
                             </div>
+                            <button
+                                onClick={openCreateModal}
+                                className="flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-medium bg-white text-black hover:bg-stone-200 transition-colors w-full md:w-auto whitespace-nowrap"
+                            >
+                                <Plus className="w-4 h-4" /> New Request
+                            </button>
                         </div>
                     </div>
 
@@ -577,6 +692,22 @@ const AdminDashboard = () => {
                     )}
                 </div>
             </main>
+
+            <InquiryModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                mode={modalMode}
+                initialData={selectedInquiry}
+                onSubmit={modalMode === 'create' ? handleCreateInquiry : handleUpdateInquiry}
+            />
+
+            <ConfirmDeleteModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteInquiry}
+                clientName={inquiryToDelete?.name}
+            />
+
         </div>
     );
 };

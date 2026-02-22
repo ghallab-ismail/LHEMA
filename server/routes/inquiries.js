@@ -67,7 +67,7 @@ const sendNotificationEmail = (inquiry) => {
 };
 
 // @route   POST api/inquiries
-// @desc    Create a new inquiry
+// @desc    Create a new inquiry (Public client-facing)
 // @access  Public
 router.post('/', async (req, res) => {
     try {
@@ -93,6 +93,31 @@ router.post('/', async (req, res) => {
     }
 });
 
+// @route   POST api/inquiries/admin
+// @desc    Create a new inquiry (Admin manual entry)
+// @access  Private (Admin)
+router.post('/admin', auth, async (req, res) => {
+    try {
+        const { name, whatsapp, city, size, productName, status } = req.body;
+
+        const newInquiry = new Inquiry({
+            name,
+            whatsapp,
+            city,
+            size,
+            productName,
+            status: status || 'pending'
+        });
+
+        const inquiry = await newInquiry.save();
+
+        res.json(inquiry);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 // @route   GET api/inquiries
 // @desc    Get all inquiries
 // @access  Private (Admin)
@@ -107,19 +132,41 @@ router.get('/', auth, async (req, res) => {
 });
 
 // @route   PUT api/inquiries/:id
-// @desc    Update inquiry status
+// @desc    Update an inquiry (Handles all fields)
 // @access  Private (Admin)
 router.put('/:id', auth, async (req, res) => {
     try {
-        const { status } = req.body;
+        const updateData = req.body;
         const inquiry = await Inquiry.findByIdAndUpdate(
             req.params.id,
-            { status },
-            { new: true }
+            { $set: updateData },
+            { new: true, runValidators: true }
         );
+
+        if (!inquiry) return res.status(404).json({ msg: 'Inquiry not found' });
+
         res.json(inquiry);
     } catch (err) {
         console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   DELETE api/inquiries/:id
+// @desc    Delete an inquiry
+// @access  Private (Admin)
+router.delete('/:id', auth, async (req, res) => {
+    try {
+        const inquiry = await Inquiry.findByIdAndDelete(req.params.id);
+
+        if (!inquiry) return res.status(404).json({ msg: 'Inquiry not found' });
+
+        res.json({ msg: 'Inquiry removed' });
+    } catch (err) {
+        console.error(err.message);
+        if (err.kind === 'ObjectId') {
+            return res.status(404).json({ msg: 'Inquiry not found' });
+        }
         res.status(500).send('Server Error');
     }
 });
