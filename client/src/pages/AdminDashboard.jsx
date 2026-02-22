@@ -77,7 +77,10 @@ const AdminDashboard = () => {
 
     const fetchInquiries = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries`);
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries`, {
+                headers: { 'x-auth-token': token }
+            });
             const data = await response.json();
             setInquiries(data);
             setLoading(false);
@@ -96,9 +99,13 @@ const AdminDashboard = () => {
             ));
             setActiveMenu(null);
 
+            const token = localStorage.getItem('adminToken');
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries/${id}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token
+                },
                 body: JSON.stringify({ status: newStatus }),
             });
 

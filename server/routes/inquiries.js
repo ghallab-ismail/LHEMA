@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
 const Inquiry = require('../models/Inquiry');
+const auth = require('../middleware/auth');
 
 // --- Email transporter setup ---
 const transporter = nodemailer.createTransport({
@@ -94,8 +95,8 @@ router.post('/', async (req, res) => {
 
 // @route   GET api/inquiries
 // @desc    Get all inquiries
-// @access  Public
-router.get('/', async (req, res) => {
+// @access  Private (Admin)
+router.get('/', auth, async (req, res) => {
     try {
         const inquiries = await Inquiry.find().sort({ createdAt: -1 });
         res.json(inquiries);
@@ -107,8 +108,8 @@ router.get('/', async (req, res) => {
 
 // @route   PUT api/inquiries/:id
 // @desc    Update inquiry status
-// @access  Public
-router.put('/:id', async (req, res) => {
+// @access  Private (Admin)
+router.put('/:id', auth, async (req, res) => {
     try {
         const { status } = req.body;
         const inquiry = await Inquiry.findByIdAndUpdate(
