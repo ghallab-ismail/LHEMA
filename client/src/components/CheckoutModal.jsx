@@ -56,7 +56,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
 
         setSubmitting(true);
         try {
-            const response = await fetch('http://localhost:5000/api/inquiries', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

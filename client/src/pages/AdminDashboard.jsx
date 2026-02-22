@@ -77,7 +77,7 @@ const AdminDashboard = () => {
 
     const fetchInquiries = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/inquiries');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries`);
             const data = await response.json();
             setInquiries(data);
             setLoading(false);
@@ -96,7 +96,7 @@ const AdminDashboard = () => {
             ));
             setActiveMenu(null);
 
-            const response = await fetch(`http://localhost:5000/api/inquiries/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: newStatus }),
