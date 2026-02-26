@@ -172,28 +172,32 @@ const ProductDetail = () => {
                         )}
 
                         {/* Description & Features */}
-                        <div className="mb-12">
-                            <h2 className="font-serif text-xl border-b border-stone-200 pb-4 mb-8">Savoir-Faire & Composition</h2>
+                        <div className="mb-12 mt-16">
+                            <div className="text-center mb-10">
+                                <h2 className="font-serif text-2xl lg:text-3xl text-stone-900 tracking-wide mb-4">Savoir-Faire & Composition</h2>
+                                <div className="w-12 h-[1px] bg-[#D4AF37] mx-auto"></div>
+                            </div>
 
                             {product.description_title && (
-                                <div className="mb-8">
-                                    <h4 className="font-serif text-lg mb-3 text-stone-900">{product.description_title}</h4>
-                                    <p className="text-stone-600 text-sm leading-relaxed">{product.description_subtitle}</p>
+                                <div className="mb-10 text-center">
+                                    <h4 className="font-serif text-xl lg:text-2xl mb-4 text-stone-800 leading-snug">{product.description_title}</h4>
+                                    <p className="text-stone-500 font-sans text-sm md:text-base leading-relaxed max-w-md mx-auto italic">
+                                        "{product.description_subtitle}"
+                                    </p>
                                 </div>
                             )}
 
                             {product.features && (
-                                <ul className="space-y-6">
-                                    {product.features.map((feature, idx) => (
-                                        <li key={idx} className="flex items-start group">
-                                            <span className="mr-4 text-[#D4AF37] mt-1 text-lg leading-none">•</span>
-                                            <div>
-                                                <strong className="text-stone-900 font-medium block mb-1">{feature.title}</strong>
-                                                <span className="text-stone-600 text-sm leading-relaxed block">{feature.desc}</span>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
+                                <div className="bg-white p-6 lg:p-8 border border-stone-100 shadow-sm mt-8">
+                                    <ul className="space-y-6">
+                                        {product.features.map((feature, idx) => (
+                                            <li key={idx} className="flex flex-col gap-1 border-b border-stone-100 pb-5 last:border-0 last:pb-0">
+                                                <strong className="text-stone-900 font-serif text-[15px] block uppercase tracking-wider">{feature.title}</strong>
+                                                <span className="text-stone-600 font-sans text-sm leading-relaxed block">{feature.desc}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             )}
                         </div>
 
