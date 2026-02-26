@@ -1,22 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ZoomIn } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Star } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import CheckoutModal from '../components/CheckoutModal';
 import { products } from '../data/products';
 
 const ProductDetail = () => {
     const { id } = useParams();
-    // Ensure product lookup handles string vs number
     const product = products.find(p => p.id === parseInt(id) || p.id === id);
     const [activeImage, setActiveImage] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showStickyButton, setShowStickyButton] = useState(false);
+    const hasAutoOpened = useRef(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 400) {
+                setShowStickyButton(true);
+                if (!hasAutoOpened.current) {
+                    setIsModalOpen(true);
+                    hasAutoOpened.current = true;
+                }
+            } else {
+                setShowStickyButton(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     if (!product) return <div className="text-white">Product not found</div>;
 
     return (
-        <div className="bg-primary-bg min-h-screen text-primary-text">
+        <div className="bg-[#FAF9F6] min-h-screen text-stone-900 font-sans pb-24 lg:pb-0 relative">
             <Navbar theme="dark" />
             <CheckoutModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} product={product} />
 
@@ -27,14 +45,18 @@ const ProductDetail = () => {
                         <ArrowLeft className="w-6 h-6" />
                     </Link>
 
-                    <img
+                    <motion.img
+                        key={activeImage}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5 }}
                         src={product.images[activeImage]}
                         alt={product.name}
-                        className="w-full h-[60vh] lg:h-full object-cover animate-fade-in"
+                        className="w-full h-[60vh] lg:h-full object-cover"
                     />
 
                     {/* Image Navigation Dots (Overlay) */}
-                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2">
+                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
                         {product.images.map((_, idx) => (
                             <button
                                 key={idx}
@@ -46,64 +68,133 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Right: Scrollable Details */}
-                <div className="w-full lg:w-1/2 px-6 py-12 lg:px-24 lg:py-32 flex flex-col justify-center">
+                <div className="w-full lg:w-1/2 px-6 py-10 lg:px-20 lg:py-24 flex flex-col pt-24 lg:pt-32">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2, duration: 0.8 }}
+                        className="max-w-xl mx-auto w-full"
                     >
-                        <div className="border-b border-stone-300 pb-6 mb-8">
-                            <h1 className="font-serif text-3xl md:text-5xl mb-2">{product.name}</h1>
-                            <p className="font-sans text-xs tracking-[0.2em] text-stone-500 uppercase">
-                                Archive {product.archive_year} — Edition 01/10
-                            </p>
+                        <div className="mb-6">
+                            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl mb-3 leading-tight">{product.name}</h1>
+
+                            {/* Premium Rating */}
+                            <div className="flex items-center gap-1 mb-4">
+                                {[...Array(5)].map((_, i) => (
+                                    <Star key={i} className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" strokeWidth={1} />
+                                ))}
+                                <span className="text-xs font-serif text-stone-500 ml-2">(Édition Limitée)</span>
+                            </div>
+
+                            <div className="flex items-center gap-4 mb-2">
+                                <p className="font-serif text-2xl text-stone-900 font-medium">
+                                    {product.price.toLocaleString()} {product.currency || 'DH'}
+                                </p>
+                                {product.stock > 0 && (
+                                    <span className="bg-emerald-100/80 text-emerald-800 text-[10px] font-bold px-3 py-1.5 rounded-sm uppercase tracking-widest">
+                                        En Stock
+                                    </span>
+                                )}
+                            </div>
                         </div>
 
-                        <div className="mb-12">
-                            <p className="font-serif text-xl md:text-2xl leading-relaxed text-stone-800">
-                                {product.price.toLocaleString()} DH
-                            </p>
-                        </div>
-
-                        {/* Storytelling Block */}
-                        <div className="mb-16 bg-stone-100 p-8 border-l-2 border-black">
-                            <h3 className="font-serif text-lg mb-4">The Architecture</h3>
-                            <p className="font-sans text-sm leading-7 text-stone-600">
-                                {product.story}
-                            </p>
-                        </div>
-
-                        {/* Fabric Details */}
-                        <div className="flex items-center gap-4 mb-12 group cursor-pointer">
-                            <div className="w-16 h-16 rounded-full overflow-hidden border border-stone-300 relative">
-                                <img src={product.images[0]} className="w-full h-full object-cover group-hover:scale-150 transition-transform duration-700" alt="Fabric" />
-                                <div className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <ZoomIn className="w-4 h-4 text-white" />
+                        {/* Limited Edition Card */}
+                        {product.is_limited_edition && (
+                            <div className="border border-[#D4AF37]/40 bg-[#FFFDF9] p-6 lg:p-8 mb-10 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] relative">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent"></div>
+                                <div className="text-center mb-6">
+                                    <h3 className="font-serif text-lg md:text-xl text-stone-900 mb-1">Collection Privée : Pièce numérotée</h3>
+                                    <p className="font-sans text-sm text-stone-500">(1 sur {product.total_edition || 10} au Maroc)</p>
                                 </div>
+
+                                <div className="flex justify-center gap-2 md:gap-3 mb-5">
+                                    {Array.from({ length: product.total_edition || 10 }).map((_, i) => {
+                                        const total = product.total_edition || 10;
+                                        const available = product.stock;
+                                        const sold = total - available;
+                                        const isSold = i < sold;
+                                        return (
+                                            <div
+                                                key={i}
+                                                className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full ${isSold ? 'bg-stone-300' : 'bg-[#2C2C2C] shadow-md'} transition-all`}
+                                            />
+                                        )
+                                    })}
+                                </div>
+                                <p className="text-center font-sans text-sm text-stone-600">
+                                    Pièces restantes : <span className="text-[#D4AF37] font-semibold text-base">{product.stock}</span> <span className="opacity-50">/ {product.total_edition || 10}</span>
+                                </p>
                             </div>
-                            <div>
-                                <p className="font-serif text-sm">Material Composition</p>
-                                <p className="font-sans text-xs text-stone-500">{product.material}</p>
-                            </div>
+                        )}
+
+                        {/* Description & Features */}
+                        <div className="mb-12">
+                            <h2 className="font-serif text-xl border-b border-stone-200 pb-4 mb-8">Savoir-Faire & Composition</h2>
+
+                            {product.description_title && (
+                                <div className="mb-8">
+                                    <h4 className="font-serif text-lg mb-3 text-stone-900">{product.description_title}</h4>
+                                    <p className="text-stone-600 text-sm leading-relaxed">{product.description_subtitle}</p>
+                                </div>
+                            )}
+
+                            {product.features && (
+                                <ul className="space-y-6">
+                                    {product.features.map((feature, idx) => (
+                                        <li key={idx} className="flex items-start group">
+                                            <span className="mr-4 text-[#D4AF37] mt-1 text-lg leading-none">•</span>
+                                            <div>
+                                                <strong className="text-stone-900 font-medium block mb-1">{feature.title}</strong>
+                                                <span className="text-stone-600 text-sm leading-relaxed block">{feature.desc}</span>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
 
                         {/* Action Button */}
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="w-full bg-black text-white py-4 px-8 text-xs tracking-[0.2em] uppercase hover:bg-stone-800 transition-colors duration-300 flex justify-between items-center group"
-                        >
-                            <span>Acquire Piece</span>
-                            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-x-2 group-hover:translate-x-0">
-                                →
-                            </span>
-                        </button>
-
-                        <p className="mt-4 text-[10px] text-center text-stone-400 font-sans tracking-wide">
-                            Only {product.stock} pieces remaining in Atelier.
-                        </p>
+                        <div className="mt-8">
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="w-full bg-[#1A1A1A] text-white py-5 px-8 text-xs tracking-[0.2em] font-medium uppercase hover:bg-black transition-all duration-300 flex justify-between items-center group shadow-xl hover:shadow-2xl"
+                            >
+                                <span>Demander l'acquisition</span>
+                                <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-4 group-hover:translate-x-0">
+                                    →
+                                </span>
+                            </button>
+                            <p className="mt-5 text-[11px] text-center text-stone-400 font-sans tracking-wide uppercase">
+                                Paiement sécurisé • Livraison offerte
+                            </p>
+                        </div>
                     </motion.div>
                 </div>
             </div>
+
+            {/* Sticky Floating CTA */}
+            <AnimatePresence>
+                {showStickyButton && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 50 }}
+                        transition={{ duration: 0.3 }}
+                        className="fixed bottom-0 left-0 right-0 p-4 lg:p-6 bg-white/90 backdrop-blur-md border-t border-stone-200 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-40 flex justify-between items-center"
+                    >
+                        <div className="hidden md:block">
+                            <h4 className="font-serif text-lg text-stone-900">{product.name}</h4>
+                            <p className="font-serif text-sm text-stone-500">{product.price.toLocaleString()} {product.currency || 'DH'}</p>
+                        </div>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="w-full md:w-auto bg-[#1A1A1A] text-white py-4 px-10 text-xs tracking-[0.2em] font-medium uppercase hover:bg-black transition-all duration-300 shadow-xl hover:shadow-2xl"
+                        >
+                            Demander l'acquisition
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

@@ -6,18 +6,38 @@ import imageBack from '../assets/imageback.jpeg';
 export const products = [
     {
         id: "the-signature-cape",
-        name: "The Signature Cape",
+        name: "Veste-Cape L'Éclat de Lhema",
         archive_year: "2024",
-        story: "Designed in Casablanca, this cape embodies the fusion of traditional Moroccan draping and modern architectural structure. Crafted from premium Italian wool, it offers a silhouette that commands attention while providing enveloping comfort. A limited edition piece that transcends seasons.",
-        price: 3500,
-        stock: 8,
+        price: 14500,
+        currency: "MAD",
+        stock: 3,
+        total_edition: 10,
         images: [
             imageFrontFull,
             imageBackFull,
             imageFront,
             imageBack,
         ],
-        material: "Italian Virgin Wool & Cashmere Blend",
         is_limited_edition: true,
+        description_title: "L'Élégance Exclusive : Votre Pièce d'Exception",
+        description_subtitle: "Découvrez le raffinement absolu avec une création conçue pour vous faire sentir unique.",
+        features: [
+            {
+                title: "Le Cachemire Royal",
+                desc: "Un tissu noble, léger et respirant. C'est l'allié parfait pour vous envelopper de douceur et d'élégance tout au long des mois de mars, avril et mai."
+            },
+            {
+                title: "Une Doublure en Satin Prestigieux",
+                desc: "À l'intérieur, un satin d'une fluidité exceptionnelle caresse votre peau pour un confort absolu."
+            },
+            {
+                title: "Des Finitions Artisanales",
+                desc: "Les bordures et les côtés sont minutieusement travaillés à la main. Un détail raffiné qui fait de cette création une véritable pièce rare."
+            },
+            {
+                title: "L'Art de la Couture",
+                desc: "Une pièce qui célèbre le savoir-faire artisanal. L'assemblage est d'une précision mécanique, tandis que les finitions et les détails minutieux sont cousus à la main, dans la plus stricte tradition des ateliers de Haute Couture."
+            }
+        ]
     }
 ];
