@@ -35,32 +35,72 @@ const ProductDetail = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const handleDragEnd = (event, info) => {
+        const swipeThreshold = 50;
+        if (info.offset.x < -swipeThreshold) {
+            // Swipe left (next image)
+            setActiveImage((prev) => (prev + 1) % product.images.length);
+        } else if (info.offset.x > swipeThreshold) {
+            // Swipe right (previous image)
+            setActiveImage((prev) => (prev === 0 ? product.images.length - 1 : prev - 1));
+        }
+    };
+
+
     if (!product) return <div className="text-white">Product not found</div>;
 
     return (
         <div className="bg-[#FAF9F6] min-h-screen text-stone-900 font-sans pb-24 lg:pb-0 relative">
-            <Navbar theme="dark" />
+            {/* The Navbar needs to be absolute or sticky so content goes under it/starts below it properly,
+                in the original code it's fixed. Let's make sure it has z-index and the content pushes down slightly. */}
+            <div className="relative z-50">
+                <Navbar theme="dark" />
+            </div>
+
             <CheckoutModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} product={product} />
 
             <div className="flex flex-col lg:flex-row min-h-screen">
                 {/* Left: Sticky Image Gallery */}
-                <div className="w-full lg:w-1/2 lg:h-screen lg:sticky lg:top-0 overflow-hidden relative group">
-                    <Link to="/" className="absolute top-24 left-6 z-20 mix-blend-difference text-white">
+                <div className="w-full lg:w-1/2 lg:h-screen lg:sticky lg:top-0 overflow-hidden relative group bg-[#FAF9F6]">
+                    <Link to="/" className="absolute top-[80px] left-6 z-20 mix-blend-difference text-white">
                         <ArrowLeft className="w-6 h-6" />
                     </Link>
 
-                    <motion.img
-                        key={activeImage}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
-                        src={product.images[activeImage]}
-                        alt={product.name}
-                        className="w-full h-[60vh] lg:h-full object-cover"
-                    />
+                    {/* Desktop View: Static Image List or Fading Images */}
+                    <div className="hidden lg:block h-full w-full pt-[80px]">
+                        <motion.img
+                            key={activeImage}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5 }}
+                            src={product.images[activeImage]}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+
+                    {/* Mobile View: Swipeable Carousel */}
+                    <div className="lg:hidden w-full h-[65vh] pt-[60px] relative overflow-hidden flex items-center justify-center">
+                        <AnimatePresence initial={false} mode="wait">
+                            <motion.img
+                                key={activeImage}
+                                src={product.images[activeImage]}
+                                alt={product.name}
+                                initial={{ opacity: 0, x: 50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -50 }}
+                                transition={{ duration: 0.3 }}
+                                className="w-full h-full object-cover absolute top-0 left-0 pt-[60px] cursor-grab active:cursor-grabbing"
+                                drag="x"
+                                dragConstraints={{ left: 0, right: 0 }}
+                                dragElastic={0.2}
+                                onDragEnd={handleDragEnd}
+                            />
+                        </AnimatePresence>
+                    </div>
 
                     {/* Image Navigation Dots (Overlay) */}
-                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
+                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-10 bg-black/10 px-3 py-1.5 rounded-full backdrop-blur-sm">
                         {product.images.map((_, idx) => (
                             <button
                                 key={idx}
