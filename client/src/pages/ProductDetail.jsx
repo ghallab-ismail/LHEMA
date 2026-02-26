@@ -16,14 +16,18 @@ const ProductDetail = () => {
 
     useEffect(() => {
         const handleScroll = () => {
+            // Show sticky button after scrolling a bit
             if (window.scrollY > 400) {
                 setShowStickyButton(true);
-                if (!hasAutoOpened.current) {
-                    setIsModalOpen(true);
-                    hasAutoOpened.current = true;
-                }
             } else {
                 setShowStickyButton(false);
+            }
+
+            // Auto-open modal when reaching the bottom of the page
+            const isAtBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
+            if (isAtBottom && !hasAutoOpened.current) {
+                setIsModalOpen(true);
+                hasAutoOpened.current = true;
             }
         };
 
@@ -153,21 +157,9 @@ const ProductDetail = () => {
                             )}
                         </div>
 
-                        {/* Action Button */}
-                        <div className="mt-8">
-                            <button
-                                onClick={() => setIsModalOpen(true)}
-                                className="w-full bg-[#1A1A1A] text-white py-5 px-8 text-xs tracking-[0.2em] font-medium uppercase hover:bg-black transition-all duration-300 flex justify-between items-center group shadow-xl hover:shadow-2xl"
-                            >
-                                <span>Demander l'acquisition</span>
-                                <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-4 group-hover:translate-x-0">
-                                    →
-                                </span>
-                            </button>
-                            <p className="mt-5 text-[11px] text-center text-stone-400 font-sans tracking-wide uppercase">
-                                Paiement sécurisé • Livraison offerte
-                            </p>
-                        </div>
+
+                        {/* Action Button Removed - Using only Sticky CTA */}
+
                     </motion.div>
                 </div>
             </div>
