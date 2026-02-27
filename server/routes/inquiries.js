@@ -1,80 +1,65 @@
 const express = require('express');
 const router = express.Router();
-const nodemailer = require('nodemailer');
-const dns = require('dns');
+const { Resend } = require('resend');
 const Inquiry = require('../models/Inquiry');
 const auth = require('../middleware/auth');
 
-// Force IPv4 to prevent ENETUNREACH error on Render's IPv6 network
-dns.setDefaultResultOrder('ipv4first');
+// --- Resend email client setup (uses HTTPS, not blocked by Render) ---
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// --- Email transporter setup ---
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // use STARTTLS instead of direct SSL to bypass firewall
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-        rejectUnauthorized: false
-    },
-    // Force Node's socket to resolve IPv4
-    family: 4
-});
+const sendNotificationEmail = async (inquiry) => {
+    try {
+        const { data, error } = await resend.emails.send({
+            from: `Maison Lhema <${process.env.RESEND_FROM_EMAIL}>`,
+            to: [process.env.NOTIFY_EMAIL],
+            subject: `✨ Nouvelle Demande — ${inquiry.productName}`,
+            html: `
+                <div style="font-family: 'Georgia', serif; max-width: 560px; margin: 0 auto; background: #0a0a0a; color: #e7e5e4; border-radius: 12px; overflow: hidden;">
+                    <div style="background: #141414; padding: 32px 28px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                        <h1 style="margin: 0; font-size: 22px; font-weight: 400; color: #ffffff; letter-spacing: 2px;">MAISON LHEMA</h1>
+                        <p style="margin: 8px 0 0; font-size: 10px; letter-spacing: 4px; color: #78716c; text-transform: uppercase;">Nouvelle Demande de Conciergerie</p>
+                    </div>
+                    <div style="padding: 28px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #78716c; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; width: 120px;">Client</td>
+                                <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ffffff; font-size: 15px;">${inquiry.name}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #78716c; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;">WhatsApp</td>
+                                <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ffffff; font-size: 15px;">
+                                    <a href="https://wa.me/${inquiry.whatsapp}" style="color: #22c55e; text-decoration: none;">${inquiry.whatsapp}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #78716c; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;">Produit</td>
+                                <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ffffff; font-size: 15px;">${inquiry.productName}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #78716c; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;">Taille</td>
+                                <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ffffff; font-size: 15px;">${inquiry.size}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 14px 0; color: #78716c; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;">Ville</td>
+                                <td style="padding: 14px 0; color: #ffffff; font-size: 15px;">${inquiry.city}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="padding: 20px 28px; background: #141414; border-top: 1px solid rgba(255,255,255,0.06); text-align: center;">
+                        <p style="margin: 0; font-size: 11px; color: #57534e;">Reçue le ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                </div>
+            `,
+        });
 
-const sendNotificationEmail = (inquiry) => {
-    const mailOptions = {
-        from: `"Maison Lhema" <${process.env.EMAIL_USER}>`,
-        to: process.env.NOTIFY_EMAIL,
-        subject: `✨ Nouvelle Demande — ${inquiry.productName}`,
-        html: `
-            <div style="font-family: 'Georgia', serif; max-width: 560px; margin: 0 auto; background: #0a0a0a; color: #e7e5e4; border-radius: 12px; overflow: hidden;">
-                <div style="background: #141414; padding: 32px 28px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                    <h1 style="margin: 0; font-size: 22px; font-weight: 400; color: #ffffff; letter-spacing: 2px;">MAISON LHEMA</h1>
-                    <p style="margin: 8px 0 0; font-size: 10px; letter-spacing: 4px; color: #78716c; text-transform: uppercase;">Nouvelle Demande de Conciergerie</p>
-                </div>
-                <div style="padding: 28px;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <tr>
-                            <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #78716c; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; width: 120px;">Client</td>
-                            <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ffffff; font-size: 15px;">${inquiry.name}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #78716c; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;">WhatsApp</td>
-                            <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ffffff; font-size: 15px;">
-                                <a href="https://wa.me/${inquiry.whatsapp}" style="color: #22c55e; text-decoration: none;">${inquiry.whatsapp}</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #78716c; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;">Produit</td>
-                            <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ffffff; font-size: 15px;">${inquiry.productName}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #78716c; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;">Taille</td>
-                            <td style="padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ffffff; font-size: 15px;">${inquiry.size}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 14px 0; color: #78716c; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;">Ville</td>
-                            <td style="padding: 14px 0; color: #ffffff; font-size: 15px;">${inquiry.city}</td>
-                        </tr>
-                    </table>
-                </div>
-                <div style="padding: 20px 28px; background: #141414; border-top: 1px solid rgba(255,255,255,0.06); text-align: center;">
-                    <p style="margin: 0; font-size: 11px; color: #57534e;">Reçue le ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-                </div>
-            </div>
-        `,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
             console.error('Email notification error:', error);
         } else {
-            console.log('Email notification sent:', info.response);
+            console.log('Email notification sent:', data.id);
         }
-    });
+    } catch (err) {
+        console.error('Email notification error:', err);
+    }
 };
 
 // @route   POST api/inquiries
