@@ -41,6 +41,10 @@ const AdminDashboard = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [inquiryToDelete, setInquiryToDelete] = useState(null);
 
+    // Bulk Actions State
+    const [selectedInquiries, setSelectedInquiries] = useState([]);
+    const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+
     const navigate = useNavigate();
 
     // Filtered inquiries based on search + status filter
@@ -133,6 +137,35 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleBulkStatusUpdate = async (newStatus) => {
+        if (selectedInquiries.length === 0) return;
+        try {
+            // Optimistic update
+            setInquiries(prev => prev.map(inq =>
+                selectedInquiries.includes(inq._id) ? { ...inq, status: newStatus } : inq
+            ));
+
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries/bulk-status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token
+                },
+                body: JSON.stringify({ ids: selectedInquiries, status: newStatus }),
+            });
+
+            if (response.ok) {
+                setSelectedInquiries([]);
+            } else {
+                fetchInquiries();
+            }
+        } catch (error) {
+            console.error('Error updating bulk status:', error);
+            fetchInquiries();
+        }
+    };
+
     const handleCreateInquiry = async (formData) => {
         try {
             const token = localStorage.getItem('adminToken');
@@ -188,11 +221,57 @@ const AdminDashboard = () => {
                 setInquiries(prev => prev.filter(inq => inq._id !== inquiryToDelete._id));
                 setIsDeleteModalOpen(false);
                 setInquiryToDelete(null);
+                setSelectedInquiries(prev => prev.filter(id => id !== inquiryToDelete._id));
             }
         } catch (err) {
             console.error('Error deleting inquiry:', err);
         }
     };
+
+    const handleBulkDelete = async () => {
+        if (selectedInquiries.length === 0) return;
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries/bulk-delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-token': token
+                },
+                body: JSON.stringify({ ids: selectedInquiries })
+            });
+
+            if (response.ok) {
+                setInquiries(prev => prev.filter(inq => !selectedInquiries.includes(inq._id)));
+                setSelectedInquiries([]);
+                setIsBulkDeleteModalOpen(false);
+            }
+        } catch (err) {
+            console.error('Error bulk deleting inquiries:', err);
+        }
+    };
+
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            const ids = paginatedInquiries.map(inq => inq._id);
+            // Add new ids to existing selection without duplicates
+            setSelectedInquiries(prev => [...new Set([...prev, ...ids])]);
+        } else {
+            const ids = paginatedInquiries.map(inq => inq._id);
+            // Remove visible ids from selection
+            setSelectedInquiries(prev => prev.filter(id => !ids.includes(id)));
+        }
+    };
+
+    const handleSelectOne = (e, id) => {
+        if (e.target.checked) {
+            setSelectedInquiries(prev => [...prev, id]);
+        } else {
+            setSelectedInquiries(prev => prev.filter(selectedId => selectedId !== id));
+        }
+    };
+
+    const isAllVisibleSelected = paginatedInquiries.length > 0 && paginatedInquiries.every(inq => selectedInquiries.includes(inq._id));
 
     const openCreateModal = () => {
         setModalMode('create');
@@ -391,6 +470,59 @@ const AdminDashboard = () => {
                         ))}
                     </div>
 
+                    {/* Bulk Actions Toolbar */}
+                    <AnimatePresence>
+                        {selectedInquiries.length > 0 && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                                className="fixed bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a]/90 backdrop-blur-md border border-white/10 rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.5)] p-3 md:p-4 flex items-center justify-between w-[calc(100%-2rem)] md:w-auto md:min-w-[400px] max-w-lg transition-all"
+                            >
+                                <div className="flex items-center gap-2 shrink-0">
+                                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-white text-black text-xs font-bold">
+                                        {selectedInquiries.length}
+                                    </span>
+                                    <span className="text-xs md:text-sm font-medium text-white hidden sm:block">Selected</span>
+                                </div>
+
+                                <div className="h-8 w-[1px] bg-white/10 mx-2 md:mx-4 hidden sm:block shrink-0" />
+
+                                <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                                    <div className="relative group">
+                                        <button className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-xl text-xs md:text-sm font-medium text-stone-200 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors whitespace-nowrap">
+                                            Status <ChevronDown className="w-3.5 h-3.5 md:w-4 md:h-4 opacity-70" />
+                                        </button>
+                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-2xl overflow-hidden hidden group-hover:block pb-2">
+                                            {['pending', 'contacted', 'no answer', 'wrong number', 'completed', 'cancelled'].map((status) => (
+                                                <button
+                                                    key={status}
+                                                    onClick={() => handleBulkStatusUpdate(status)}
+                                                    className="w-full text-left px-4 py-3 text-xs font-medium uppercase tracking-wider hover:bg-white/5 transition-colors text-stone-300"
+                                                >
+                                                    {status}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => setIsBulkDeleteModalOpen(true)}
+                                        className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-xl text-xs md:text-sm font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors whitespace-nowrap"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" /> <span className="hidden sm:inline">Delete</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setSelectedInquiries([])}
+                                        className="p-2 md:ml-1 rounded-xl text-stone-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors shrink-0"
+                                        title="Clear Selection"
+                                    >
+                                        <X className="w-4 h-4 md:w-5 md:h-5" />
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     {/* Desktop Table View */}
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
@@ -402,13 +534,21 @@ const AdminDashboard = () => {
                             <table className="w-full">
                                 <thead>
                                     <tr className="border-b border-white/5">
-                                        <th className="text-left py-6 px-8 text-xs font-medium text-stone-500 uppercase tracking-wider">Client</th>
-                                        <th className="text-left py-6 px-8 text-xs font-medium text-stone-500 uppercase tracking-wider">Product</th>
-                                        <th className="text-left py-6 px-8 text-xs font-medium text-stone-500 uppercase tracking-wider">Size</th>
-                                        <th className="text-left py-6 px-8 text-xs font-medium text-stone-500 uppercase tracking-wider">Location</th>
-                                        <th className="text-left py-6 px-8 text-xs font-medium text-stone-500 uppercase tracking-wider">Status</th>
-                                        <th className="text-left py-6 px-8 text-xs font-medium text-stone-500 uppercase tracking-wider">Date</th>
-                                        <th className="py-6 px-8"></th>
+                                        <th className="py-6 pl-8 pr-4">
+                                            <input
+                                                type="checkbox"
+                                                checked={isAllVisibleSelected}
+                                                onChange={handleSelectAll}
+                                                className="w-4 h-4 rounded border-white/20 bg-transparent text-white focus:ring-0 focus:ring-offset-0 accent-white cursor-pointer"
+                                            />
+                                        </th>
+                                        <th className="text-left py-6 px-4 text-xs font-medium text-stone-500 uppercase tracking-wider">Client</th>
+                                        <th className="text-left py-6 px-4 text-xs font-medium text-stone-500 uppercase tracking-wider">Product</th>
+                                        <th className="text-left py-6 px-4 text-xs font-medium text-stone-500 uppercase tracking-wider">Size</th>
+                                        <th className="text-left py-6 px-4 text-xs font-medium text-stone-500 uppercase tracking-wider">Location</th>
+                                        <th className="text-left py-6 px-4 text-xs font-medium text-stone-500 uppercase tracking-wider">Status</th>
+                                        <th className="text-left py-6 px-4 text-xs font-medium text-stone-500 uppercase tracking-wider">Date</th>
+                                        <th className="py-6 px-4"></th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
@@ -424,9 +564,17 @@ const AdminDashboard = () => {
                                             initial={{ opacity: 0 }}
                                             animate={{ opacity: 1 }}
                                             transition={{ delay: 0.5 + (i * 0.05) }}
-                                            className="group hover:bg-white/[0.02] transition-colors"
+                                            className={`group transition-colors ${selectedInquiries.includes(inquiry._id) ? 'bg-white/[0.05]' : 'hover:bg-white/[0.02]'}`}
                                         >
-                                            <td className="py-6 px-8">
+                                            <td className="py-6 pl-8 pr-4">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedInquiries.includes(inquiry._id)}
+                                                    onChange={(e) => handleSelectOne(e, inquiry._id)}
+                                                    className="w-4 h-4 rounded border-white/20 bg-transparent text-white focus:ring-0 focus:ring-offset-0 accent-white cursor-pointer"
+                                                />
+                                            </td>
+                                            <td className="py-6 px-4">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-stone-700 to-stone-800 flex items-center justify-center text-white font-serif">
                                                         {inquiry?.name ? inquiry.name.charAt(0) : '?'}
@@ -462,7 +610,7 @@ const AdminDashboard = () => {
                                                     {new Date(inquiry.createdAt).toLocaleDateString()}
                                                 </div>
                                             </td>
-                                            <td className="py-6 px-8 text-right relative">
+                                            <td className="py-6 px-4 text-right relative">
                                                 <button
                                                     onClick={(e) => toggleMenu(e, inquiry._id)}
                                                     className="text-stone-500 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5"
@@ -587,10 +735,16 @@ const AdminDashboard = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1 * i }}
-                                className="bg-[#0F0F0F] border border-white/5 p-5 rounded-2xl"
+                                className={`border p-5 rounded-2xl ${selectedInquiries.includes(inquiry._id) ? 'bg-white/[0.05] border-white/20' : 'bg-[#0F0F0F] border-white/5'}`}
                             >
                                 <div className="flex justify-between items-start mb-4 relative">
                                     <div className="flex items-center gap-3">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedInquiries.includes(inquiry._id)}
+                                            onChange={(e) => handleSelectOne(e, inquiry._id)}
+                                            className="w-5 h-5 mr-1 rounded border-white/20 bg-transparent text-white focus:ring-0 focus:ring-offset-0 accent-white cursor-pointer"
+                                        />
                                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-stone-700 to-stone-800 flex items-center justify-center text-white font-serif">
                                             {inquiry?.name ? inquiry.name.charAt(0) : '?'}
                                         </div>
@@ -732,6 +886,13 @@ const AdminDashboard = () => {
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleDeleteInquiry}
                 clientName={inquiryToDelete?.name}
+            />
+
+            <ConfirmDeleteModal
+                isOpen={isBulkDeleteModalOpen}
+                onClose={() => setIsBulkDeleteModalOpen(false)}
+                onConfirm={handleBulkDelete}
+                clientName={`${selectedInquiries.length} selected requests`}
             />
 
         </div>

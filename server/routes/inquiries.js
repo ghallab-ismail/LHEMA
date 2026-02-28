@@ -127,8 +127,86 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
+// @route   PUT api/inquiries/bulk-status
+// @desc    Update status for multiple inquiries
+// @access  Private (Admin)
+router.put('/bulk-status', auth, async (req, res) => {
+    try {
+        const { ids, status } = req.body;
+
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ msg: 'No inquiry IDs provided' });
+        }
+
+        await Inquiry.updateMany(
+            { _id: { $in: ids } },
+            { $set: { status } }
+        );
+
+        res.json({ msg: 'Inquiries updated successfully' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   POST api/inquiries/bulk-delete
+// @desc    Delete multiple inquiries
+// @access  Private (Admin)
+router.post('/bulk-delete', auth, async (req, res) => {
+    try {
+        const { ids } = req.body;
+
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ msg: 'No inquiry IDs provided' });
+        }
+
+        await Inquiry.deleteMany({ _id: { $in: ids } });
+
+        res.json({ msg: 'Inquiries deleted successfully' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   GET api/inquiries/completed-count
+// @desc    Get count of completed inquiries for a specific product
+// @access  Public
+router.get('/completed-count', async (req, res) => {
+    try {
+        const { productName, productId } = req.query;
+
+        if (!productName && !productId) {
+            return res.status(400).json({ msg: 'Product Name or ID is required' });
+        }
+
+        const orConditions = [];
+        if (productName) {
+            orConditions.push({ productName: productName });
+        }
+        if (productId) {
+            orConditions.push({ productId: productId }); // Although productId isn't saved yet, good future proofing.
+        }
+
+        // Handle database history where the name might be the English "The Signature Cape"
+        if (productId === 'the-signature-cape' || productName?.includes('Veste-Cape')) {
+            orConditions.push({ productName: 'The Signature Cape' });
+        }
+
+        const count = await Inquiry.countDocuments({
+            $or: orConditions,
+            status: 'completed'
+        });
+
+        res.json({ count });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 // @route   PUT api/inquiries/:id
-// @desc    Update an inquiry (Handles all fields)
 // @access  Private (Admin)
 router.put('/:id', auth, async (req, res) => {
     try {

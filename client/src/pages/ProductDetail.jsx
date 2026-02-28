@@ -12,7 +12,29 @@ const ProductDetail = () => {
     const [activeImage, setActiveImage] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showStickyButton, setShowStickyButton] = useState(false);
+    const [completedCount, setCompletedCount] = useState(0);
     const hasAutoOpened = useRef(false);
+
+    useEffect(() => {
+        if (!product) return;
+
+        const fetchCompletedCount = async () => {
+            try {
+                // Fetch by product.id (or product.name as fallback if old DB entries use name)
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries/completed-count?productId=${encodeURIComponent(product.id)}&productName=${encodeURIComponent(product.name)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setCompletedCount(data.count || 0);
+                }
+            } catch (err) {
+                console.error('Error fetching completed inquiries count:', err);
+            }
+        };
+
+        fetchCompletedCount();
+    }, [product]);
+
+    const dynamicStock = product ? Math.max(0, product.total_edition - completedCount) : 0;
 
     useEffect(() => {
         const handleScroll = () => {
@@ -134,9 +156,13 @@ const ProductDetail = () => {
                                 <p className="font-serif text-2xl text-stone-900 font-medium">
                                     {product.price.toLocaleString()} {product.currency || 'DH'}
                                 </p>
-                                {product.stock > 0 && (
+                                {dynamicStock > 0 ? (
                                     <span className="bg-emerald-100/80 text-emerald-800 text-[10px] font-bold px-3 py-1.5 rounded-sm uppercase tracking-widest">
                                         En Stock
+                                    </span>
+                                ) : (
+                                    <span className="bg-red-100/80 text-red-800 text-[10px] font-bold px-3 py-1.5 rounded-sm uppercase tracking-widest">
+                                        Rupture de stock
                                     </span>
                                 )}
                             </div>
@@ -154,7 +180,7 @@ const ProductDetail = () => {
                                 <div className="flex justify-center gap-2 md:gap-3 mb-5">
                                     {Array.from({ length: product.total_edition || 10 }).map((_, i) => {
                                         const total = product.total_edition || 10;
-                                        const available = product.stock;
+                                        const available = dynamicStock;
                                         const sold = total - available;
                                         const isSold = i < sold;
                                         return (
@@ -166,7 +192,7 @@ const ProductDetail = () => {
                                     })}
                                 </div>
                                 <p className="text-center font-sans text-sm text-stone-600">
-                                    Pièces restantes : <span className="text-[#D4AF37] font-semibold text-base">{product.stock}</span> <span className="opacity-50">/ {product.total_edition || 10}</span>
+                                    Pièces restantes : <span className="text-[#D4AF37] font-semibold text-base">{dynamicStock}</span> <span className="opacity-50">/ {product.total_edition || 10}</span>
                                 </p>
                             </div>
                         )}
@@ -224,9 +250,13 @@ const ProductDetail = () => {
                         </div>
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="w-full md:w-auto bg-[#1A1A1A] text-white py-4 px-10 text-xs tracking-[0.2em] font-medium uppercase hover:bg-black transition-all duration-300 shadow-xl hover:shadow-2xl"
+                            disabled={dynamicStock <= 0}
+                            className={`w-full md:w-auto py-4 px-10 text-xs tracking-[0.2em] font-medium uppercase transition-all duration-300 shadow-xl ${dynamicStock > 0
+                                ? 'bg-[#1A1A1A] text-white hover:bg-black hover:shadow-2xl'
+                                : 'bg-stone-300 text-stone-500 cursor-not-allowed'
+                                }`}
                         >
-                            Demander l'acquisition
+                            {dynamicStock > 0 ? "Demander l'acquisition" : "Épuisé"}
                         </button>
                     </motion.div>
                 )}
