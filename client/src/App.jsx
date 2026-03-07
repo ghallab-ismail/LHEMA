@@ -15,6 +15,7 @@ import LegalPrivacy from './pages/LegalPrivacy';
 import LegalExchange from './pages/LegalExchange';
 import LegalDelivery from './pages/LegalDelivery';
 import LegalWarranty from './pages/LegalWarranty';
+import NotFound from './pages/NotFound';
 
 function App() {
     // Wake up the Render backend as soon as the app loads
@@ -47,6 +48,9 @@ function App() {
                 <Route element={<ProtectedRoute />}>
                     <Route path="/portal-lhema-access" element={<AdminDashboard />} />
                 </Route>
+
+                {/* 404 Catch-All */}
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </Router>
     );
