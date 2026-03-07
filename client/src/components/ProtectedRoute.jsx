@@ -7,7 +7,7 @@ const ProtectedRoute = () => {
     const isAuthenticated = localStorage.getItem('adminToken');
 
     if (!isAuthenticated) {
-        return <Navigate to="/admin/login" replace />;
+        return <Navigate to="/portal-lhema-access/login" replace />;
     }
 
     return <Outlet />;

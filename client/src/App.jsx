@@ -42,10 +42,10 @@ function App() {
                     <Route path="/legal/warranty" element={<LegalWarranty />} />
                 </Route>
 
-                {/* Admin Routes (Clean UI) */}
-                <Route path="/admin/login" element={<AdminLogin />} />
+                {/* Admin Routes (Hidden Access) */}
+                <Route path="/portal-lhema-access/login" element={<AdminLogin />} />
                 <Route element={<ProtectedRoute />}>
-                    <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/portal-lhema-access" element={<AdminDashboard />} />
                 </Route>
             </Routes>
         </Router>

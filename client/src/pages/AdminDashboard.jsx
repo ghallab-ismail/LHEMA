@@ -78,7 +78,7 @@ const AdminDashboard = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('adminToken');
-        navigate('/admin/login');
+        navigate('/portal-lhema-access/login');
     };
 
     useEffect(() => {

@@ -33,7 +33,7 @@ mongoose.connect(process.env.MONGODB_URI)
 // Routes
 // app.use('/api/products', require('./routes/products'));
 app.use('/api/inquiries', require('./routes/inquiries'));
-app.use('/api/admin', require('./routes/admin'));
+app.use('/api/portal', require('./routes/admin'));
 
 // Health check endpoint (used by frontend wake-up ping & cron-job keep-alive)
 app.get('/health', (req, res) => {
