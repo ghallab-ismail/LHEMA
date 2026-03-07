@@ -15,6 +15,11 @@ const ProductDetail = () => {
     const [completedCount, setCompletedCount] = useState(0);
     const hasAutoOpened = useRef(false);
 
+    // Wake up the Render backend immediately when user lands on the product page
+    useEffect(() => {
+        fetch(`${import.meta.env.VITE_API_URL}/health`).catch(() => { });
+    }, []);
+
     useEffect(() => {
         if (!product) return;
 
