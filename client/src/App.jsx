@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import ComingSoon from './pages/ComingSoon';
@@ -17,6 +17,12 @@ import LegalDelivery from './pages/LegalDelivery';
 import LegalWarranty from './pages/LegalWarranty';
 
 function App() {
+    // Wake up the Render backend as soon as the app loads
+    // This way, by the time the user fills the form, the server is already awake
+    useEffect(() => {
+        fetch(`${import.meta.env.VITE_API_URL}/health`).catch(() => { });
+    }, []);
+
     return (
         <Router>
             <ScrollToTop />

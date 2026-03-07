@@ -35,6 +35,11 @@ mongoose.connect(process.env.MONGODB_URI)
 app.use('/api/inquiries', require('./routes/inquiries'));
 app.use('/api/admin', require('./routes/admin'));
 
+// Health check endpoint (used by frontend wake-up ping & cron-job keep-alive)
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok' });
+});
+
 app.get('/', (req, res) => {
     res.send('Maison Lhema API Running');
 });
