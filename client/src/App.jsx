@@ -1,57 +1,62 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
-import ComingSoon from './pages/ComingSoon';
-import Atelier from './pages/Atelier';
-import Femme from './pages/Femme';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminLogin from './pages/AdminLogin';
+
+const ComingSoon = lazy(() => import('./pages/ComingSoon'));
+const Atelier = lazy(() => import('./pages/Atelier'));
+const Femme = lazy(() => import('./pages/Femme'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminLogin = lazy(() => import('./pages/AdminLogin'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const LegalPrivacy = lazy(() => import('./pages/LegalPrivacy'));
+const LegalExchange = lazy(() => import('./pages/LegalExchange'));
+const LegalDelivery = lazy(() => import('./pages/LegalDelivery'));
+const LegalWarranty = lazy(() => import('./pages/LegalWarranty'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 import ProtectedRoute from './components/ProtectedRoute';
-import ProductDetail from './pages/ProductDetail';
 import PublicLayout from './layouts/PublicLayout';
 import ScrollToTop from './components/ScrollToTop';
-
-import LegalPrivacy from './pages/LegalPrivacy';
-import LegalExchange from './pages/LegalExchange';
-import LegalDelivery from './pages/LegalDelivery';
-import LegalWarranty from './pages/LegalWarranty';
-import NotFound from './pages/NotFound';
 
 function App() {
     // Wake up the Render backend as soon as the app loads
     // This way, by the time the user fills the form, the server is already awake
     useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL}/health`).catch(() => { });
+        const timer = setTimeout(() => {
+            fetch(`${import.meta.env.VITE_API_URL}/health`).catch(() => { });
+        }, 3000);
+        return () => clearTimeout(timer);
     }, []);
 
     return (
         <Router>
             <ScrollToTop />
-            <Routes>
-                {/* Public Routes with Custom Cursor & WhatsApp */}
-                <Route element={<PublicLayout />}>
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/femme" element={<Femme />} />
-                    <Route path="/homme" element={<ComingSoon />} />
-                    <Route path="/atelier" element={<Atelier />} />
-                    <Route path="/product/:id" element={<ProductDetail />} />
+            <Suspense fallback={<div className="h-screen w-full bg-lhema-cream" />}>
+                <Routes>
+                    {/* Public Routes with Custom Cursor & WhatsApp */}
+                    <Route element={<PublicLayout />}>
+                        <Route path="/" element={<LandingPage />} />
+                        <Route path="/femme" element={<Femme />} />
+                        <Route path="/homme" element={<ComingSoon />} />
+                        <Route path="/atelier" element={<Atelier />} />
+                        <Route path="/product/:id" element={<ProductDetail />} />
 
-                    {/* Legal Routes */}
-                    <Route path="/legal/privacy" element={<LegalPrivacy />} />
-                    <Route path="/legal/exchange" element={<LegalExchange />} />
-                    <Route path="/legal/delivery" element={<LegalDelivery />} />
-                    <Route path="/legal/warranty" element={<LegalWarranty />} />
-                </Route>
+                        {/* Legal Routes */}
+                        <Route path="/legal/privacy" element={<LegalPrivacy />} />
+                        <Route path="/legal/exchange" element={<LegalExchange />} />
+                        <Route path="/legal/delivery" element={<LegalDelivery />} />
+                        <Route path="/legal/warranty" element={<LegalWarranty />} />
+                    </Route>
 
-                {/* Admin Routes (Hidden Access) */}
-                <Route path="/portal-lhema-access/login" element={<AdminLogin />} />
-                <Route element={<ProtectedRoute />}>
-                    <Route path="/portal-lhema-access" element={<AdminDashboard />} />
-                </Route>
+                    {/* Admin Routes (Hidden Access) */}
+                    <Route path="/portal-lhema-access/login" element={<AdminLogin />} />
+                    <Route element={<ProtectedRoute />}>
+                        <Route path="/portal-lhema-access" element={<AdminDashboard />} />
+                    </Route>
 
-                {/* 404 Catch-All */}
-                <Route path="*" element={<NotFound />} />
-            </Routes>
+                    {/* 404 Catch-All */}
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+            </Suspense>
         </Router>
     );
 }
