@@ -4,11 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Star } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import CheckoutModal from '../components/CheckoutModal';
-import { products } from '../data/products';
+import { products as staticProducts } from '../data/products';
 
 const ProductDetail = () => {
     const { id } = useParams();
-    const product = products.find(p => p.id === parseInt(id) || p.id === id);
+    const [product, setProduct] = useState(null);
+    const [productLoading, setProductLoading] = useState(true);
     const [activeImage, setActiveImage] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showStickyButton, setShowStickyButton] = useState(false);
@@ -20,13 +21,42 @@ const ProductDetail = () => {
         fetch(`${import.meta.env.VITE_API_URL}/health`).catch(() => { });
     }, []);
 
+    // Load product: try static first, then API
+    useEffect(() => {
+        const staticProduct = staticProducts.find(p => p.id === parseInt(id) || p.id === id);
+        if (staticProduct) {
+            setProduct(staticProduct);
+            setProductLoading(false);
+            return;
+        }
+        // Fetch from API (DB product by _id)
+        const fetchProduct = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setProduct(data);
+                } else {
+                    setProduct(null);
+                }
+            } catch (err) {
+                console.error('Error fetching product:', err);
+                setProduct(null);
+            } finally {
+                setProductLoading(false);
+            }
+        };
+        fetchProduct();
+    }, [id]);
+
     useEffect(() => {
         if (!product) return;
 
         const fetchCompletedCount = async () => {
             try {
-                // Fetch by product.id (or product.name as fallback if old DB entries use name)
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries/completed-count?productId=${encodeURIComponent(product.id)}&productName=${encodeURIComponent(product.name)}`);
+                // Fetch by product.id or product._id (for DB products)
+                const pid = product.id || product._id;
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries/completed-count?productId=${encodeURIComponent(pid)}&productName=${encodeURIComponent(product.name)}`);
                 if (response.ok) {
                     const data = await response.json();
                     setCompletedCount(data.count || 0);
@@ -73,8 +103,18 @@ const ProductDetail = () => {
         }
     };
 
+    if (productLoading) return (
+        <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-stone-300 border-t-stone-800 rounded-full animate-spin" />
+        </div>
+    );
 
-    if (!product) return <div className="text-white">Product not found</div>;
+    if (!product) return (
+        <div className="min-h-screen bg-[#FAF9F6] flex flex-col items-center justify-center text-stone-600">
+            <p className="font-serif text-2xl mb-2">Produit introuvable</p>
+            <a href="/" className="text-xs uppercase tracking-widest underline mt-4">Retour à l'accueil</a>
+        </div>
+    );
 
     return (
         <div className="bg-[#FAF9F6] min-h-screen text-stone-900 font-sans pb-24 lg:pb-0 relative">
@@ -152,9 +192,9 @@ const ProductDetail = () => {
                             {/* Premium Rating */}
                             <div className="flex items-center gap-1 mb-4">
                                 {[...Array(5)].map((_, i) => (
-                                    <Star key={i} className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" strokeWidth={1} />
+                                    <Star key={i} className={`w-4 h-4 ${i < (product.stars !== undefined ? product.stars : 5) ? 'fill-[#D4AF37] text-[#D4AF37]' : 'text-stone-300'}`} strokeWidth={1} />
                                 ))}
-                                <span className="text-xs font-serif text-stone-500 ml-2">(Édition Limitée)</span>
+                                {product.is_limited_edition && <span className="text-xs font-serif text-stone-500 ml-2">(Édition Limitée)</span>}
                             </div>
 
                             <div className="flex items-center gap-4 mb-2">

@@ -5,6 +5,7 @@ import LandingPage from './pages/LandingPage';
 const ComingSoon = lazy(() => import('./pages/ComingSoon'));
 const Atelier = lazy(() => import('./pages/Atelier'));
 const Femme = lazy(() => import('./pages/Femme'));
+const Homme = lazy(() => import('./pages/Homme'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
@@ -36,7 +37,7 @@ function App() {
                     <Route element={<PublicLayout />}>
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/femme" element={<Femme />} />
-                        <Route path="/homme" element={<ComingSoon />} />
+                        <Route path="/homme" element={<Homme />} />
                         <Route path="/atelier" element={<Atelier />} />
                         <Route path="/product/:id" element={<ProductDetail />} />
 

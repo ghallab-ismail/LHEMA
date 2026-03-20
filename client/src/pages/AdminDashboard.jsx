@@ -19,12 +19,20 @@ import {
     ChevronRight,
     Plus,
     Edit2,
-    Trash2
+    Trash2,
+    Package,
+    Tag,
+    ImageOff
 } from 'lucide-react';
 import InquiryModal from '../components/InquiryModal';
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
+import ProductModal from '../components/ProductModal';
 
 const AdminDashboard = () => {
+    // Section toggle
+    const [activeSection, setActiveSection] = useState('inquiries'); // 'inquiries' | 'products'
+
+    // Inquiries state
     const [inquiries, setInquiries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeMenu, setActiveMenu] = useState(null);
@@ -34,7 +42,7 @@ const AdminDashboard = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
-    // CRUD Modal States
+    // Inquiry CRUD Modal States
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalMode, setModalMode] = useState('create'); // 'create' or 'edit'
     const [selectedInquiry, setSelectedInquiry] = useState(null);
@@ -44,6 +52,16 @@ const AdminDashboard = () => {
     // Bulk Actions State
     const [selectedInquiries, setSelectedInquiries] = useState([]);
     const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+
+    // Products state
+    const [products, setProducts] = useState([]);
+    const [productsLoading, setProductsLoading] = useState(false);
+    const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+    const [productModalMode, setProductModalMode] = useState('create');
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [isProductDeleteModalOpen, setIsProductDeleteModalOpen] = useState(false);
+    const [productToDelete, setProductToDelete] = useState(null);
+    const [productCategoryFilter, setProductCategoryFilter] = useState('all');
 
     const navigate = useNavigate();
 
@@ -83,6 +101,7 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         fetchInquiries();
+        fetchProducts();
     }, []);
 
     // Close menu when clicking outside
@@ -106,6 +125,88 @@ const AdminDashboard = () => {
             setLoading(false);
         }
     };
+
+    const fetchProducts = async () => {
+        try {
+            setProductsLoading(true);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`);
+            const data = await response.json();
+            setProducts(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        } finally {
+            setProductsLoading(false);
+        }
+    };
+
+    const handleCreateProduct = async (formData) => {
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+                body: JSON.stringify(formData)
+            });
+            if (response.ok) {
+                await fetchProducts();
+                setIsProductModalOpen(false);
+            }
+        } catch (err) {
+            console.error('Error creating product:', err);
+        }
+    };
+
+    const handleUpdateProduct = async (formData) => {
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${selectedProduct._id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+                body: JSON.stringify(formData)
+            });
+            if (response.ok) {
+                await fetchProducts();
+                setIsProductModalOpen(false);
+            }
+        } catch (err) {
+            console.error('Error updating product:', err);
+        }
+    };
+
+    const handleDeleteProduct = async () => {
+        if (!productToDelete) return;
+        try {
+            const token = localStorage.getItem('adminToken');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${productToDelete._id}`, {
+                method: 'DELETE',
+                headers: { 'x-auth-token': token }
+            });
+            if (response.ok) {
+                setProducts(prev => prev.filter(p => p._id !== productToDelete._id));
+                setIsProductDeleteModalOpen(false);
+                setProductToDelete(null);
+            }
+        } catch (err) {
+            console.error('Error deleting product:', err);
+        }
+    };
+
+    const openCreateProductModal = () => {
+        setProductModalMode('create');
+        setSelectedProduct(null);
+        setIsProductModalOpen(true);
+    };
+
+    const openEditProductModal = (product) => {
+        setProductModalMode('edit');
+        setSelectedProduct(product);
+        setIsProductModalOpen(true);
+    };
+
+    const filteredProducts = useMemo(() => {
+        if (productCategoryFilter === 'all') return products;
+        return products.filter(p => p.category === productCategoryFilter);
+    }, [products, productCategoryFilter]);
 
     const handleStatusUpdate = async (e, id, newStatus) => {
         e.stopPropagation(); // Prevent menu from closing immediately
@@ -318,9 +419,24 @@ const AdminDashboard = () => {
                 <div className="mb-12">
                     <div className="w-8 h-8 bg-white rounded-full opacity-90" />
                 </div>
-                <div className="space-y-8">
-                    <button className="p-3 rounded-xl bg-white/5 text-white transition-all hover:scale-105">
+                <div className="space-y-4">
+                    <button
+                        onClick={() => setActiveSection('inquiries')}
+                        title="Requests"
+                        className={`p-3 rounded-xl transition-all hover:scale-105 ${
+                            activeSection === 'inquiries' ? 'bg-white/10 text-white' : 'text-stone-500 hover:text-white hover:bg-white/5'
+                        }`}
+                    >
                         <LayoutDashboard className="w-5 h-5" />
+                    </button>
+                    <button
+                        onClick={() => setActiveSection('products')}
+                        title="Products"
+                        className={`p-3 rounded-xl transition-all hover:scale-105 ${
+                            activeSection === 'products' ? 'bg-white/10 text-white' : 'text-stone-500 hover:text-white hover:bg-white/5'
+                        }`}
+                    >
+                        <Package className="w-5 h-5" />
                     </button>
                 </div>
                 <div className="mt-auto">
@@ -336,7 +452,27 @@ const AdminDashboard = () => {
 
             {/* Mobile Header */}
             <header className="md:hidden flex items-center justify-between p-6 border-b border-white/5 sticky top-0 bg-[#0a0a0a]/90 backdrop-blur-md z-40">
-                <div className="w-8 h-8 bg-white rounded-full opacity-90" />
+                <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-white rounded-full opacity-90" />
+                    <div className="flex gap-1">
+                        <button
+                            onClick={() => setActiveSection('inquiries')}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                activeSection === 'inquiries' ? 'bg-white/10 text-white' : 'text-stone-500'
+                            }`}
+                        >
+                            Requests
+                        </button>
+                        <button
+                            onClick={() => setActiveSection('products')}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                activeSection === 'products' ? 'bg-white/10 text-white' : 'text-stone-500'
+                            }`}
+                        >
+                            Products
+                        </button>
+                    </div>
+                </div>
                 <button
                     onClick={handleLogout}
                     className="p-2 text-stone-500 hover:text-red-400 transition-colors"
@@ -349,6 +485,171 @@ const AdminDashboard = () => {
             {/* Main Content */}
             <main className="md:pl-20">
                 <div className="max-w-7xl mx-auto p-6 md:p-12">
+                {/* ======================== PRODUCTS SECTION ======================== */}
+                {activeSection === 'products' && (
+                    <motion.div
+                        key="products"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        {/* Products Header */}
+                        <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-12 space-y-6 md:space-y-0">
+                            <div>
+                                <h1 className="text-3xl md:text-4xl font-serif text-white mb-2">Collection</h1>
+                                <p className="text-stone-500 text-xs md:text-sm tracking-widest uppercase">Product Management</p>
+                            </div>
+                            <div className="flex gap-3">
+                                {/* Category Filter */}
+                                <div className="flex gap-2">
+                                    {['all', 'femme', 'homme'].map(cat => (
+                                        <button
+                                            key={cat}
+                                            onClick={() => setProductCategoryFilter(cat)}
+                                            className={`px-4 py-2.5 rounded-full text-xs font-medium uppercase tracking-wider transition-colors ${
+                                                productCategoryFilter === cat
+                                                    ? 'bg-white text-black'
+                                                    : 'bg-white/5 text-stone-400 border border-white/10 hover:bg-white/10'
+                                            }`}
+                                        >
+                                            {cat === 'all' ? 'All' : cat === 'femme' ? '♀ Femme' : '♂ Homme'}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button
+                                    onClick={openCreateProductModal}
+                                    className="flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium bg-white text-black hover:bg-stone-200 transition-colors whitespace-nowrap"
+                                >
+                                    <Plus className="w-4 h-4" /> Add Product
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Products Stats */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                            {[
+                                { label: 'Total', value: products.length },
+                                { label: 'Femme', value: products.filter(p => p.category === 'femme').length },
+                                { label: 'Homme', value: products.filter(p => p.category === 'homme').length },
+                                { label: 'Available', value: products.filter(p => p.isAvailable).length },
+                            ].map((stat, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1 * (i + 1) }}
+                                    className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors"
+                                >
+                                    <p className="text-stone-500 text-xs uppercase tracking-wider mb-2">{stat.label}</p>
+                                    <span className="text-3xl font-serif text-white">{stat.value}</span>
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        {/* Products Grid */}
+                        {productsLoading ? (
+                            <div className="flex items-center justify-center py-24">
+                                <div className="w-8 h-8 border border-white/20 border-t-white rounded-full animate-spin" />
+                            </div>
+                        ) : filteredProducts.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-24 text-stone-600">
+                                <Package className="w-12 h-12 mb-4 opacity-30" />
+                                <p className="text-sm">No products yet. Add your first one.</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {filteredProducts.map((product, i) => (
+                                    <motion.div
+                                        key={product._id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.05 * i }}
+                                        className="group relative bg-[#0F0F0F] border border-white/5 rounded-2xl overflow-hidden hover:border-white/15 transition-all"
+                                    >
+                                        {/* Image */}
+                                        <div className="aspect-[3/4] bg-stone-900 relative overflow-hidden">
+                                            {product.images && product.images.length > 0 ? (
+                                                <img
+                                                    src={product.images[0]}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                                />
+                                            ) : null}
+                                            <div className={`w-full h-full ${product.images && product.images.length > 0 ? 'hidden' : 'flex'} items-center justify-center text-stone-700 absolute inset-0 bg-stone-900`}>
+                                                <ImageOff className="w-10 h-10" />
+                                            </div>
+                                            {/* Category badge */}
+                                            <div className="absolute top-3 left-3">
+                                                <span className={`px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider ${
+                                                    product.category === 'femme'
+                                                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/20'
+                                                        : 'bg-blue-500/20 text-blue-300 border border-blue-500/20'
+                                                }`}>
+                                                    {product.category}
+                                                </span>
+                                            </div>
+                                            {/* Availability badge */}
+                                            {!product.isAvailable && (
+                                                <div className="absolute top-3 right-3">
+                                                    <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-stone-800 text-stone-400 border border-stone-700">
+                                                        Sold Out
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {/* Image count */}
+                                            {product.images && product.images.length > 1 && (
+                                                <div className="absolute bottom-3 right-3">
+                                                    <span className="px-2 py-1 rounded-lg text-[10px] bg-black/60 text-stone-300 backdrop-blur-sm">
+                                                        +{product.images.length - 1}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Card body */}
+                                        <div className="p-4">
+                                            <h3 className="text-white font-serif text-base mb-1 truncate">{product.name}</h3>
+                                            <p className="text-stone-400 text-sm font-medium">{product.price.toLocaleString()} MAD</p>
+                                            {product.sizes && product.sizes.length > 0 && (
+                                                <div className="flex flex-wrap gap-1 mt-2">
+                                                    {product.sizes.slice(0, 4).map(size => (
+                                                        <span key={size} className="px-1.5 py-0.5 rounded text-[10px] bg-white/5 text-stone-500 border border-white/5">{size}</span>
+                                                    ))}
+                                                    {product.sizes.length > 4 && (
+                                                        <span className="px-1.5 py-0.5 rounded text-[10px] text-stone-600">+{product.sizes.length - 4}</span>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="border-t border-white/5 flex">
+                                            <button
+                                                onClick={() => openEditProductModal(product)}
+                                                className="flex-1 flex items-center justify-center gap-2 py-3 text-stone-500 hover:text-white hover:bg-white/5 transition-colors text-xs uppercase tracking-wider"
+                                            >
+                                                <Edit2 className="w-3.5 h-3.5" /> Edit
+                                            </button>
+                                            <div className="w-px bg-white/5" />
+                                            <button
+                                                onClick={() => { setProductToDelete(product); setIsProductDeleteModalOpen(true); }}
+                                                className="flex-1 flex items-center justify-center gap-2 py-3 text-stone-500 hover:text-red-400 hover:bg-red-500/5 transition-colors text-xs uppercase tracking-wider"
+                                            >
+                                                <Trash2 className="w-3.5 h-3.5" /> Delete
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        )}
+                    </motion.div>
+                )}
+                {/* ======================== END PRODUCTS SECTION ======================== */}
+
+                {/* ======================== INQUIRIES SECTION ======================== */}
+                {activeSection === 'inquiries' && (<>
                     {/* Header */}
                     <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-12 space-y-6 md:space-y-0">
                         <div>
@@ -870,6 +1171,8 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                     )}
+                </>)}
+                {/* ======================== END INQUIRIES SECTION ======================== */}
                 </div>
             </main>
 
@@ -893,6 +1196,22 @@ const AdminDashboard = () => {
                 onClose={() => setIsBulkDeleteModalOpen(false)}
                 onConfirm={handleBulkDelete}
                 clientName={`${selectedInquiries.length} selected requests`}
+            />
+
+            {/* Product Modals */}
+            <ProductModal
+                isOpen={isProductModalOpen}
+                onClose={() => setIsProductModalOpen(false)}
+                mode={productModalMode}
+                initialData={selectedProduct}
+                onSubmit={productModalMode === 'create' ? handleCreateProduct : handleUpdateProduct}
+            />
+
+            <ConfirmDeleteModal
+                isOpen={isProductDeleteModalOpen}
+                onClose={() => setIsProductDeleteModalOpen(false)}
+                onConfirm={handleDeleteProduct}
+                clientName={productToDelete?.name}
             />
 
         </div>

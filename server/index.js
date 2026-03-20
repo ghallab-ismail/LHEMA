@@ -4,18 +4,24 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Security Middlewares
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 app.use(cors({
-    origin: [process.env.FRONTEND_URL, 'http://localhost:5173', 'https://lhema.vercel.app', 'https://maisonlhema.com', 'https://www.maisonlhema.com', /\.vercel\.app$/],
+    origin: [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174', 'https://lhema.vercel.app', 'https://maisonlhema.com', 'https://www.maisonlhema.com', /\.vercel\.app$/],
     credentials: true,
 }));
 app.set('trust proxy', 1); // Enable trusting the reverse proxy (Vercel) for rate limiting
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+
+// Serve uploaded images statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rate Limiting (apply to all requests or specific routes)
 const limiter = rateLimit({
@@ -31,9 +37,10 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch(err => console.error('MongoDB Connection Error:', err));
 
 // Routes
-// app.use('/api/products', require('./routes/products'));
+app.use('/api/products', require('./routes/products'));
 app.use('/api/inquiries', require('./routes/inquiries'));
 app.use('/api/portal', require('./routes/admin'));
+app.use('/api/upload', require('./routes/upload'));
 
 // Health check endpoint (used by frontend wake-up ping & cron-job keep-alive)
 app.get('/health', (req, res) => {

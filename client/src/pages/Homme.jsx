@@ -3,29 +3,22 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import NoiseOverlay from '../components/NoiseOverlay';
-import { products as staticProducts } from '../data/products';
 import { motion } from 'framer-motion';
 
-const Femme = () => {
-    // Start with the original static products (they have real images + rich description)
-    const [products, setProducts] = useState(staticProducts);
+const Homme = () => {
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products?category=femme`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products?category=homme`);
                 if (response.ok) {
-                    const dbProducts = await response.json();
-                    // Merge: static products first, then any NEW DB products (skip duplicates by name)
-                    const staticNames = staticProducts.map(p => p.name.toLowerCase());
-                    const newDbProducts = (Array.isArray(dbProducts) ? dbProducts : []).filter(
-                        p => !staticNames.includes(p.name.toLowerCase())
-                    );
-                    setProducts([...staticProducts, ...newDbProducts]);
+                    const data = await response.json();
+                    setProducts(Array.isArray(data) ? data : []);
                 }
             } catch (err) {
-                console.error('Error fetching femme products:', err);
+                console.error('Error fetching homme products:', err);
             } finally {
                 setLoading(false);
             }
@@ -45,9 +38,9 @@ const Femme = () => {
                     transition={{ duration: 0.8 }}
                     className="text-center mb-24"
                 >
-                    <h1 className="font-serif text-5xl md:text-7xl mb-6">COLLECTION FEMME</h1>
+                    <h1 className="font-serif text-5xl md:text-7xl mb-6">COLLECTION HOMME</h1>
                     <p className="font-sans text-xs uppercase tracking-[0.2em] max-w-xl mx-auto opacity-70 leading-relaxed">
-                        Élégance intemporelle et silhouettes architecturales.
+                        Tailoring contemporain, esthétique minimaliste et précision artisanale.
                     </p>
                 </motion.div>
 
@@ -74,4 +67,4 @@ const Femme = () => {
     );
 };
 
-export default Femme;
+export default Homme;
