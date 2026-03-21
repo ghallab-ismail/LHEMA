@@ -111,12 +111,23 @@ const AdminDashboard = () => {
         return () => window.removeEventListener('click', handleClickOutside);
     }, []);
 
+    // Helper: if any API call returns 401, clear token and redirect to login
+    const handleUnauthorized = (response) => {
+        if (response.status === 401) {
+            localStorage.removeItem('adminToken');
+            navigate('/portal-lhema-access/login');
+            return true;
+        }
+        return false;
+    };
+
     const fetchInquiries = async () => {
         try {
             const token = localStorage.getItem('adminToken');
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries`, {
                 headers: { 'x-auth-token': token }
             });
+            if (handleUnauthorized(response)) return;
             const data = await response.json();
             setInquiries(data);
             setLoading(false);
