@@ -70,6 +70,8 @@ const ProductDetail = () => {
     }, [product]);
 
     const dynamicStock = product ? Math.max(0, product.total_edition - completedCount) : 0;
+    // Product is purchasable only if isAvailable is true AND there is stock
+    const isProductAvailable = product ? (product.isAvailable !== false && dynamicStock > 0) : false;
 
     useEffect(() => {
         const handleScroll = () => {
@@ -201,7 +203,11 @@ const ProductDetail = () => {
                                 <p className="font-serif text-2xl text-stone-900 font-medium">
                                     {product.price.toLocaleString()} {product.currency || 'DH'}
                                 </p>
-                                {dynamicStock > 0 ? (
+                                {product.isAvailable === false ? (
+                                    <span className="bg-stone-200/80 text-stone-600 text-[10px] font-bold px-3 py-1.5 rounded-sm uppercase tracking-widest">
+                                        Indisponible
+                                    </span>
+                                ) : dynamicStock > 0 ? (
                                     <span className="bg-emerald-100/80 text-emerald-800 text-[10px] font-bold px-3 py-1.5 rounded-sm uppercase tracking-widest">
                                         En Stock
                                     </span>
@@ -295,13 +301,13 @@ const ProductDetail = () => {
                         </div>
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            disabled={dynamicStock <= 0}
-                            className={`w-full md:w-auto py-4 px-10 text-xs tracking-[0.2em] font-medium uppercase transition-all duration-300 shadow-xl ${dynamicStock > 0
+                            disabled={!isProductAvailable}
+                            className={`w-full md:w-auto py-4 px-10 text-xs tracking-[0.2em] font-medium uppercase transition-all duration-300 shadow-xl ${isProductAvailable
                                 ? 'bg-[#1A1A1A] text-white hover:bg-black hover:shadow-2xl'
                                 : 'bg-stone-300 text-stone-500 cursor-not-allowed'
                                 }`}
                         >
-                            {dynamicStock > 0 ? "Demander l'acquisition" : "Épuisé"}
+                            {product.isAvailable === false ? "Indisponible" : dynamicStock > 0 ? "Demander l'acquisition" : "Épuisé"}
                         </button>
                     </motion.div>
                 )}
