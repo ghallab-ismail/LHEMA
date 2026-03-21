@@ -511,7 +511,7 @@ const AdminDashboard = () => {
                                 <h1 className="text-3xl md:text-4xl font-serif text-white mb-2">Collection</h1>
                                 <p className="text-stone-500 text-xs md:text-sm tracking-widest uppercase">Product Management</p>
                             </div>
-                            <div className="flex gap-3">
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                                 {/* Category Filter */}
                                 <div className="flex gap-2">
                                     {['all', 'femme', 'homme'].map(cat => (
@@ -530,7 +530,7 @@ const AdminDashboard = () => {
                                 </div>
                                 <button
                                     onClick={openCreateProductModal}
-                                    className="flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium bg-white text-black hover:bg-stone-200 transition-colors whitespace-nowrap"
+                                    className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-sm font-medium bg-white text-black hover:bg-stone-200 transition-colors whitespace-nowrap"
                                 >
                                     <Plus className="w-4 h-4" /> Add Product
                                 </button>
