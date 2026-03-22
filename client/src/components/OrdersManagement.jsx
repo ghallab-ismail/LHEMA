@@ -17,7 +17,9 @@ import {
     Save,
     GripVertical,
     CheckCircle2,
-    AlertCircle
+    AlertCircle,
+    MessageCircle,
+    Mail
 } from 'lucide-react';
 
 const OrdersManagement = () => {
@@ -197,6 +199,52 @@ const OrdersManagement = () => {
     const handleSaveEditStep = async (orderId, stepId) => {
         await handleUpdateStep(orderId, stepId, { title: editStepTitle, description: editStepDesc });
         setEditingStep(null);
+    };
+
+    const handleWhatsAppNotify = (order) => {
+        if (!order.whatsapp) {
+            showToast('No WhatsApp number provided for this customer');
+            return;
+        }
+        
+        // Ensure phone number has international format (defaulting to MA +212 if starts with 0)
+        let phoneNumber = order.whatsapp.replace(/\D/g, '');
+        if (phoneNumber.startsWith('0')) {
+            phoneNumber = '212' + phoneNumber.substring(1);
+        }
+        
+        const trackingLink = `${window.location.origin}/suivi?code=${order.trackingCode}`;
+        const productText = order.productName ? `de la pièce ${order.productName}` : 'de votre pièce';
+        
+        const message = `Bonjour ${order.customerName || 'Cher Client'},\n\nVotre commande ${productText} a bien été enregistrée et confirmée.\n\nVoici votre code de suivi : *${order.trackingCode}*\n\nVous pouvez suivre l'avancement de la confection de votre pièce sur ce lien :\n${trackingLink}\n\nL'équipe Maison Lhema.`;
+        
+        const encodedMessage = encodeURIComponent(message);
+        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+    };
+
+    const handleEmailNotify = (e, order) => {
+        e.stopPropagation();
+        if (!order.email) {
+            showToast('No email address provided for this customer');
+            return;
+        }
+
+        const trackingLink = `${window.location.origin}/suivi?code=${order.trackingCode}`;
+        const productText = order.productName ? `de la pièce ${order.productName}` : 'de votre pièce';
+        const subject = `Confirmation de votre commande Maison Lhema - ${order.trackingCode}`;
+        
+        const message = `Bonjour ${order.customerName || 'Cher Client'},\n\nVotre commande ${productText} a bien été enregistrée et confirmée.\n\nVoici votre code de suivi : ${order.trackingCode}\n\nVous pouvez suivre l'avancement de la confection de votre pièce sur ce lien :\n${trackingLink}\n\nL'équipe Maison Lhema.`;
+        
+        const encodedSubject = encodeURIComponent(subject);
+        const encodedMessage = encodeURIComponent(message);
+        
+        const mailtoLink = `mailto:${order.email}?subject=${encodedSubject}&body=${encodedMessage}`;
+        const a = document.createElement('a');
+        a.href = mailtoLink;
+        a.target = '_top'; // Use _top for mailto links to avoid blank tabs
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     };
 
     const getStatusColor = (status) => {
@@ -423,7 +471,7 @@ const OrdersManagement = () => {
                                         >
                                             <div className="border-t border-white/5 p-6">
                                                 {/* Order Details Grid */}
-                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                                                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
                                                     <div>
                                                         <p className="text-stone-600 text-[10px] uppercase tracking-wider mb-1">Client</p>
                                                         <p className="text-white text-sm">{order.customerName}</p>
@@ -432,6 +480,12 @@ const OrdersManagement = () => {
                                                         <p className="text-stone-600 text-[10px] uppercase tracking-wider mb-1">WhatsApp</p>
                                                         <a href={`https://wa.me/${order.whatsapp}`} className="text-emerald-400 text-sm hover:underline" target="_blank" rel="noreferrer">{order.whatsapp}</a>
                                                     </div>
+                                                    {order.email && (
+                                                        <div>
+                                                            <p className="text-stone-600 text-[10px] uppercase tracking-wider mb-1">Email</p>
+                                                            <a href={`mailto:${order.email}`} className="text-emerald-400 text-sm hover:underline">{order.email}</a>
+                                                        </div>
+                                                    )}
                                                     <div>
                                                         <p className="text-stone-600 text-[10px] uppercase tracking-wider mb-1">Ville</p>
                                                         <p className="text-white text-sm">{order.city}</p>
@@ -617,6 +671,24 @@ const OrdersManagement = () => {
                                                                             >
                                                                                 <Edit3 className="w-3 h-3" />
                                                                             </button>
+                                                                            {stepIndex === 0 && (
+                                                                                <>
+                                                                                    <button
+                                                                                        onClick={() => handleWhatsAppNotify(order)}
+                                                                                        className="p-1.5 rounded-lg text-green-500 hover:text-green-400 hover:bg-green-500/10 transition-colors"
+                                                                                        title="Send WhatsApp Confirmation"
+                                                                                    >
+                                                                                        <MessageCircle className="w-3 h-3" />
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={(e) => handleEmailNotify(e, order)}
+                                                                                        className="p-1.5 rounded-lg text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-colors"
+                                                                                        title="Send Email Confirmation"
+                                                                                    >
+                                                                                        <Mail className="w-3 h-3" />
+                                                                                    </button>
+                                                                                </>
+                                                                            )}
                                                                             <button
                                                                                 onClick={() => handleDeleteStep(order._id, step._id)}
                                                                                 className="p-1.5 rounded-lg text-stone-600 hover:text-red-400 hover:bg-red-500/10 transition-colors"
@@ -667,6 +739,24 @@ const OrdersManagement = () => {
                                                                         >
                                                                             <Edit3 className="w-3.5 h-3.5" />
                                                                         </button>
+                                                                        {stepIndex === 0 && (
+                                                                            <>
+                                                                                <button
+                                                                                    onClick={() => handleWhatsAppNotify(order)}
+                                                                                    className="p-2 rounded-lg text-green-500 active:text-green-400 bg-white/5 active:bg-green-500/10 transition-colors"
+                                                                                    title="Send WhatsApp Confirmation"
+                                                                                >
+                                                                                    <MessageCircle className="w-3.5 h-3.5" />
+                                                                                </button>
+                                                                                <button
+                                                                                    onClick={(e) => handleEmailNotify(e, order)}
+                                                                                    className="p-2 rounded-lg text-blue-400 active:text-blue-300 bg-white/5 active:bg-blue-500/10 transition-colors"
+                                                                                    title="Send Email Confirmation"
+                                                                                >
+                                                                                    <Mail className="w-3.5 h-3.5" />
+                                                                                </button>
+                                                                            </>
+                                                                        )}
                                                                         <button
                                                                             onClick={() => handleDeleteStep(order._id, step._id)}
                                                                             className="p-2 rounded-lg text-stone-600 active:text-red-400 bg-white/5 active:bg-red-500/10 transition-colors"

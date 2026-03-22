@@ -39,6 +39,10 @@ const OrderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    email: {
+        type: String,
+        default: ''
+    },
     city: {
         type: String,
         required: true

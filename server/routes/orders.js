@@ -61,6 +61,29 @@ router.get('/track/:code', async (req, res) => {
     }
 });
 
+// @route   PUT api/orders/track/:code/email
+// @desc    Update order email by tracking code (Public - immediately after checkout)
+// @access  Public
+router.put('/track/:code/email', async (req, res) => {
+    try {
+        const code = req.params.code.toUpperCase();
+        const { email } = req.body;
+        
+        const order = await Order.findOne({ trackingCode: code });
+        if (!order) {
+            return res.status(404).json({ msg: 'Aucune commande trouvée avec ce code.' });
+        }
+        
+        order.email = email;
+        await order.save();
+        
+        res.json({ msg: 'Email updated successfully' });
+    } catch (err) {
+        console.error('Error updating order email:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 // @route   GET api/orders
 // @desc    Get all orders (Admin)
 // @access  Private

@@ -10,6 +10,8 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
     const [submitting, setSubmitting] = useState(false);
     const [trackingCode, setTrackingCode] = useState('');
     const [copied, setCopied] = useState(false);
+    const [email, setEmail] = useState('');
+    const [emailSubmitted, setEmailSubmitted] = useState(false);
 
     const validate = () => {
         const newErrors = {};
@@ -48,6 +50,8 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
         setErrors({});
         setTrackingCode('');
         setCopied(false);
+        setEmail('');
+        setEmailSubmitted(false);
     };
 
     const handleCopyCode = async () => {
@@ -115,6 +119,22 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
         } catch (error) {
             console.error('Error submitting form:', error);
             setSubmitting(false);
+        }
+    };
+
+    const handleEmailSubmit = async (e) => {
+        e.preventDefault();
+        if (!email) return;
+
+        try {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/orders/track/${trackingCode}/email`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            setEmailSubmitted(true);
+        } catch (error) {
+            console.error('Error saving email:', error);
         }
     };
 
@@ -303,6 +323,38 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                             Conservez ce code pour suivre la confection de votre pièce.
                                         </p>
                                     </motion.div>
+                                )}
+
+                                {/* Email collection */}
+                                {!emailSubmitted ? (
+                                    <form onSubmit={handleEmailSubmit} className="mb-8 max-w-sm mx-auto">
+                                        <p className="font-sans text-xs text-stone-500 mb-3">
+                                            Afin de rester au courant de l'avancement, laissez-nous votre email (optionnel) :
+                                        </p>
+                                        <div className="flex gap-2">
+                                            <input 
+                                                type="email" 
+                                                placeholder="votre@email.com" 
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                className="flex-1 bg-transparent border-b border-stone-300 py-2 text-sm text-black focus:outline-none focus:border-black transition-colors"
+                                            />
+                                            <button 
+                                                type="submit"
+                                                className="px-4 py-2 bg-black text-white text-[10px] uppercase tracking-[0.2em] hover:bg-stone-800 transition-colors"
+                                            >
+                                                Valider
+                                            </button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    <motion.p 
+                                        initial={{ opacity: 0, y: 5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="text-emerald-600 text-xs font-sans mb-8"
+                                    >
+                                        Merci, votre email est enregistré.
+                                    </motion.p>
                                 )}
 
                                 <Link
