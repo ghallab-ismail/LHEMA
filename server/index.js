@@ -41,6 +41,7 @@ app.use('/api/products', require('./routes/products'));
 app.use('/api/inquiries', require('./routes/inquiries'));
 app.use('/api/portal', require('./routes/admin'));
 app.use('/api/upload', require('./routes/upload'));
+app.use('/api/orders', require('./routes/orders'));
 
 // Health check endpoint (used by frontend wake-up ping & cron-job keep-alive)
 app.get('/health', (req, res) => {

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Copy, Check } from 'lucide-react';
 
 const CheckoutModal = ({ isOpen, onClose, product }) => {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'M (42-45)' });
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
+    const [trackingCode, setTrackingCode] = useState('');
+    const [copied, setCopied] = useState(false);
 
     const validate = () => {
         const newErrors = {};
@@ -43,6 +45,25 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
         setStep(1);
         setFormData({ name: '', whatsapp: '', city: '', size: 'M (42-45)' });
         setErrors({});
+        setTrackingCode('');
+        setCopied(false);
+    };
+
+    const handleCopyCode = async () => {
+        try {
+            await navigator.clipboard.writeText(trackingCode);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            const el = document.createElement('textarea');
+            el.value = trackingCode;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -56,28 +77,40 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
 
         setSubmitting(true);
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries`, {
+            const productNameToSend = product?.name || "The Signature Cape";
+
+            // Create inquiry (existing flow)
+            const inquiryResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...formData,
-                    productName: product?.name || "The Signature Cape"
+                    productName: productNameToSend
                 }),
             });
 
-            if (response.ok) {
+            // Create order with tracking code
+            const orderResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    customerName: formData.name,
+                    whatsapp: formData.whatsapp,
+                    city: formData.city,
+                    size: formData.size,
+                    productName: productNameToSend
+                }),
+            });
+
+            if (inquiryResponse.ok && orderResponse.ok) {
+                const orderData = await orderResponse.json();
+                setTrackingCode(orderData.trackingCode);
                 setStep(2);
                 setErrors({});
-                setTimeout(() => {
-                    handleCloseModal();
-                    setSubmitting(false);
-                }, 3000);
             } else {
                 console.error('Submission failed');
-                setSubmitting(false);
             }
+            setSubmitting(false);
         } catch (error) {
             console.error('Error submitting form:', error);
             setSubmitting(false);
@@ -221,12 +254,62 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                 </form>
                             </div>
                         ) : (
-                            <div className="text-center py-12">
-                                <h3 className="font-serif text-2xl mb-4 text-black">Demande Reçue</h3>
-                                <p className="font-sans text-sm text-stone-600 leading-relaxed">
+                            <div className="text-center py-6">
+                                {/* Success checkmark */}
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
+                                    className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-50 flex items-center justify-center"
+                                >
+                                    <Check className="w-8 h-8 text-emerald-600" />
+                                </motion.div>
+
+                                <h3 className="font-serif text-2xl mb-3 text-black">Demande Reçue</h3>
+                                <p className="font-sans text-sm text-stone-600 leading-relaxed mb-8">
                                     Merci, {formData.name}. <br />
                                     Un conseiller privé vous contactera bientôt sur WhatsApp.
                                 </p>
+
+                                {/* Tracking Code */}
+                                {trackingCode && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.3 }}
+                                        className="bg-stone-50 border border-stone-200 p-6 mb-6"
+                                    >
+                                        <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-stone-500 mb-3">
+                                            Votre Code de Suivi
+                                        </p>
+                                        <div className="flex items-center justify-center gap-3">
+                                            <span className="font-serif text-2xl text-black tracking-widest">
+                                                {trackingCode}
+                                            </span>
+                                            <button
+                                                onClick={handleCopyCode}
+                                                className="p-2 hover:bg-stone-200 rounded-lg transition-colors"
+                                                title="Copier le code"
+                                            >
+                                                {copied ? (
+                                                    <Check className="w-4 h-4 text-emerald-600" />
+                                                ) : (
+                                                    <Copy className="w-4 h-4 text-stone-400" />
+                                                )}
+                                            </button>
+                                        </div>
+                                        <p className="font-sans text-[10px] text-stone-400 mt-3">
+                                            Conservez ce code pour suivre la confection de votre pièce.
+                                        </p>
+                                    </motion.div>
+                                )}
+
+                                <a
+                                    href="/suivi"
+                                    className="inline-block text-xs font-sans uppercase tracking-[0.15em] text-stone-500 hover:text-black transition-colors border-b border-stone-300 hover:border-black pb-1"
+                                >
+                                    Suivre ma commande →
+                                </a>
                             </div>
                         )}
                     </motion.div>

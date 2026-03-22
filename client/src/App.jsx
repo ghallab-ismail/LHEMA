@@ -14,6 +14,7 @@ const LegalExchange = lazy(() => import('./pages/LegalExchange'));
 const LegalDelivery = lazy(() => import('./pages/LegalDelivery'));
 const LegalWarranty = lazy(() => import('./pages/LegalWarranty'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const OrderTracking = lazy(() => import('./pages/OrderTracking'));
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicLayout from './layouts/PublicLayout';
 import ScrollToTop from './components/ScrollToTop';
@@ -40,6 +41,9 @@ function App() {
                         <Route path="/homme" element={<Homme />} />
                         <Route path="/atelier" element={<Atelier />} />
                         <Route path="/product/:id" element={<ProductDetail />} />
+
+                        {/* Order Tracking */}
+                        <Route path="/suivi" element={<OrderTracking />} />
 
                         {/* Legal Routes */}
                         <Route path="/legal/privacy" element={<LegalPrivacy />} />

@@ -22,15 +22,17 @@ import {
     Trash2,
     Package,
     Tag,
-    ImageOff
+    ImageOff,
+    Truck
 } from 'lucide-react';
+import OrdersManagement from '../components/OrdersManagement';
 import InquiryModal from '../components/InquiryModal';
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal';
 import ProductModal from '../components/ProductModal';
 
 const AdminDashboard = () => {
     // Section toggle
-    const [activeSection, setActiveSection] = useState('inquiries'); // 'inquiries' | 'products'
+    const [activeSection, setActiveSection] = useState('inquiries'); // 'inquiries' | 'products' | 'orders'
 
     // Inquiries state
     const [inquiries, setInquiries] = useState([]);
@@ -449,6 +451,15 @@ const AdminDashboard = () => {
                     >
                         <Package className="w-5 h-5" />
                     </button>
+                    <button
+                        onClick={() => setActiveSection('orders')}
+                        title="Orders"
+                        className={`p-3 rounded-xl transition-all hover:scale-105 ${
+                            activeSection === 'orders' ? 'bg-white/10 text-white' : 'text-stone-500 hover:text-white hover:bg-white/5'
+                        }`}
+                    >
+                        <Truck className="w-5 h-5" />
+                    </button>
                 </div>
                 <div className="mt-auto">
                     <button
@@ -481,6 +492,14 @@ const AdminDashboard = () => {
                             }`}
                         >
                             Products
+                        </button>
+                        <button
+                            onClick={() => setActiveSection('orders')}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                activeSection === 'orders' ? 'bg-white/10 text-white' : 'text-stone-500'
+                            }`}
+                        >
+                            Orders
                         </button>
                     </div>
                 </div>
@@ -658,6 +677,10 @@ const AdminDashboard = () => {
                     </motion.div>
                 )}
                 {/* ======================== END PRODUCTS SECTION ======================== */}
+
+                {/* ======================== ORDERS SECTION ======================== */}
+                {activeSection === 'orders' && <OrdersManagement />}
+                {/* ======================== END ORDERS SECTION ======================== */}
 
                 {/* ======================== INQUIRIES SECTION ======================== */}
                 {activeSection === 'inquiries' && (<>
