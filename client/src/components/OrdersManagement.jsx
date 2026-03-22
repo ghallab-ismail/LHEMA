@@ -481,9 +481,9 @@ const OrdersManagement = () => {
                                                         <a href={`https://wa.me/${order.whatsapp}`} className="text-emerald-400 text-sm hover:underline" target="_blank" rel="noreferrer">{order.whatsapp}</a>
                                                     </div>
                                                     {order.email && (
-                                                        <div>
+                                                        <div className="col-span-2 md:col-span-1">
                                                             <p className="text-stone-600 text-[10px] uppercase tracking-wider mb-1">Email</p>
-                                                            <a href={`mailto:${order.email}`} className="text-emerald-400 text-sm hover:underline">{order.email}</a>
+                                                            <a href={`mailto:${order.email}`} className="text-emerald-400 text-sm hover:underline break-all">{order.email}</a>
                                                         </div>
                                                     )}
                                                     <div>
