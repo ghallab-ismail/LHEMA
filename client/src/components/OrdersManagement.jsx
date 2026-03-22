@@ -521,116 +521,157 @@ const OrdersManagement = () => {
                                                         {order.craftingSteps.map((step, stepIndex) => (
                                                             <div
                                                                 key={step._id}
-                                                                className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group"
+                                                                className="p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all group"
                                                             >
-                                                                {/* Step Number */}
-                                                                <div className="flex items-center gap-2 flex-shrink-0 pt-0.5">
-                                                                    <span className="text-stone-600 text-[10px] font-mono w-4 text-right">{stepIndex + 1}</span>
-                                                                    <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${getStepStatusColor(step.status)}`} />
-                                                                </div>
+                                                                <div className="flex items-start gap-3">
+                                                                    {/* Step Number */}
+                                                                    <div className="flex items-center gap-2 flex-shrink-0 pt-0.5">
+                                                                        <span className="text-stone-600 text-[10px] font-mono w-4 text-right">{stepIndex + 1}</span>
+                                                                        <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${getStepStatusColor(step.status)}`} />
+                                                                    </div>
 
-                                                                {/* Step Content */}
-                                                                <div className="flex-1 min-w-0">
-                                                                    {editingStep === step._id ? (
-                                                                        <div className="space-y-2">
-                                                                            <input
-                                                                                type="text"
-                                                                                value={editStepTitle}
-                                                                                onChange={(e) => setEditStepTitle(e.target.value)}
-                                                                                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-white/20"
-                                                                            />
-                                                                            <input
-                                                                                type="text"
-                                                                                value={editStepDesc}
-                                                                                onChange={(e) => setEditStepDesc(e.target.value)}
-                                                                                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-stone-300 focus:outline-none focus:border-white/20"
-                                                                            />
-                                                                            <div className="flex gap-2">
-                                                                                <button
-                                                                                    onClick={() => handleSaveEditStep(order._id, step._id)}
-                                                                                    className="px-3 py-1 rounded-lg text-[10px] font-medium bg-white text-black hover:bg-stone-200"
-                                                                                >
-                                                                                    <Save className="w-3 h-3" />
-                                                                                </button>
-                                                                                <button
-                                                                                    onClick={() => setEditingStep(null)}
-                                                                                    className="px-3 py-1 rounded-lg text-[10px] font-medium text-stone-400 hover:text-white bg-white/5"
-                                                                                >
-                                                                                    <X className="w-3 h-3" />
-                                                                                </button>
+                                                                    {/* Step Content */}
+                                                                    <div className="flex-1 min-w-0">
+                                                                        {editingStep === step._id ? (
+                                                                            <div className="space-y-2">
+                                                                                <input
+                                                                                    type="text"
+                                                                                    value={editStepTitle}
+                                                                                    onChange={(e) => setEditStepTitle(e.target.value)}
+                                                                                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-white/20"
+                                                                                />
+                                                                                <input
+                                                                                    type="text"
+                                                                                    value={editStepDesc}
+                                                                                    onChange={(e) => setEditStepDesc(e.target.value)}
+                                                                                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-stone-300 focus:outline-none focus:border-white/20"
+                                                                                />
+                                                                                <div className="flex gap-2">
+                                                                                    <button
+                                                                                        onClick={() => handleSaveEditStep(order._id, step._id)}
+                                                                                        className="px-3 py-1 rounded-lg text-[10px] font-medium bg-white text-black hover:bg-stone-200"
+                                                                                    >
+                                                                                        <Save className="w-3 h-3" />
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={() => setEditingStep(null)}
+                                                                                        className="px-3 py-1 rounded-lg text-[10px] font-medium text-stone-400 hover:text-white bg-white/5"
+                                                                                    >
+                                                                                        <X className="w-3 h-3" />
+                                                                                    </button>
+                                                                                </div>
                                                                             </div>
+                                                                        ) : (
+                                                                            <>
+                                                                                <p className="text-white text-sm font-medium">{step.title}</p>
+                                                                                {step.description && (
+                                                                                    <p className="text-stone-500 text-xs mt-0.5">{step.description}</p>
+                                                                                )}
+                                                                                {step.completedAt && (
+                                                                                    <p className="text-stone-600 text-[10px] mt-1 flex items-center gap-1">
+                                                                                        <Clock className="w-3 h-3" />
+                                                                                        {new Date(step.completedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                                                                    </p>
+                                                                                )}
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+
+                                                                    {/* Desktop Step Actions (hover reveal) */}
+                                                                    {editingStep !== step._id && (
+                                                                        <div className="hidden md:flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                            {step.status === 'pending' && (
+                                                                                <button
+                                                                                    onClick={() => handleUpdateStep(order._id, step._id, { status: 'in-progress' })}
+                                                                                    disabled={savingStep === step._id}
+                                                                                    className="px-2 py-1 rounded-lg text-[9px] font-medium text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 transition-colors uppercase tracking-wider"
+                                                                                >
+                                                                                    {savingStep === step._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Start'}
+                                                                                </button>
+                                                                            )}
+                                                                            {step.status === 'in-progress' && (
+                                                                                <button
+                                                                                    onClick={() => handleUpdateStep(order._id, step._id, { status: 'completed' })}
+                                                                                    disabled={savingStep === step._id}
+                                                                                    className="px-2 py-1 rounded-lg text-[9px] font-medium text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors uppercase tracking-wider"
+                                                                                >
+                                                                                    {savingStep === step._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Complete'}
+                                                                                </button>
+                                                                            )}
+                                                                            {step.status === 'completed' && (
+                                                                                <button
+                                                                                    onClick={() => handleUpdateStep(order._id, step._id, { status: 'pending' })}
+                                                                                    disabled={savingStep === step._id}
+                                                                                    className="px-2 py-1 rounded-lg text-[9px] font-medium text-stone-400 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors uppercase tracking-wider"
+                                                                                >
+                                                                                    {savingStep === step._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Reset'}
+                                                                                </button>
+                                                                            )}
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    setEditingStep(step._id);
+                                                                                    setEditStepTitle(step.title);
+                                                                                    setEditStepDesc(step.description || '');
+                                                                                }}
+                                                                                className="p-1.5 rounded-lg text-stone-500 hover:text-white hover:bg-white/5 transition-colors"
+                                                                            >
+                                                                                <Edit3 className="w-3 h-3" />
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => handleDeleteStep(order._id, step._id)}
+                                                                                className="p-1.5 rounded-lg text-stone-600 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                                                                            >
+                                                                                <Trash2 className="w-3 h-3" />
+                                                                            </button>
                                                                         </div>
-                                                                    ) : (
-                                                                        <>
-                                                                            <p className="text-white text-sm font-medium">{step.title}</p>
-                                                                            {step.description && (
-                                                                                <p className="text-stone-500 text-xs mt-0.5">{step.description}</p>
-                                                                            )}
-                                                                            {step.completedAt && (
-                                                                                <p className="text-stone-600 text-[10px] mt-1 flex items-center gap-1">
-                                                                                    <Clock className="w-3 h-3" />
-                                                                                    {new Date(step.completedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                                                                                </p>
-                                                                            )}
-                                                                        </>
                                                                     )}
                                                                 </div>
 
-                                                                {/* Step Actions */}
+                                                                {/* Mobile Step Actions (always visible) */}
                                                                 {editingStep !== step._id && (
-                                                                    <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                        {/* Status cycle buttons */}
+                                                                    <div className="flex md:hidden items-center gap-2 mt-3 ml-9 pt-2 border-t border-white/5">
                                                                         {step.status === 'pending' && (
                                                                             <button
                                                                                 onClick={() => handleUpdateStep(order._id, step._id, { status: 'in-progress' })}
                                                                                 disabled={savingStep === step._id}
-                                                                                className="px-2 py-1 rounded-lg text-[9px] font-medium text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 transition-colors uppercase tracking-wider"
-                                                                                title="Start this step"
+                                                                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[10px] font-medium text-blue-400 bg-blue-500/10 active:bg-blue-500/30 border border-blue-500/20 transition-colors uppercase tracking-wider"
                                                                             >
-                                                                                {savingStep === step._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Start'}
+                                                                                {savingStep === step._id ? <Loader2 className="w-3 h-3 animate-spin" /> : <><Clock className="w-3 h-3" /> Start</>}
                                                                             </button>
                                                                         )}
                                                                         {step.status === 'in-progress' && (
                                                                             <button
                                                                                 onClick={() => handleUpdateStep(order._id, step._id, { status: 'completed' })}
                                                                                 disabled={savingStep === step._id}
-                                                                                className="px-2 py-1 rounded-lg text-[9px] font-medium text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors uppercase tracking-wider"
-                                                                                title="Complete this step"
+                                                                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[10px] font-medium text-emerald-400 bg-emerald-500/10 active:bg-emerald-500/30 border border-emerald-500/20 transition-colors uppercase tracking-wider"
                                                                             >
-                                                                                {savingStep === step._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Complete'}
+                                                                                {savingStep === step._id ? <Loader2 className="w-3 h-3 animate-spin" /> : <><Check className="w-3 h-3" /> Complete</>}
                                                                             </button>
                                                                         )}
                                                                         {step.status === 'completed' && (
                                                                             <button
                                                                                 onClick={() => handleUpdateStep(order._id, step._id, { status: 'pending' })}
                                                                                 disabled={savingStep === step._id}
-                                                                                className="px-2 py-1 rounded-lg text-[9px] font-medium text-stone-400 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors uppercase tracking-wider"
-                                                                                title="Reset this step"
+                                                                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[10px] font-medium text-stone-400 bg-white/5 active:bg-white/15 border border-white/10 transition-colors uppercase tracking-wider"
                                                                             >
                                                                                 {savingStep === step._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Reset'}
                                                                             </button>
                                                                         )}
-
-                                                                        {/* Edit button */}
                                                                         <button
                                                                             onClick={() => {
                                                                                 setEditingStep(step._id);
                                                                                 setEditStepTitle(step.title);
                                                                                 setEditStepDesc(step.description || '');
                                                                             }}
-                                                                            className="p-1.5 rounded-lg text-stone-500 hover:text-white hover:bg-white/5 transition-colors"
-                                                                            title="Edit step"
+                                                                            className="p-2 rounded-lg text-stone-500 active:text-white bg-white/5 active:bg-white/10 transition-colors"
                                                                         >
-                                                                            <Edit3 className="w-3 h-3" />
+                                                                            <Edit3 className="w-3.5 h-3.5" />
                                                                         </button>
-
-                                                                        {/* Delete */}
                                                                         <button
                                                                             onClick={() => handleDeleteStep(order._id, step._id)}
-                                                                            className="p-1.5 rounded-lg text-stone-600 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                                                                            title="Delete step"
+                                                                            className="p-2 rounded-lg text-stone-600 active:text-red-400 bg-white/5 active:bg-red-500/10 transition-colors"
                                                                         >
-                                                                            <Trash2 className="w-3 h-3" />
+                                                                            <Trash2 className="w-3.5 h-3.5" />
                                                                         </button>
                                                                     </div>
                                                                 )}
