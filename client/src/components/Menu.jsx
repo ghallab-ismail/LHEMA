@@ -8,7 +8,8 @@ const Menu = ({ onClose }) => {
         { name: "COLLECTION", path: "/" },
         { name: "FEMME", path: "/femme" },
         { name: "HOMME", path: "/homme" },
-        { name: "ATELIER", path: "/atelier" }
+        { name: "ATELIER", path: "/atelier" },
+        { name: "SUIVI", path: "/suivi" }
     ];
     const secondaryLinks = ["LA MAISON", "BOUTIQUES", "SERVICES", "COMPTE"];
 

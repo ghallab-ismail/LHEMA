@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const CheckoutModal = ({ isOpen, onClose, product }) => {
     const [step, setStep] = useState(1);
@@ -304,12 +305,13 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                     </motion.div>
                                 )}
 
-                                <a
-                                    href="/suivi"
+                                <Link
+                                    to="/suivi"
+                                    onClick={handleCloseModal}
                                     className="inline-block text-xs font-sans uppercase tracking-[0.15em] text-stone-500 hover:text-black transition-colors border-b border-stone-300 hover:border-black pb-1"
                                 >
                                     Suivre ma commande →
-                                </a>
+                                </Link>
                             </div>
                         )}
                     </motion.div>
