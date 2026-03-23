@@ -358,7 +358,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                 )}
 
                                 <Link
-                                    to="/suivi"
+                                    to={`/suivi?code=${trackingCode}`}
                                     onClick={handleCloseModal}
                                     className="inline-block text-xs font-sans uppercase tracking-[0.15em] text-stone-500 hover:text-black transition-colors border-b border-stone-300 hover:border-black pb-1"
                                 >
