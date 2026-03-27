@@ -53,7 +53,9 @@ router.get('/track/:code', async (req, res) => {
             status: order.status,
             craftingSteps: order.craftingSteps,
             estimatedDelivery: order.estimatedDelivery,
-            createdAt: order.createdAt
+            createdAt: order.createdAt,
+            customerReview: order.customerReview,
+            customerRating: order.customerRating
         });
     } catch (err) {
         console.error('Error tracking order:', err.message);
@@ -218,16 +220,27 @@ router.delete('/:id/steps/:stepId', auth, async (req, res) => {
     }
 });
 
-// @route   DELETE api/orders/:id
-// @desc    Delete an order (Admin)
-// @access  Private
-router.delete('/:id', auth, async (req, res) => {
+// @route   PUT api/orders/track/:code/review
+// @desc    Submit customer review (Public)
+// @access  Public
+router.put('/track/:code/review', async (req, res) => {
     try {
-        const order = await Order.findByIdAndDelete(req.params.id);
-        if (!order) return res.status(404).json({ msg: 'Order not found' });
-        res.json({ msg: 'Order removed' });
+        const code = req.params.code.toUpperCase();
+        const { review, rating } = req.body;
+        
+        const order = await Order.findOne({ trackingCode: code });
+        if (!order) {
+            return res.status(404).json({ msg: 'Aucune commande trouvée avec ce code.' });
+        }
+        
+        order.customerReview = review;
+        order.customerRating = rating;
+        order.reviewDate = new Date();
+        await order.save();
+        
+        res.json({ msg: 'Review submitted successfully' });
     } catch (err) {
-        console.error('Error deleting order:', err.message);
+        console.error('Error submitting review:', err.message);
         res.status(500).send('Server Error');
     }
 });

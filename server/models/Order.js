@@ -84,6 +84,20 @@ const OrderSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    customerReview: {
+        type: String,
+        default: ''
+    },
+    customerRating: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5
+    },
+    reviewDate: {
+        type: Date,
+        default: null
     }
 });
 

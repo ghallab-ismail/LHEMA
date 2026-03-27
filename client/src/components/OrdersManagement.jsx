@@ -32,9 +32,11 @@ const OrdersManagement = () => {
     const [savingStep, setSavingStep] = useState(null);
     const [showAddStep, setShowAddStep] = useState(null);
     const [newStepTitle, setNewStepTitle] = useState('');
+    const [newStepTitleAr, setNewStepTitleAr] = useState('');
     const [newStepDesc, setNewStepDesc] = useState('');
     const [editingStep, setEditingStep] = useState(null);
     const [editStepTitle, setEditStepTitle] = useState('');
+    const [editStepTitleAr, setEditStepTitleAr] = useState('');
     const [editStepDesc, setEditStepDesc] = useState('');
     const [toast, setToast] = useState(null);
 
@@ -126,13 +128,18 @@ const OrdersManagement = () => {
             const response = await fetch(`${API}/api/orders/${orderId}/steps`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-auth-token': getToken() },
-                body: JSON.stringify({ title: newStepTitle, description: newStepDesc })
+                body: JSON.stringify({ 
+                    title: newStepTitle, 
+                    titleAr: newStepTitleAr,
+                    description: newStepDesc 
+                })
             });
 
             if (response.ok) {
                 const updatedOrder = await response.json();
                 setOrders(prev => prev.map(o => o._id === orderId ? updatedOrder : o));
                 setNewStepTitle('');
+                setNewStepTitleAr('');
                 setNewStepDesc('');
                 setShowAddStep(null);
                 showToast('Step added');
@@ -197,11 +204,15 @@ const OrdersManagement = () => {
     };
 
     const handleSaveEditStep = async (orderId, stepId) => {
-        await handleUpdateStep(orderId, stepId, { title: editStepTitle, description: editStepDesc });
+        await handleUpdateStep(orderId, stepId, { 
+            title: editStepTitle, 
+            titleAr: editStepTitleAr,
+            description: editStepDesc 
+        });
         setEditingStep(null);
     };
 
-    const handleWhatsAppNotify = (order) => {
+    const handleWhatsAppNotify = (order, step = null) => {
         if (!order.whatsapp) {
             showToast('No WhatsApp number provided for this customer');
             return;
@@ -216,13 +227,18 @@ const OrdersManagement = () => {
         const trackingLink = `${window.location.origin}/suivi?code=${order.trackingCode}`;
         const productText = order.productName ? `de la pièce ${order.productName}` : 'de votre pièce';
         
-        const message = `Bonjour ${order.customerName || 'Cher Client'},\n\nVotre commande ${productText} a bien été enregistrée et confirmée.\n\nVoici votre code de suivi : *${order.trackingCode}*\n\nVous pouvez suivre l'avancement de la confection de votre pièce sur ce lien :\n${trackingLink}\n\nL'équipe Maison Lhema.`;
+        let message = '';
+        if (!step || step.title.includes('Demande Reçue')) {
+            message = `Bonjour ${order.customerName || 'Cher Client'},\n\nVotre commande ${productText} a bien été enregistrée et confirmée.\n\nVoici votre code de suivi : *${order.trackingCode}*\n\nVous pouvez suivre l'avancement de la confection de votre pièce sur ce lien :\n${trackingLink}\n\nL'équipe Maison Lhema.`;
+        } else {
+            message = `Bonjour ${order.customerName || 'Cher Client'},\n\nBonne nouvelle ! Votre commande ${productText} a franchi une nouvelle étape : *${step.title}*.\n\nVous pouvez suivre les détails ici :\n${trackingLink}\n\nL'équipe Maison Lhema.`;
+        }
         
         const encodedMessage = encodeURIComponent(message);
         window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
     };
 
-    const handleEmailNotify = (e, order) => {
+    const handleEmailNotify = (e, order, step = null) => {
         e.stopPropagation();
         if (!order.email) {
             showToast('No email address provided for this customer');
@@ -231,9 +247,16 @@ const OrdersManagement = () => {
 
         const trackingLink = `${window.location.origin}/suivi?code=${order.trackingCode}`;
         const productText = order.productName ? `de la pièce ${order.productName}` : 'de votre pièce';
-        const subject = `Confirmation de votre commande Maison Lhema - ${order.trackingCode}`;
+        const subject = !step || step.title.includes('Demande Reçue') 
+            ? `Confirmation de votre commande Maison Lhema - ${order.trackingCode}`
+            : `Mise à jour de votre commande Maison Lhema - ${step.title}`;
         
-        const message = `Bonjour ${order.customerName || 'Cher Client'},\n\nVotre commande ${productText} a bien été enregistrée et confirmée.\n\nVoici votre code de suivi : ${order.trackingCode}\n\nVous pouvez suivre l'avancement de la confection de votre pièce sur ce lien :\n${trackingLink}\n\nL'équipe Maison Lhema.`;
+        let message = '';
+        if (!step || step.title.includes('Demande Reçue')) {
+            message = `Bonjour ${order.customerName || 'Cher Client'},\n\nVotre commande ${productText} a bien été enregistrée et confirmée.\n\nVoici votre code de suivi : ${order.trackingCode}\n\nVous pouvez suivre l'avancement de la confection de votre pièce sur ce lien :\n${trackingLink}\n\nL'équipe Maison Lhema.`;
+        } else {
+            message = `Bonjour ${order.customerName || 'Cher Client'},\n\nVotre commande ${productText} vient de franchir une nouvelle étape importante : ${step.title}.\n\nVous pouvez consulter l'état détaillé de la confection ici :\n${trackingLink}\n\nL'équipe Maison Lhema.`;
+        }
         
         const encodedSubject = encodeURIComponent(subject);
         const encodedMessage = encodeURIComponent(message);
@@ -241,7 +264,7 @@ const OrdersManagement = () => {
         const mailtoLink = `mailto:${order.email}?subject=${encodedSubject}&body=${encodedMessage}`;
         const a = document.createElement('a');
         a.href = mailtoLink;
-        a.target = '_top'; // Use _top for mailto links to avoid blank tabs
+        a.target = '_top';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -519,7 +542,12 @@ const OrdersManagement = () => {
                                                     <div className="flex items-center justify-between mb-4">
                                                         <h4 className="text-white text-sm font-medium">Crafting Steps</h4>
                                                         <button
-                                                            onClick={() => { setShowAddStep(showAddStep === order._id ? null : order._id); setNewStepTitle(''); setNewStepDesc(''); }}
+                                                            onClick={() => { 
+                                                                setShowAddStep(showAddStep === order._id ? null : order._id); 
+                                                                setNewStepTitle(''); 
+                                                                setNewStepTitleAr('');
+                                                                setNewStepDesc(''); 
+                                                            }}
                                                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-medium text-stone-400 hover:text-white bg-white/5 hover:bg-white/10 transition-all"
                                                         >
                                                             <Plus className="w-3 h-3" /> Add Step
@@ -536,13 +564,23 @@ const OrdersManagement = () => {
                                                                 className="mb-4 overflow-hidden"
                                                             >
                                                                 <div className="bg-white/[0.03] border border-white/10 rounded-xl p-4 space-y-3">
-                                                                    <input
-                                                                        type="text"
-                                                                        placeholder="Step title..."
-                                                                        value={newStepTitle}
-                                                                        onChange={(e) => setNewStepTitle(e.target.value)}
-                                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-stone-600 focus:outline-none focus:border-white/20"
-                                                                    />
+                                                                    <div className="grid grid-cols-2 gap-3">
+                                                                        <input
+                                                                            type="text"
+                                                                            placeholder="Step title (FR)..."
+                                                                            value={newStepTitle}
+                                                                            onChange={(e) => setNewStepTitle(e.target.value)}
+                                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-stone-600 focus:outline-none focus:border-white/20"
+                                                                        />
+                                                                        <input
+                                                                            type="text"
+                                                                            placeholder="Title (AR)..."
+                                                                            value={newStepTitleAr}
+                                                                            onChange={(e) => setNewStepTitleAr(e.target.value)}
+                                                                            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white text-right placeholder:text-stone-600 focus:outline-none focus:border-white/20"
+                                                                            dir="rtl"
+                                                                        />
+                                                                    </div>
                                                                     <input
                                                                         type="text"
                                                                         placeholder="Description (optional)..."
@@ -588,17 +626,29 @@ const OrdersManagement = () => {
                                                                     <div className="flex-1 min-w-0">
                                                                         {editingStep === step._id ? (
                                                                             <div className="space-y-2">
-                                                                                <input
-                                                                                    type="text"
-                                                                                    value={editStepTitle}
-                                                                                    onChange={(e) => setEditStepTitle(e.target.value)}
-                                                                                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-white/20"
-                                                                                />
+                                                                                <div className="grid grid-cols-2 gap-2">
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        value={editStepTitle}
+                                                                                        onChange={(e) => setEditStepTitle(e.target.value)}
+                                                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-white/20"
+                                                                                        placeholder="Title (FR)"
+                                                                                    />
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        value={editStepTitleAr}
+                                                                                        onChange={(e) => setEditStepTitleAr(e.target.value)}
+                                                                                        className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white text-right focus:outline-none focus:border-white/20"
+                                                                                        placeholder="Title (AR)"
+                                                                                        dir="rtl"
+                                                                                    />
+                                                                                </div>
                                                                                 <input
                                                                                     type="text"
                                                                                     value={editStepDesc}
                                                                                     onChange={(e) => setEditStepDesc(e.target.value)}
                                                                                     className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-stone-300 focus:outline-none focus:border-white/20"
+                                                                                    placeholder="Description"
                                                                                 />
                                                                                 <div className="flex gap-2">
                                                                                     <button
@@ -617,7 +667,12 @@ const OrdersManagement = () => {
                                                                             </div>
                                                                         ) : (
                                                                             <>
-                                                                                <p className="text-white text-sm font-medium">{step.title}</p>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <p className="text-white text-sm font-medium">{step.title}</p>
+                                                                                    {step.titleAr && (
+                                                                                        <p className="text-stone-400 text-xs font-serif" dir="rtl">{step.titleAr}</p>
+                                                                                    )}
+                                                                                </div>
                                                                                 {step.description && (
                                                                                     <p className="text-stone-500 text-xs mt-0.5">{step.description}</p>
                                                                                 )}
@@ -665,30 +720,27 @@ const OrdersManagement = () => {
                                                                                 onClick={() => {
                                                                                     setEditingStep(step._id);
                                                                                     setEditStepTitle(step.title);
+                                                                                    setEditStepTitleAr(step.titleAr || '');
                                                                                     setEditStepDesc(step.description || '');
                                                                                 }}
                                                                                 className="p-1.5 rounded-lg text-stone-500 hover:text-white hover:bg-white/5 transition-colors"
                                                                             >
                                                                                 <Edit3 className="w-3 h-3" />
                                                                             </button>
-                                                                            {stepIndex === 0 && (
-                                                                                <>
-                                                                                    <button
-                                                                                        onClick={() => handleWhatsAppNotify(order)}
-                                                                                        className="p-1.5 rounded-lg text-green-500 hover:text-green-400 hover:bg-green-500/10 transition-colors"
-                                                                                        title="Send WhatsApp Confirmation"
-                                                                                    >
-                                                                                        <MessageCircle className="w-3 h-3" />
-                                                                                    </button>
-                                                                                    <button
-                                                                                        onClick={(e) => handleEmailNotify(e, order)}
-                                                                                        className="p-1.5 rounded-lg text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-colors"
-                                                                                        title="Send Email Confirmation"
-                                                                                    >
-                                                                                        <Mail className="w-3 h-3" />
-                                                                                    </button>
-                                                                                </>
-                                                                            )}
+                                                                            <button
+                                                                                onClick={() => handleWhatsAppNotify(order, step)}
+                                                                                className="p-1.5 rounded-lg text-green-500 hover:text-green-400 hover:bg-green-500/10 transition-colors"
+                                                                                title={stepIndex === 0 ? "Send WhatsApp Confirmation" : `Notify: ${step.title}`}
+                                                                            >
+                                                                                <MessageCircle className="w-3 h-3" />
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={(e) => handleEmailNotify(e, order, step)}
+                                                                                className="p-1.5 rounded-lg text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 transition-colors"
+                                                                                title={stepIndex === 0 ? "Send Email Confirmation" : `Notify via Email: ${step.title}`}
+                                                                            >
+                                                                                <Mail className="w-3 h-3" />
+                                                                            </button>
                                                                             <button
                                                                                 onClick={() => handleDeleteStep(order._id, step._id)}
                                                                                 className="p-1.5 rounded-lg text-stone-600 hover:text-red-400 hover:bg-red-500/10 transition-colors"
@@ -733,30 +785,27 @@ const OrdersManagement = () => {
                                                                             onClick={() => {
                                                                                 setEditingStep(step._id);
                                                                                 setEditStepTitle(step.title);
+                                                                                setEditStepTitleAr(step.titleAr || '');
                                                                                 setEditStepDesc(step.description || '');
                                                                             }}
                                                                             className="p-2 rounded-lg text-stone-500 active:text-white bg-white/5 active:bg-white/10 transition-colors"
                                                                         >
                                                                             <Edit3 className="w-3.5 h-3.5" />
                                                                         </button>
-                                                                        {stepIndex === 0 && (
-                                                                            <>
-                                                                                <button
-                                                                                    onClick={() => handleWhatsAppNotify(order)}
+                                                                        <button
+                                                                                    onClick={() => handleWhatsAppNotify(order, step)}
                                                                                     className="p-2 rounded-lg text-green-500 active:text-green-400 bg-white/5 active:bg-green-500/10 transition-colors"
-                                                                                    title="Send WhatsApp Confirmation"
+                                                                                    title={stepIndex === 0 ? "Send WhatsApp Confirmation" : `Notify: ${step.title}`}
                                                                                 >
                                                                                     <MessageCircle className="w-3.5 h-3.5" />
                                                                                 </button>
                                                                                 <button
-                                                                                    onClick={(e) => handleEmailNotify(e, order)}
+                                                                                    onClick={(e) => handleEmailNotify(e, order, step)}
                                                                                     className="p-2 rounded-lg text-blue-400 active:text-blue-300 bg-white/5 active:bg-blue-500/10 transition-colors"
-                                                                                    title="Send Email Confirmation"
+                                                                                    title={stepIndex === 0 ? "Send Email Confirmation" : `Notify via Email: ${step.title}`}
                                                                                 >
                                                                                     <Mail className="w-3.5 h-3.5" />
                                                                                 </button>
-                                                                            </>
-                                                                        )}
                                                                         <button
                                                                             onClick={() => handleDeleteStep(order._id, step._id)}
                                                                             className="p-2 rounded-lg text-stone-600 active:text-red-400 bg-white/5 active:bg-red-500/10 transition-colors"

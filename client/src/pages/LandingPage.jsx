@@ -4,6 +4,9 @@ import Loader from '../components/Loader';
 import Hero from '../components/Hero';
 import SocialProof from '../components/SocialProof';
 import StylingGuide from '../components/StylingGuide';
+import Exclusivity from '../components/Exclusivity';
+import Distinction from '../components/Distinction';
+import Bespoke from '../components/Bespoke';
 import StickyCTA from '../components/StickyCTA';
 // import Lookbook from '../components/Lookbook';
 // import ThreadReveal from '../components/ThreadReveal';
@@ -40,8 +43,14 @@ const LandingPage = () => {
                     {/* Phase 5: Packaging Showcase */}
                     <Packaging />
 
-                    {/* Phase 6: Styling Guide */}
-                    <StylingGuide />
+                    {/* Phase 6: Exclusivity Manifesto */}
+                    <Exclusivity />
+
+                    {/* Phase 7: Distinction Narrative */}
+                    <Distinction />
+
+                    {/* Phase 8: Made-to-Measure Commitment */}
+                    <Bespoke />
 
                     {/* Footer Sign-off */}
                     <Footer />

@@ -13,8 +13,10 @@ import {
     ClipboardCheck,
     Gem,
     ArrowLeft,
-    Gift
+    Gift,
+    Star
 } from 'lucide-react';
+import { toast, Toaster } from 'react-hot-toast';
 
 const stepIcons = {
     'Demande Reçue': ClipboardCheck,
@@ -38,6 +40,10 @@ const OrderTracking = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [searched, setSearched] = useState(false);
+    const [reviewText, setReviewText] = useState('');
+    const [rating, setRating] = useState(0);
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+    const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
     useEffect(() => {
         if (searchParams.get('code')) {
@@ -62,6 +68,10 @@ const OrderTracking = () => {
             if (response.ok) {
                 const data = await response.json();
                 setOrder(data);
+                // Reset review states for new search
+                setReviewSubmitted(!!data.customerReview);
+                setReviewText('');
+                setRating(0);
                 setError('');
             } else {
                 setOrder(null);
@@ -76,6 +86,37 @@ const OrderTracking = () => {
         }
     };
 
+    const handleSubmitReview = async (e) => {
+        e.preventDefault();
+        if (rating === 0) {
+            toast.error('Veuillez sélectionner une note.');
+            return;
+        }
+
+        setIsSubmittingReview(true);
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders/track/${order.trackingCode}/review`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ review: reviewText, rating })
+            });
+
+            if (response.ok) {
+                setReviewSubmitted(true);
+                toast.success('Merci pour votre précieux retour !');
+                // Refresh order data
+                handleTrack(order.trackingCode);
+            } else {
+                toast.error('Erreur lors de l\'envoi du commentaire.');
+            }
+        } catch (err) {
+            console.error('Review error:', err);
+            toast.error('Erreur de connexion.');
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         handleTrack();
@@ -87,6 +128,7 @@ const OrderTracking = () => {
 
     return (
         <div className="min-h-screen bg-lhema-cream">
+            <Toaster position="top-center" reverseOrder={false} />
             {/* Hero Section */}
             <div className="relative overflow-hidden">
                 {/* Decorative background */}
@@ -337,18 +379,23 @@ const OrderTracking = () => {
 
                                                 {/* Step content */}
                                                 <div className={`flex-1 pb-1 ${isPending ? 'opacity-40' : ''}`}>
-                                                    <div className="flex items-center gap-3 mb-1">
-                                                        <h4 className={`font-serif text-base ${
-                                                            isCompleted ? 'text-lhema-black' : isInProgress ? 'text-blue-600' : 'text-stone-400'
-                                                        }`}>
-                                                            {step.title}
-                                                        </h4>
-                                                        {isInProgress && (
-                                                            <span className="font-sans text-[9px] uppercase tracking-[0.15em] px-2.5 py-1 bg-blue-50 text-blue-500 border border-blue-100 rounded-full font-medium">
-                                                                En Cours
-                                                            </span>
-                                                        )}
-                                                    </div>
+                                                        <div className="flex flex-wrap items-baseline gap-2 mb-1">
+                                                            <h4 className={`font-serif text-base ${
+                                                                isCompleted ? 'text-lhema-black' : isInProgress ? 'text-blue-600' : 'text-stone-400'
+                                                            }`}>
+                                                                {step.title}
+                                                            </h4>
+                                                            {step.titleAr && (
+                                                                <span className="font-serif text-sm text-stone-400" dir="rtl">
+                                                                    {step.titleAr}
+                                                                </span>
+                                                            )}
+                                                            {isInProgress && (
+                                                                <span className="font-sans text-[9px] uppercase tracking-[0.15em] px-2.5 py-1 bg-blue-50 text-blue-500 border border-blue-100 rounded-full font-medium ml-1">
+                                                                    En Cours
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                     {step.description && (
                                                         <p className="font-sans text-xs text-stone-500 leading-relaxed">
                                                             {step.description}
@@ -373,6 +420,98 @@ const OrderTracking = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Customer Review Section */}
+                        {progressPercent === 100 && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.8 }}
+                                className="mt-8 bg-white border border-stone-200/60 p-8 md:p-10 shadow-sm overflow-hidden relative"
+                            >
+                                <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
+                                    <Sparkles className="w-24 h-24 text-lhema-gold" />
+                                </div>
+
+                                {order.customerReview || reviewSubmitted ? (
+                                    <div className="text-center py-6">
+                                        <div className="flex justify-center gap-1 mb-4 text-lhema-gold">
+                                            {[...Array(order.customerRating || rating)].map((_, i) => (
+                                                <Star key={i} className="w-5 h-5 fill-lhema-gold" />
+                                            ))}
+                                        </div>
+                                        <h3 className="font-serif text-xl text-lhema-black mb-4 italic">
+                                            "{(order.customerReview || reviewText) || "Expérience magnifique"}"
+                                        </h3>
+                                        <p className="font-sans text-xs uppercase tracking-widest text-stone-400">
+                                            Merci pour votre confiance, {order.customerName}.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="max-w-xl mx-auto">
+                                        <div className="text-center mb-10">
+                                            <h3 className="font-serif text-2xl text-lhema-black mb-3">
+                                                Partagez Votre Expérience
+                                            </h3>
+                                            <p className="font-sans text-xs text-stone-400 uppercase tracking-widest">
+                                                Votre avis est notre plus belle distinction.
+                                            </p>
+                                        </div>
+
+                                        <form onSubmit={handleSubmitReview} className="space-y-8">
+                                            {/* Star Rating */}
+                                            <div className="flex flex-col items-center gap-3">
+                                                <div className="flex gap-2">
+                                                    {[1, 2, 3, 4, 5].map((star) => (
+                                                        <button
+                                                            key={star}
+                                                            type="button"
+                                                            onClick={() => setRating(star)}
+                                                            onMouseEnter={() => setRating(star)}
+                                                            className="transition-transform active:scale-95"
+                                                        >
+                                                            <Star
+                                                                className={`w-8 h-8 transition-colors ${
+                                                                    rating >= star
+                                                                        ? 'text-lhema-gold fill-lhema-gold'
+                                                                        : 'text-stone-200 hover:text-lhema-gold/40'
+                                                                }`}
+                                                            />
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                <span className="font-sans text-[10px] uppercase tracking-widest text-lhema-gold/60 font-medium">
+                                                    {rating === 0 ? 'Notez votre expérience' : `${rating} / 5 Étoiles`}
+                                                </span>
+                                            </div>
+
+                                            {/* Review Text */}
+                                            <div className="relative">
+                                                <textarea
+                                                    value={reviewText}
+                                                    onChange={(e) => setReviewText(e.target.value)}
+                                                    placeholder="Laissez un commentaire sur votre pièce et notre service..."
+                                                    className="w-full bg-stone-50 border border-stone-100 rounded-none p-6 text-sm font-sans text-lhema-black focus:outline-none focus:border-lhema-gold focus:ring-0 transition-all min-h-[140px] placeholder:text-stone-300 italic"
+                                                />
+                                                <div className="absolute top-0 right-0 w-px h-full bg-stone-100" />
+                                            </div>
+
+                                            <button
+                                                type="submit"
+                                                disabled={isSubmittingReview || rating === 0}
+                                                className="w-full bg-lhema-black text-white px-8 py-5 text-xs uppercase tracking-[0.2em] hover:bg-stone-800 transition-all disabled:opacity-30 flex items-center justify-center gap-3"
+                                            >
+                                                {isSubmittingReview ? (
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                ) : (
+                                                    'Soumettre Mon Avis'
+                                                )}
+                                            </button>
+                                        </form>
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
 
                         {/* Footer note */}
                         <motion.p
