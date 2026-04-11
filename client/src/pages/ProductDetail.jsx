@@ -219,34 +219,91 @@ const ProductDetail = () => {
                             </div>
                         </div>
 
-                        {/* Limited Edition Card */}
-                        {product.is_limited_edition && (
-                            <div className="border border-[#D4AF37]/40 bg-[#FFFDF9] p-6 lg:p-8 mb-10 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] relative">
-                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent"></div>
-                                <div className="text-center mb-6">
-                                    <h3 className="font-serif text-lg md:text-xl text-stone-900 mb-1">Collection Privée : Pièce numérotée</h3>
-                                    <p className="font-sans text-sm text-stone-500">(1 sur {product.total_edition || 10} au Maroc)</p>
-                                </div>
+                        {/* Limited Edition — Numbered Grid */}
+                        {product.is_limited_edition && (() => {
+                            const total = product.total_edition || 10;
+                            const available = dynamicStock;
+                            const sold = total - available;
+                            return (
+                                <div className="mb-10 relative">
+                                    {/* Top gold accent line */}
+                                    <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent"></div>
+                                    
+                                    <div className="border border-[#D4AF37]/30 bg-gradient-to-b from-[#FFFDF9] to-[#FBF8F3] p-6 lg:p-8 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.08)] relative overflow-hidden">
+                                        {/* Subtle background number watermark */}
+                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03]">
+                                            <span className="font-serif text-[180px] md:text-[220px] leading-none text-stone-900 select-none">{total}</span>
+                                        </div>
 
-                                <div className="flex justify-center gap-2 md:gap-3 mb-5">
-                                    {Array.from({ length: product.total_edition || 10 }).map((_, i) => {
-                                        const total = product.total_edition || 10;
-                                        const available = dynamicStock;
-                                        const sold = total - available;
-                                        const isSold = i < sold;
-                                        return (
-                                            <div
-                                                key={i}
-                                                className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full ${isSold ? 'bg-stone-300' : 'bg-[#2C2C2C] shadow-md'} transition-all`}
-                                            />
-                                        )
-                                    })}
+                                        {/* Header */}
+                                        <div className="text-center mb-6 relative">
+                                            <p className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#D4AF37] mb-2 font-bold">Édition Numérotée</p>
+                                            <h3 className="font-serif text-lg md:text-xl text-stone-900 mb-1">Collection Privée</h3>
+                                            <p className="font-sans text-xs text-stone-400">{total} exemplaires uniques au Maroc</p>
+                                        </div>
+
+                                        {/* Numbered Slots Grid */}
+                                        <div className="grid grid-cols-5 gap-2 md:gap-2.5 mb-6 max-w-xs mx-auto relative">
+                                            {Array.from({ length: total }).map((_, i) => {
+                                                const isSold = i < sold;
+                                                return (
+                                                    <motion.div
+                                                        key={i}
+                                                        initial={{ opacity: 0, scale: 0.85 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        transition={{ duration: 0.4, delay: 0.05 * i }}
+                                                        className={`aspect-square flex items-center justify-center relative group transition-all duration-500 ${
+                                                            isSold
+                                                                ? 'bg-stone-100 border border-stone-200/80'
+                                                                : 'bg-[#1A1A1A] border border-[#2C2C2C] shadow-sm hover:shadow-md hover:border-[#D4AF37]/40'
+                                                        }`}
+                                                    >
+                                                        {isSold ? (
+                                                            <>
+                                                                <span className="font-serif text-sm md:text-base text-stone-300 select-none">
+                                                                    {(i + 1).toString().padStart(2, '0')}
+                                                                </span>
+                                                                {/* Subtle diagonal line for sold */}
+                                                                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                                                                    <div className="absolute top-0 right-0 bottom-0 left-0">
+                                                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-px bg-stone-300/60 rotate-45"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <span className="font-serif text-sm md:text-base text-stone-400 group-hover:text-[#D4AF37] transition-colors duration-500 select-none">
+                                                                    {(i + 1).toString().padStart(2, '0')}
+                                                                </span>
+                                                                {/* Subtle gold corner accent on hover */}
+                                                                <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-transparent group-hover:border-[#D4AF37]/40 transition-all duration-500"></div>
+                                                                <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-transparent group-hover:border-[#D4AF37]/40 transition-all duration-500"></div>
+                                                            </>
+                                                        )}
+                                                    </motion.div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        {/* Stock Counter */}
+                                        <div className="flex items-center justify-center gap-3 pt-4 border-t border-stone-200/60">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 bg-[#1A1A1A] rounded-full"></div>
+                                                <span className="font-sans text-[10px] uppercase tracking-widest text-stone-400">Disponible</span>
+                                            </div>
+                                            <span className="text-stone-300">·</span>
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 bg-stone-200 rounded-full"></div>
+                                                <span className="font-sans text-[10px] uppercase tracking-widest text-stone-400">Acquis</span>
+                                            </div>
+                                        </div>
+                                        <p className="text-center font-sans text-sm text-stone-500 mt-3">
+                                            Pièces restantes : <span className="text-[#D4AF37] font-semibold text-lg">{available}</span> <span className="opacity-40 text-xs">/ {total}</span>
+                                        </p>
+                                    </div>
                                 </div>
-                                <p className="text-center font-sans text-sm text-stone-600">
-                                    Pièces restantes : <span className="text-[#D4AF37] font-semibold text-base">{dynamicStock}</span> <span className="opacity-50">/ {product.total_edition || 10}</span>
-                                </p>
-                            </div>
-                        )}
+                            );
+                        })()}
 
                         {/* Description & Features */}
                         <div className="mb-12 mt-16">
