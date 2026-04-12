@@ -59,7 +59,7 @@ const seed = async () => {
             const product = new Product({
                 name: "Veste-Cape L'Éclat de Lhema",
                 description: '',
-                price: 14500,
+                price: 580,
                 currency: 'MAD',
                 category: 'femme',
                 images: [

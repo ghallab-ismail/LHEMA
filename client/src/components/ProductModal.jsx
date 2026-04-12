@@ -261,11 +261,10 @@ const ProductModal = ({ isOpen, onClose, mode, initialData, onSubmit }) => {
                                             key={cat}
                                             type="button"
                                             onClick={() => setFormData({ ...formData, category: cat })}
-                                            className={`flex-1 py-3 px-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all border ${
-                                                formData.category === cat
+                                            className={`flex-1 py-3 px-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all border ${formData.category === cat
                                                     ? 'bg-white text-black border-white'
                                                     : 'bg-transparent text-stone-400 border-white/10 hover:border-white/30'
-                                            }`}
+                                                }`}
                                         >
                                             {cat === 'femme' ? '♀ Femme' : '♂ Homme'}
                                         </button>
@@ -281,11 +280,10 @@ const ProductModal = ({ isOpen, onClose, mode, initialData, onSubmit }) => {
                                 <button
                                     type="button"
                                     onClick={() => setFormData({ ...formData, isAvailable: !formData.isAvailable })}
-                                    className={`w-full py-3 px-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all border flex items-center justify-center gap-2 ${
-                                        formData.isAvailable
+                                    className={`w-full py-3 px-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all border flex items-center justify-center gap-2 ${formData.isAvailable
                                             ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                                             : 'bg-red-500/10 text-red-400 border-red-500/20'
-                                    }`}
+                                        }`}
                                 >
                                     <span className={`w-2 h-2 rounded-full ${formData.isAvailable ? 'bg-emerald-400' : 'bg-red-400'}`} />
                                     {formData.isAvailable ? 'Available' : 'Unavailable'}
@@ -351,11 +349,10 @@ const ProductModal = ({ isOpen, onClose, mode, initialData, onSubmit }) => {
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, is_limited_edition: !formData.is_limited_edition })}
-                                className={`w-full py-3 px-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all border flex items-center justify-center gap-2 ${
-                                    formData.is_limited_edition
+                                className={`w-full py-3 px-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all border flex items-center justify-center gap-2 ${formData.is_limited_edition
                                         ? 'bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/30'
                                         : 'bg-white/5 text-stone-400 border-white/10'
-                                }`}
+                                    }`}
                             >
                                 <span className={`w-2 h-2 rounded-full ${formData.is_limited_edition ? 'bg-[#D4AF37]' : 'bg-stone-500'}`} />
                                 {formData.is_limited_edition ? 'Édition Limitée ✓' : 'Standard Edition'}
@@ -373,11 +370,10 @@ const ProductModal = ({ isOpen, onClose, mode, initialData, onSubmit }) => {
                                         key={size}
                                         type="button"
                                         onClick={() => toggleSize(size)}
-                                        className={`px-4 py-2 rounded-lg text-xs font-medium tracking-wider transition-all border ${
-                                            formData.sizes.includes(size)
+                                        className={`px-4 py-2 rounded-lg text-xs font-medium tracking-wider transition-all border ${formData.sizes.includes(size)
                                                 ? 'bg-white text-black border-white'
                                                 : 'bg-transparent text-stone-400 border-white/10 hover:border-white/30'
-                                        }`}
+                                            }`}
                                     >
                                         {size}
                                     </button>
@@ -394,13 +390,12 @@ const ProductModal = ({ isOpen, onClose, mode, initialData, onSubmit }) => {
                             {/* Upload Area */}
                             <div
                                 onClick={() => !isUploading && fileInputRef.current?.click()}
-                                className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
-                                    isUploading
+                                className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${isUploading
                                         ? 'border-[#D4AF37]/30 bg-[#D4AF37]/5'
                                         : errors.images
                                             ? 'border-red-500/30 hover:border-red-500/50 bg-red-500/5'
                                             : 'border-white/10 hover:border-white/30 bg-white/[0.02]'
-                                }`}
+                                    }`}
                             >
                                 <input
                                     ref={fileInputRef}
