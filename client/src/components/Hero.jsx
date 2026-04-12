@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 // import { motion } from 'framer-motion';
-import videoBg from '../assets/video-optimized.mp4';
+import videoBg from '../assets/cheval-optimized.mp4';
 import imageBg from '../assets/imagebackfull.jpeg';
 
 const Hero = (props) => {
@@ -41,10 +41,10 @@ const Hero = (props) => {
                     transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
                 >
                     <p className="font-sans text-[10px] md:text-xs uppercase tracking-[0.3em] text-lhema-cream/80 mb-4 md:mb-6">
-                        Volume 01 : La Cape Souveraine
+                        Volume 01 : L’ensemble "souveraine"
                     </p>
                     <h1 className="font-serif text-4xl md:text-7xl text-lhema-cream mb-8 md:mb-12 leading-tight">
-                        La Cape Signature :<br className="hidden md:block" /> Élégance Naturelle
+                        L’ensemble "souveraine" :<br className="hidden md:block" /> Élégance Naturelle
                     </h1>
 
                     <button

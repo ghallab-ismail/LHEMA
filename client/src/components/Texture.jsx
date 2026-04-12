@@ -1,14 +1,23 @@
-import React, { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
-import detail1 from '../assets/Gemini_Generated_Image_acqai7acqai7acqa.png';
-import detail2 from '../assets/Gemini_Generated_Image_caik0scaik0scaik.png';
-import detail3 from '../assets/Gemini_Generated_Image_dfosyqdfosyqdfos.png';
-import detail4 from '../assets/Gemini_Generated_Image_za2jslza2jslza2j.png';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import st1 from '../assets/st1.PNG';
+import st2 from '../assets/st2.JPEG';
+import st3 from '../assets/st3.JPEG';
+import st4 from '../assets/st4.JPEG';
+import st5 from '../assets/st5.JPEG';
+
+const images = [st1, st2, st3, st4, st5];
+
+const captions = [
+    'La Cape en pleine liberté',
+    'Chaque fil, une décision',
+    'La soie qui se souvient',
+    'Portée comme une seconde peau',
+    'Souveraine, sans effort',
+];
 
 const Texture = () => {
-    const [activeImage, setActiveImage] = useState(detail1);
-
-    const images = [detail1, detail2, detail3, detail4];
+    const [activeIdx, setActiveIdx] = useState(0);
 
     return (
         <section className="bg-lhema-cream py-24 md:py-48">
@@ -23,23 +32,40 @@ const Texture = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
                         >
-                            <h2 className="font-serif text-3xl md:text-5xl text-lhema-black mb-6 md:mb-8 leading-tight">
-                                100% Laine Vierge.<br />
-                                Doublure en Soie.
-                            </h2>
-                            <p className="font-sans text-sm md:text-base leading-relaxed text-lhema-black/70 mb-8 max-w-md">
-                                Méticuleusement sourcée pour une douceur et une chaleur inégalées.
-                                La composition double texture offre une expérience tactile
-                                qui murmure le luxe plutôt que de le crier.
+                            {/* Overline */}
+                            <p className="font-sans text-[10px] uppercase tracking-[0.35em] text-lhema-black/40 mb-5">
+                                l'ensemble souveraine — En Mouvement
                             </p>
+
+                            <h2 className="font-serif text-3xl md:text-5xl text-lhema-black mb-6 md:mb-8 leading-tight">
+                                Née pour le Vent.<br />
+                                <span className="italic text-lhema-black/60">Faite pour Durer.</span>
+                            </h2>
+
+                            <p className="font-sans text-sm md:text-base leading-relaxed text-lhema-black/65 mb-4 max-w-md">
+                                La Cape Signature Maison Lhema n'a pas été conçue pour rester immobile.
+                                Sa matière — satin de soie structuré à liseré ivoire — épouse chaque
+                                mouvement avec une grâce qui ne s'apprend pas. Elle se porte.
+                                Elle se vit. Elle impose.
+                            </p>
+
+                            <p className="font-sans text-sm md:text-base leading-relaxed text-lhema-black/50 mb-10 max-w-md">
+                                Ces images ne sont pas une mise en scène. C'est la Cape dans son élément
+                                naturel — sauvage, puissante, libre.
+                            </p>
+
                             <div className="flex gap-8 border-t border-lhema-black/10 pt-8">
                                 <div>
-                                    <span className="block font-serif text-2xl text-lhema-black">100%</span>
-                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/50">Naturel</span>
+                                    <span className="block font-serif text-2xl text-lhema-black">Satin</span>
+                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/40">de Soie</span>
                                 </div>
                                 <div>
-                                    <span className="block font-serif text-2xl text-lhema-black">Zéro</span>
-                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/50">Synthétique</span>
+                                    <span className="block font-serif text-2xl text-lhema-black">10</span>
+                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/40">Pièces Seulement</span>
+                                </div>
+                                <div>
+                                    <span className="block font-serif text-2xl text-lhema-black">01</span>
+                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/40">Volume</span>
                                 </div>
                             </div>
                         </motion.div>
@@ -52,40 +78,79 @@ const Texture = () => {
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{ duration: 1 }}
-                            className="relative aspect-[4/5] overflow-hidden bg-gray-100"
+                            className="relative aspect-[4/5] overflow-hidden bg-stone-900"
                         >
-                            <img
-                                src={activeImage}
-                                alt="Fabric Detail"
-                                className="w-full h-full object-cover"
-                            />
+                            {/* Animated image swap */}
+                            <AnimatePresence mode="wait">
+                                <motion.img
+                                    key={activeIdx}
+                                    src={images[activeIdx]}
+                                    alt={captions[activeIdx]}
+                                    className="w-full h-full object-cover"
+                                    initial={{ opacity: 0, scale: 1.04 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.97 }}
+                                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                                />
+                            </AnimatePresence>
 
-                            {/* Simple Image Selector Overlay */}
-                            <div className="absolute bottom-6 left-6 flex gap-2">
-                                {images.map((img, idx) => (
+                            {/* Caption overlay */}
+                            <div className="absolute bottom-0 left-0 right-0 px-6 py-5 bg-gradient-to-t from-black/60 to-transparent">
+                                <p className="text-white/80 text-[11px] uppercase tracking-[0.25em] font-sans">
+                                    {captions[activeIdx]}
+                                </p>
+                            </div>
+
+                            {/* Dot selectors */}
+                            <div className="absolute bottom-5 right-6 flex gap-2">
+                                {images.map((_, idx) => (
                                     <button
                                         key={idx}
-                                        onClick={() => setActiveImage(img)}
-                                        className={`w-2 h-2 rounded-full transition-all ${activeImage === img ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/80'}`}
+                                        onClick={() => setActiveIdx(idx)}
+                                        aria-label={`Image ${idx + 1}`}
+                                        className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${activeIdx === idx
+                                            ? 'bg-white scale-125'
+                                            : 'bg-white/40 hover:bg-white/70'
+                                            }`}
                                     />
                                 ))}
                             </div>
                         </motion.div>
-                    </div>
 
-                    {/* Mobile Carousel - Peeking */}
-                    <div className="md:hidden order-1 w-full overflow-x-scroll snap-x snap-mandatory pb-6 hide-scrollbar flex items-center">
-                        {/* Added generous padding to start so it doesn't feel stuck to the edge */}
-                        <div className="flex gap-4 px-6 w-max">
+                        {/* Thumbnail strip */}
+                        <div className="flex gap-2 mt-3">
                             {images.map((img, idx) => (
-                                <div key={idx} className="w-[75vw] snap-center relative aspect-[4/5] bg-gray-100 overflow-hidden shadow-sm transition-transform">
+                                <button
+                                    key={idx}
+                                    onClick={() => setActiveIdx(idx)}
+                                    aria-label={`Voir image ${idx + 1}`}
+                                    className={`relative flex-1 aspect-square overflow-hidden transition-all duration-300 ${activeIdx === idx ? 'ring-1 ring-lhema-black' : 'opacity-50 hover:opacity-80'
+                                        }`}
+                                >
                                     <img
                                         src={img}
-                                        alt={`Fabric Detail ${idx + 1}`}
+                                        alt={captions[idx]}
                                         className="w-full h-full object-cover"
                                     />
-                                    <div className="absolute bottom-4 left-4 bg-black/20 text-white text-[10px] px-2 py-1 uppercase tracking-widest backdrop-blur-sm">
-                                        {idx + 1} / {images.length}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Mobile Carousel */}
+                    <div className="md:hidden order-1 w-full overflow-x-scroll snap-x snap-mandatory pb-6 hide-scrollbar flex items-center">
+                        <div className="flex gap-4 px-6 w-max">
+                            {images.map((img, idx) => (
+                                <div key={idx} className="w-[75vw] snap-center relative aspect-[4/5] bg-stone-900 overflow-hidden shadow-sm">
+                                    <img
+                                        src={img}
+                                        alt={captions[idx]}
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute bottom-0 left-0 right-0 px-4 py-4 bg-gradient-to-t from-black/60 to-transparent">
+                                        <p className="text-white/80 text-[10px] uppercase tracking-widest font-sans">
+                                            {captions[idx]}
+                                        </p>
                                     </div>
                                 </div>
                             ))}
