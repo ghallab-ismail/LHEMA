@@ -10,7 +10,8 @@ export const products = [
         archive_year: "2024",
         price: 850,
         currency: "MAD",
-        stock: 3,
+        stock: 0,
+        completed_count: 10,
         total_edition: 10,
         images: [
             imageFrontFull,

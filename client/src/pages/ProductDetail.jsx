@@ -69,7 +69,9 @@ const ProductDetail = () => {
         fetchCompletedCount();
     }, [product]);
 
-    const dynamicStock = product ? Math.max(0, product.total_edition - completedCount) : 0;
+    // For static products with a preset completed_count, use it as floor
+    const effectiveCompleted = Math.max(completedCount, product?.completed_count || 0);
+    const dynamicStock = product ? Math.max(0, product.total_edition - effectiveCompleted) : 0;
     // Product is purchasable only if isAvailable is true AND there is stock
     const isProductAvailable = product ? (product.isAvailable !== false && dynamicStock > 0) : false;
 
