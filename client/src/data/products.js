@@ -8,7 +8,7 @@ export const products = [
         id: "the-signature-cape",
         name: "Veste-Cape L'Éclat de Lhema",
         archive_year: "2024",
-        price: 850,
+        price: 1400,
         currency: "MAD",
         stock: 0,
         completed_count: 10,

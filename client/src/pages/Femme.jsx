@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 
 const Femme = () => {
     // Start with the original static products (they have real images + rich description)
-    const [products, setProducts] = useState(staticProducts);
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -22,10 +22,11 @@ const Femme = () => {
                     const newDbProducts = (Array.isArray(dbProducts) ? dbProducts : []).filter(
                         p => !staticNames.includes(p.name.toLowerCase())
                     );
-                    setProducts([...staticProducts, ...newDbProducts]);
+                    setProducts([...newDbProducts, ...staticProducts]);
                 }
             } catch (err) {
                 console.error('Error fetching femme products:', err);
+                setProducts(staticProducts); // fallback to static only
             } finally {
                 setLoading(false);
             }
