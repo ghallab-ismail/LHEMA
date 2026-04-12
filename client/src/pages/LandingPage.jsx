@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import Loader from '../components/Loader';
+import Prelude from '../components/Prelude';
 import Hero from '../components/Hero';
 import SocialProof from '../components/SocialProof';
 import StylingGuide from '../components/StylingGuide';
@@ -21,6 +22,11 @@ import CheckoutModal from '../components/CheckoutModal';
 const LandingPage = () => {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const heroRef = useRef(null);
+
+    const scrollToHero = () => {
+        heroRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
 
     return (
         <main className="relative min-h-screen w-full bg-lhema-cream">
@@ -31,8 +37,13 @@ const LandingPage = () => {
                 <>
                     <Navbar />
 
-                    {/* Phase 2: The Hero Section */}
-                    <Hero onReserve={() => setIsModalOpen(true)} />
+                    {/* Phase 1: Brand Prelude — static, loads instantly */}
+                    <Prelude onDiscover={scrollToHero} />
+
+                    {/* Phase 2: The Hero Section (Video) */}
+                    <div ref={heroRef}>
+                        <Hero onReserve={() => setIsModalOpen(true)} />
+                    </div>
 
                     {/* Phase 3: Social Proof */}
                     <SocialProof />
