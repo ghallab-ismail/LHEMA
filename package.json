@@ -11,6 +11,7 @@
     "concurrently": "^8.2.2"
   },
   "dependencies": {
-    "@microsoft/clarity": "^1.0.2"
+    "@microsoft/clarity": "^1.0.2",
+    "react-ga4": "^3.0.1"
   }
 }
