@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import st1 from '../assets/st1.PNG';
+// import st1 from '../assets/st1.PNG';
 import st2 from '../assets/st2.JPEG';
 import st3 from '../assets/st3.JPEG';
 import st4 from '../assets/st4.JPEG';
 import st5 from '../assets/st5.JPEG';
 
-const images = [st1, st2, st3, st4, st5];
+const images = [st2, st3, st4, st5];
 
 const captions = [
     'La Cape en pleine liberté',
     'Chaque fil, une décision',
     'La soie qui se souvient',
     'Portée comme une seconde peau',
-    'Souveraine, sans effort',
+    'Souverain, sans effort',
 ];
 
 const Texture = () => {
@@ -34,30 +34,26 @@ const Texture = () => {
                         >
                             {/* Overline */}
                             <p className="font-sans text-[10px] uppercase tracking-[0.35em] text-lhema-black/40 mb-5">
-                                l'ensemble souveraine — En Mouvement
+                                l'ensemble souverain — En Mouvement
                             </p>
 
                             <h2 className="font-serif text-3xl md:text-5xl text-lhema-black mb-6 md:mb-8 leading-tight">
-                                Née pour le Vent.<br />
-                                <span className="italic text-lhema-black/60">Faite pour Durer.</span>
+                                Créé pour le Mouvement.<br />
+                                <span className="italic text-lhema-black/60">Conçu pour l'Éternité.</span>
                             </h2>
 
                             <p className="font-sans text-sm md:text-base leading-relaxed text-lhema-black/65 mb-4 max-w-md">
-                                La Cape Signature Maison Lhema n'a pas été conçue pour rester immobile.
-                                Sa matière — satin de soie structuré à liseré ivoire — épouse chaque
-                                mouvement avec une grâce qui ne s'apprend pas. Elle se porte.
-                                Elle se vit. Elle impose.
+                                L'Ensemble Souverain par Maison Lhema n'a pas été conçu pour rester immobile. Le contraste majestueux entre le Satin Duchesse français et la fluidité du Crêpe de Soie épouse chaque pas avec une grâce innée. Il se porte. Il se vit. Il fascine.
                             </p>
 
                             <p className="font-sans text-sm md:text-base leading-relaxed text-lhema-black/50 mb-10 max-w-md">
-                                Ces images ne sont pas une mise en scène. C'est la Cape dans son élément
-                                naturel — sauvage, puissante, libre.
+                                Ces images ne sont pas une simple mise en scène. C'est l'essence même de notre création dans son élément naturel — noble, puissante et farouchement libre.
                             </p>
 
                             <div className="flex gap-8 border-t border-lhema-black/10 pt-8">
                                 <div>
                                     <span className="block font-serif text-2xl text-lhema-black">Satin</span>
-                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/40">de Soie</span>
+                                    <span className="text-[10px] uppercase tracking-widest text-lhema-black/40">Duchesse</span>
                                 </div>
                                 <div>
                                     <span className="block font-serif text-2xl text-lhema-black">10</span>

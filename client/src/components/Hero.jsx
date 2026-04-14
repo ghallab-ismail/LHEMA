@@ -41,10 +41,10 @@ const Hero = (props) => {
                     transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
                 >
                     <p className="font-sans text-[10px] md:text-xs uppercase tracking-[0.3em] text-lhema-cream/80 mb-4 md:mb-6">
-                        Volume 01 : L’ensemble "souveraine"
+                        Volume 01 : L’ensemble souverain
                     </p>
                     <h1 className="font-serif text-4xl md:text-7xl text-lhema-cream mb-8 md:mb-12 leading-tight">
-                        L’ensemble "souveraine" :<br className="hidden md:block" /> Élégance Naturelle
+                        L’ensemble souverain :<br className="hidden md:block" /> L'Art de la Maîtrise.
                     </h1>
 
                     <button

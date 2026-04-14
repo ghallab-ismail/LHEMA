@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 const CheckoutModal = ({ isOpen, onClose, product }) => {
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'M (42-45)' });
+    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'Sur Mesure' });
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
     const [trackingCode, setTrackingCode] = useState('');
@@ -13,40 +13,58 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
     const [email, setEmail] = useState('');
     const [emailSubmitted, setEmailSubmitted] = useState(false);
 
+    const SIZE_LABELS = {
+        'XS': 'XS',
+        'S': 'S',
+        'M': 'M (42-45)',
+        'L': 'L (46-49)',
+        'XL': 'XL (50-53)',
+        'XXL': 'XXL (54-57)',
+        'Sur Mesure': 'Sur Mesure'
+    };
+
+    const getAvailableSizes = () => {
+        if (!product?.sizes || product.sizes.length === 0) {
+            return ['M (42-45)', 'L (46-49)', 'XL (50-53)', 'XXL (54-57)', 'Sur Mesure'];
+        }
+        if (product.sizes.includes('Sur Mesure')) {
+            return ['Sur Mesure'];
+        }
+        return product.sizes.map(s => SIZE_LABELS[s] || s);
+    };
+
+    const availableSizes = getAvailableSizes();
+
+    React.useEffect(() => {
+        if (isOpen && availableSizes.length > 0) {
+            if (!availableSizes.includes(formData.size)) {
+                setFormData(prev => ({ ...prev, size: availableSizes[0] }));
+            }
+        }
+    }, [isOpen, product, availableSizes]);
+
     const validate = () => {
         const newErrors = {};
-
-        if (!formData.name.trim()) {
-            newErrors.name = 'Le nom est obligatoire.';
-        } else if (formData.name.trim().length < 2) {
-            newErrors.name = 'Le nom doit contenir au moins 2 caractères.';
-        }
+        if (!formData.name.trim()) newErrors.name = 'Le nom est obligatoire.';
+        else if (formData.name.trim().length < 2) newErrors.name = 'Le nom doit contenir au moins 2 caractères.';
 
         const cleanedPhone = formData.whatsapp.replace(/\s/g, '');
-        if (!cleanedPhone) {
-            newErrors.whatsapp = 'Le numéro WhatsApp est obligatoire.';
-        } else if (!/^\+?\d{8,15}$/.test(cleanedPhone)) {
-            newErrors.whatsapp = 'Numéro invalide. Entrez 8 à 15 chiffres (ex: 0612345678).';
-        }
+        if (!cleanedPhone) newErrors.whatsapp = 'Le numéro WhatsApp est obligatoire.';
+        else if (!/^\+?\d{8,15}$/.test(cleanedPhone)) newErrors.whatsapp = 'Numéro invalide.';
 
-        if (!formData.city.trim()) {
-            newErrors.city = 'La ville est obligatoire.';
-        }
-
+        if (!formData.city.trim()) newErrors.city = 'La ville est obligatoire.';
         return newErrors;
     };
 
     const handleFieldChange = (field, value) => {
         setFormData({ ...formData, [field]: value });
-        if (errors[field]) {
-            setErrors({ ...errors, [field]: '' });
-        }
+        if (errors[field]) setErrors({ ...errors, [field]: '' });
     };
 
     const handleCloseModal = () => {
         onClose();
         setStep(1);
-        setFormData({ name: '', whatsapp: '', city: '', size: 'M (42-45)' });
+        setFormData({ name: '', whatsapp: '', city: '', size: availableSizes[0] || 'Sur Mesure' });
         setErrors({});
         setTrackingCode('');
         setCopied(false);
@@ -238,11 +256,9 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                                     value={formData.size}
                                                     onChange={(e) => handleFieldChange('size', e.target.value)}
                                                 >
-                                                    <option value="M (42-45)">M (42-45)</option>
-                                                    <option value="L (46-49)">L (46-49)</option>
-                                                    <option value="XL (50-53)">XL (50-53)</option>
-                                                    <option value="XXL (54-57)">XXL (54-57)</option>
-                                                    <option value="Sur Mesure">Sur Mesure</option>
+                                                    {availableSizes.map(size => (
+                                                        <option key={size} value={size}>{size}</option>
+                                                    ))}
                                                 </select>
                                                 <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-stone-400 text-[10px]">
                                                     ▼
