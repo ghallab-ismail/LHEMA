@@ -1,4 +1,5 @@
 import React, { useEffect, Suspense, lazy } from 'react';
+import Clarity from '@microsoft/clarity';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 
@@ -23,6 +24,9 @@ function App() {
     // Wake up the Render backend as soon as the app loads
     // This way, by the time the user fills the form, the server is already awake
     useEffect(() => {
+        // Initialize Microsoft Clarity
+        Clarity.init("wbohg9nwgn");
+
         const timer = setTimeout(() => {
             fetch(`${import.meta.env.VITE_API_URL}/health`).catch(() => { });
         }, 3000);
