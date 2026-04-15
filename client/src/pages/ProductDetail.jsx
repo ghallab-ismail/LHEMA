@@ -5,7 +5,6 @@ import { ArrowLeft, Star } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import CheckoutModal from '../components/CheckoutModal';
 import { products as staticProducts } from '../data/products';
-import ReactPixel from 'react-facebook-pixel';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -360,15 +359,7 @@ const ProductDetail = () => {
                             <p className="font-serif text-sm text-stone-500">{product.price.toLocaleString()} {product.currency || 'DH'}</p>
                         </div>
                         <button
-                            onClick={() => {
-                                ReactPixel.track('InitiateCheckout', {
-                                    content_name: product.name,
-                                    content_category: 'Product Detail Button',
-                                    value: product.price,
-                                    currency: product.currency || 'DH'
-                                });
-                                setIsModalOpen(true);
-                            }}
+                            onClick={() => setIsModalOpen(true)}
                             disabled={!isProductAvailable}
                             className={`w-full md:w-auto py-4 px-10 text-xs tracking-[0.2em] font-medium uppercase transition-all duration-300 shadow-xl ${isProductAvailable
                                 ? 'bg-[#1A1A1A] text-white hover:bg-black hover:shadow-2xl'

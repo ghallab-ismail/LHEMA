@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import ReactPixel from 'react-facebook-pixel';
+// import { motion } from 'framer-motion';
 import videoBg from '../assets/cheval-optimized.mp4';
 import imageBg from '../assets/imagebackfull.jpeg';
 
@@ -48,13 +48,7 @@ const Hero = (props) => {
                     </h1>
 
                     <button
-                        onClick={() => {
-                            ReactPixel.track('InitiateCheckout', {
-                                content_name: "L'ensemble souverain",
-                                content_category: 'Hero Button'
-                            });
-                            props.onReserve();
-                        }}
+                        onClick={props.onReserve}
                         className="hidden md:inline-block border border-lhema-cream/30 px-12 py-4 text-xs uppercase tracking-[0.2em] text-lhema-cream hover:bg-lhema-cream hover:text-lhema-black transition-all duration-500"
                     >
                         Réserver Ma Pièce
