@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ReactPixel from 'react-facebook-pixel';
 
 const CheckoutModal = ({ isOpen, onClose, product }) => {
     const [step, setStep] = useState(1);
@@ -127,6 +128,15 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
 
             if (inquiryResponse.ok && orderResponse.ok) {
                 const orderData = await orderResponse.json();
+                
+                // Track Conversion for Facebook Pixel
+                ReactPixel.track('Lead', {
+                    content_name: productNameToSend,
+                    content_category: 'Acquisition Request',
+                    value: 0.00,
+                    currency: 'MAD' // Or your local currency
+                });
+
                 setTrackingCode(orderData.trackingCode);
                 setStep(2);
                 setErrors({});
