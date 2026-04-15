@@ -1,6 +1,7 @@
 import React, { useEffect, Suspense, lazy } from 'react';
 import Clarity from '@microsoft/clarity';
 import ReactGA from 'react-ga4';
+import ReactPixel from 'react-facebook-pixel';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 
@@ -30,7 +31,13 @@ function App() {
 
         // Initialize Google Analytics 4
         ReactGA.initialize("G-4PMB7MBZJ5");
-        ReactGA.send({ hitType: "pageview", page: window.location.pathname });
+
+        // Initialize Facebook Pixel
+        const options = {
+            autoConfig: true,
+            debug: false,
+        };
+        ReactPixel.init('1304464341598639', options);
 
         const timer = setTimeout(() => {
             fetch(`${import.meta.env.VITE_API_URL}/health`).catch(() => { });
