@@ -942,7 +942,13 @@ const AdminDashboard = () => {
                                             <td className="py-6 px-8">
                                                 <div className="flex items-center gap-2 text-stone-500 text-xs">
                                                     <Clock className="w-3 h-3" />
-                                                    {new Date(inquiry.createdAt).toLocaleDateString()}
+                                                    {new Date(inquiry.createdAt).toLocaleString(undefined, {
+                                                        year: 'numeric',
+                                                        month: 'numeric',
+                                                        day: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    })}
                                                 </div>
                                             </td>
                                             <td className="py-6 px-4 text-right relative">
@@ -1153,7 +1159,13 @@ const AdminDashboard = () => {
                                     <div className="flex justify-between text-sm items-center pt-2 border-t border-white/5 mt-3">
                                         <div className="flex items-center gap-2 text-stone-500 text-xs">
                                             <Clock className="w-3 h-3" />
-                                            {new Date(inquiry.createdAt).toLocaleDateString()}
+                                            {new Date(inquiry.createdAt).toLocaleString(undefined, {
+                                                year: 'numeric',
+                                                month: 'numeric',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
                                         </div>
                                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium border ${getStatusColor(inquiry.status)}`}>
                                             {inquiry.status}
