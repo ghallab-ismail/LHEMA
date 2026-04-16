@@ -268,9 +268,21 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                     </div>
 
                                     <div className="pt-4">
-                                        <p className="text-[10px] text-stone-500 text-center mb-6 font-sans italic">
-                                            Paiement à la livraison.
-                                        </p>
+                                        <div className="py-6 my-2 border-y border-stone-100/60 bg-stone-50/30">
+                                            <div className="space-y-4 px-2">
+                                                <p className="text-[11px] text-stone-500 font-sans leading-relaxed text-center italic">
+                                                    “Un essayage privé sera organisé pour vous présenter la pièce et prendre vos mesures exactes.”
+                                                </p>
+                                                <div className="flex justify-center items-center gap-4">
+                                                    <div className="h-[1px] w-6 bg-stone-200" />
+                                                    <div className="w-1 h-1 rounded-full bg-stone-300" />
+                                                    <div className="h-[1px] w-6 bg-stone-200" />
+                                                </div>
+                                                <p className="text-[10px] text-stone-800 font-sans text-center tracking-[0.1em] uppercase font-semibold">
+                                                    Les modalités de règlement seront finalisées lors de votre essayage privé.
+                                                </p>
+                                            </div>
+                                        </div>
 
                                         <button
                                             type="submit"
