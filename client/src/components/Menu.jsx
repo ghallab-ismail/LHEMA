@@ -13,7 +13,7 @@ const Menu = ({ onClose }) => {
     ];
     
     const secondaryLinks = [
-        { name: "LA MAISON", path: "/" },
+        { name: "LA MAISON", path: "/la-maison" },
         { name: "SUIVI COMMANDE", path: "/suivi" }
     ];
 
