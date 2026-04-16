@@ -1,17 +1,21 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { X, Search } from 'lucide-react';
 
 const Menu = ({ onClose }) => {
+    const location = useLocation();
+
     const primaryLinks = [
-        { name: "COLLECTION", path: "/" },
-        { name: "FEMME", path: "/femme" },
-        { name: "HOMME", path: "/homme" },
+        { name: "LA COLLECTION", path: "/collection" },
+        { name: "L'ESSAYAGE PRIVÉ", path: "/essayage-prive" },
         { name: "ATELIER", path: "/atelier" },
-        { name: "SUIVI", path: "/suivi" }
     ];
-    const secondaryLinks = ["LA MAISON", "BOUTIQUES", "SERVICES", "COMPTE"];
+    
+    const secondaryLinks = [
+        { name: "LA MAISON", path: "/" },
+        { name: "SUIVI COMMANDE", path: "/suivi" }
+    ];
 
     return (
         <motion.div
@@ -46,7 +50,8 @@ const Menu = ({ onClose }) => {
                             <Link
                                 to={link.path}
                                 onClick={onClose}
-                                className="font-serif text-3xl font-medium tracking-wide transition-colors hover:text-lhema-gold md:text-5xl"
+                                className={`font-serif text-3xl font-medium tracking-wide transition-colors hover:text-lhema-gold md:text-5xl ${location.pathname === link.path ? 'text-lhema-gold' : 'text-lhema-black'
+                                    }`}
                             >
                                 {link.name}
                             </Link>
@@ -54,21 +59,24 @@ const Menu = ({ onClose }) => {
                     ))}
                 </div>
 
-                {/* Separator / Spacer (Visual only, handled by space-y) */}
-
                 {/* Secondary Links (Bottom Half) */}
                 <div className="mt-12 flex flex-col items-center space-y-4 text-center">
                     {secondaryLinks.map((link, index) => (
-                        <motion.a
-                            key={link}
-                            href="#"
-                            className="font-sans text-xs font-bold uppercase tracking-[0.2em] transition-colors hover:text-lhema-gold"
+                        <motion.div
+                            key={link.name}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 + (0.05 * index), duration: 0.8 }}
                         >
-                            {link}
-                        </motion.a>
+                            <Link
+                                to={link.path}
+                                onClick={onClose}
+                                className={`font-sans text-xs font-bold uppercase tracking-[0.2em] transition-colors hover:text-lhema-gold ${location.pathname === link.path ? 'text-lhema-gold' : 'text-lhema-black'
+                                    }`}
+                            >
+                                {link.name}
+                            </Link>
+                        </motion.div>
                     ))}
                 </div>
 

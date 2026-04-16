@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Menu as MenuIcon, Search } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Link } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Menu from './Menu';
 
@@ -56,9 +57,11 @@ const Navbar = ({ theme = 'light' }) => {
 
                 {/* Center: Logo */}
                 <div className="absolute left-1/2 transform -translate-x-1/2">
-                    <h2 className={clsx("font-serif text-xl md:text-2xl tracking-widest cursor-pointer", textColorClass)}>
-                        MAISON LHEMA
-                    </h2>
+                    <Link to="/">
+                        <h2 className={clsx("font-serif text-xl md:text-2xl tracking-widest cursor-pointer", textColorClass)}>
+                            MAISON LHEMA
+                        </h2>
+                    </Link>
                 </div>
 
                 {/* Right: Actions */}

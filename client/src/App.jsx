@@ -9,9 +9,11 @@ const ComingSoon = lazy(() => import('./pages/ComingSoon'));
 const Atelier = lazy(() => import('./pages/Atelier'));
 const Femme = lazy(() => import('./pages/Femme'));
 const Homme = lazy(() => import('./pages/Homme'));
+const Collection = lazy(() => import('./pages/Collection'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const PrivateFitting = lazy(() => import('./pages/PrivateFitting'));
 const LegalPrivacy = lazy(() => import('./pages/LegalPrivacy'));
 const LegalExchange = lazy(() => import('./pages/LegalExchange'));
 const LegalDelivery = lazy(() => import('./pages/LegalDelivery'));
@@ -53,6 +55,8 @@ function App() {
                     {/* Public Routes with Custom Cursor & WhatsApp */}
                     <Route element={<PublicLayout />}>
                         <Route path="/" element={<LandingPage />} />
+                        <Route path="/essayage-prive" element={<PrivateFitting />} />
+                        <Route path="/collection" element={<Collection />} />
                         <Route path="/femme" element={<Femme />} />
                         <Route path="/homme" element={<Homme />} />
                         <Route path="/atelier" element={<Atelier />} />
