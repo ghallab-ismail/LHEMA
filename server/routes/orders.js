@@ -8,8 +8,8 @@ const auth = require('../middleware/auth');
 // @access  Public
 router.post('/', async (req, res) => {
     try {
-        const { customerName, whatsapp, city, size, productName } = req.body;
-
+        const { customerName, whatsapp, city, size, productName, inquiryId } = req.body;
+        
         if (!customerName || !whatsapp || !city || !size || !productName) {
             return res.status(400).json({ msg: 'All fields are required' });
         }
@@ -22,10 +22,16 @@ router.post('/', async (req, res) => {
             whatsapp,
             city,
             size,
-            productName
+            productName,
+            inquiryId
         });
 
         const order = await newOrder.save();
+        
+        if (inquiryId) {
+            const Inquiry = require('../models/Inquiry');
+            await Inquiry.findByIdAndUpdate(inquiryId, { orderId: order._id });
+        }
         res.json({ trackingCode: order.trackingCode, orderId: order._id });
     } catch (err) {
         console.error('Error creating order:', err.message);
@@ -216,6 +222,27 @@ router.delete('/:id/steps/:stepId', auth, async (req, res) => {
         res.json(order);
     } catch (err) {
         console.error('Error removing step:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   DELETE api/orders/:id
+// @desc    Delete an order (Admin)
+// @access  Private
+router.delete('/:id', auth, async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order) return res.status(404).json({ msg: 'Order not found' });
+        
+        if (order.inquiryId) {
+            const Inquiry = require('../models/Inquiry');
+            await Inquiry.findByIdAndDelete(order.inquiryId);
+        }
+
+        await order.deleteOne();
+        res.json({ msg: 'Order deleted' });
+    } catch (err) {
+        console.error('Error deleting order:', err.message);
         res.status(500).send('Server Error');
     }
 });

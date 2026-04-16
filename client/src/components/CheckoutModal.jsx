@@ -111,6 +111,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                     productName: productNameToSend
                 }),
             });
+            const inquiryData = await inquiryResponse.json();
 
             // Create order with tracking code
             const orderResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
@@ -121,7 +122,8 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                     whatsapp: formData.whatsapp,
                     city: formData.city,
                     size: formData.size,
-                    productName: productNameToSend
+                    productName: productNameToSend,
+                    inquiryId: inquiryData._id
                 }),
             });
 

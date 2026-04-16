@@ -29,6 +29,10 @@ const InquirySchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    orderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order'
     }
 });
 

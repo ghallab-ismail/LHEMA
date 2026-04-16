@@ -98,6 +98,10 @@ const OrderSchema = new mongoose.Schema({
     reviewDate: {
         type: Date,
         default: null
+    },
+    inquiryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Inquiry'
     }
 });
 

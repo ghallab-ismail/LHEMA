@@ -21,6 +21,7 @@ import {
     MessageCircle,
     Mail
 } from 'lucide-react';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 const OrdersManagement = () => {
     const [orders, setOrders] = useState([]);
@@ -39,6 +40,8 @@ const OrdersManagement = () => {
     const [editStepTitleAr, setEditStepTitleAr] = useState('');
     const [editStepDesc, setEditStepDesc] = useState('');
     const [toast, setToast] = useState(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [orderToDelete, setOrderToDelete] = useState(null);
 
     const API = import.meta.env.VITE_API_URL;
     const getToken = () => localStorage.getItem('adminToken');
@@ -167,21 +170,29 @@ const OrdersManagement = () => {
         }
     };
 
-    const handleDeleteOrder = async (orderId) => {
-        if (!window.confirm('Delete this order?')) return;
+    const confirmDeleteOrder = (order) => {
+        setOrderToDelete(order);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleDeleteOrder = async () => {
+        if (!orderToDelete) return;
         try {
-            const response = await fetch(`${API}/api/orders/${orderId}`, {
+            const response = await fetch(`${API}/api/orders/${orderToDelete._id}`, {
                 method: 'DELETE',
                 headers: { 'x-auth-token': getToken() }
             });
 
             if (response.ok) {
-                setOrders(prev => prev.filter(o => o._id !== orderId));
-                if (expandedOrder === orderId) setExpandedOrder(null);
+                setOrders(prev => prev.filter(o => o._id !== orderToDelete._id));
+                if (expandedOrder === orderToDelete._id) setExpandedOrder(null);
                 showToast('Order deleted');
             }
         } catch (err) {
             console.error('Error deleting order:', err);
+        } finally {
+            setIsDeleteModalOpen(false);
+            setOrderToDelete(null);
         }
     };
 
@@ -475,7 +486,7 @@ const OrdersManagement = () => {
 
                                     {/* Delete */}
                                     <button
-                                        onClick={(e) => { e.stopPropagation(); handleDeleteOrder(order._id); }}
+                                        onClick={(e) => { e.stopPropagation(); confirmDeleteOrder(order); }}
                                         className="p-2 rounded-lg text-stone-600 hover:text-red-400 hover:bg-red-500/10 transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100"
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
@@ -840,6 +851,13 @@ const OrdersManagement = () => {
                     })}
                 </div>
             )}
+            
+            <ConfirmDeleteModal 
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteOrder}
+                clientName={orderToDelete?.customerName}
+            />
         </motion.div>
     );
 };

@@ -107,6 +107,21 @@ router.post('/admin', auth, async (req, res) => {
 
         const inquiry = await newInquiry.save();
 
+        const Order = require('../models/Order');
+        const trackingCode = await Order.generateTrackingCode();
+        const newOrder = new Order({
+            trackingCode,
+            customerName: name,
+            whatsapp,
+            city,
+            size,
+            productName,
+            inquiryId: inquiry._id
+        });
+        const order = await newOrder.save();
+        inquiry.orderId = order._id;
+        await inquiry.save();
+
         res.json(inquiry);
     } catch (err) {
         console.error(err.message);
@@ -159,6 +174,13 @@ router.post('/bulk-delete', auth, async (req, res) => {
 
         if (!ids || !Array.isArray(ids) || ids.length === 0) {
             return res.status(400).json({ msg: 'No inquiry IDs provided' });
+        }
+
+        const inquiries = await Inquiry.find({ _id: { $in: ids } });
+        const orderIds = inquiries.map(inq => inq.orderId).filter(id => id);
+        if (orderIds.length > 0) {
+            const Order = require('../models/Order');
+            await Order.deleteMany({ _id: { $in: orderIds } });
         }
 
         await Inquiry.deleteMany({ _id: { $in: ids } });
@@ -219,6 +241,20 @@ router.put('/:id', auth, async (req, res) => {
 
         if (!inquiry) return res.status(404).json({ msg: 'Inquiry not found' });
 
+        if (inquiry.orderId) {
+            const Order = require('../models/Order');
+            const orderUpdate = {};
+            if (updateData.name) orderUpdate.customerName = updateData.name;
+            if (updateData.whatsapp) orderUpdate.whatsapp = updateData.whatsapp;
+            if (updateData.city) orderUpdate.city = updateData.city;
+            if (updateData.size) orderUpdate.size = updateData.size;
+            if (updateData.productName) orderUpdate.productName = updateData.productName;
+            
+            if (Object.keys(orderUpdate).length > 0) {
+                 await Order.findByIdAndUpdate(inquiry.orderId, { $set: orderUpdate });
+            }
+        }
+
         res.json(inquiry);
     } catch (err) {
         console.error(err.message);
@@ -231,9 +267,16 @@ router.put('/:id', auth, async (req, res) => {
 // @access  Private (Admin)
 router.delete('/:id', auth, async (req, res) => {
     try {
-        const inquiry = await Inquiry.findByIdAndDelete(req.params.id);
+        const inquiry = await Inquiry.findById(req.params.id);
 
         if (!inquiry) return res.status(404).json({ msg: 'Inquiry not found' });
+
+        if (inquiry.orderId) {
+            const Order = require('../models/Order');
+            await Order.findByIdAndDelete(inquiry.orderId);
+        }
+
+        await inquiry.deleteOne();
 
         res.json({ msg: 'Inquiry removed' });
     } catch (err) {
