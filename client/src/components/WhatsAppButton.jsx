@@ -60,6 +60,9 @@ const WhatsAppButton = () => {
             </AnimatePresence>
 
             <motion.button
+                id="whatsapp-button"
+                aria-label="WhatsApp Contact"
+                type="button"
                 onClick={handleWhatsAppClick}
                 className="relative flex h-14 w-14 items-center justify-center rounded-full bg-lhema-black text-lhema-cream shadow-[0_0_40px_rgba(0,0,0,0.3)] transition-colors hover:bg-lhema-gold cursor-pointer"
                 onMouseEnter={() => setIsHovered(true)}
@@ -70,6 +73,9 @@ const WhatsAppButton = () => {
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 260, damping: 20 }}
             >
+                {/* Hidden text for accessibility and Meta Event Setup Tool detection */}
+                <span className="sr-only">WhatsApp Contact</span>
+                
                 {/* Pulse Effect */}
                 <span className="absolute -inset-1 rounded-full border border-lhema-gold/30 opacity-0 animate-ping" />
 
