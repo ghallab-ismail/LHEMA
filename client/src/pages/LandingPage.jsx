@@ -76,7 +76,7 @@ const LandingPage = () => {
                     <CheckoutModal
                         isOpen={isModalOpen}
                         onClose={() => setIsModalOpen(false)}
-                        product={{ name: "L'ensemble Souverain" }}
+                        product={{ name: "L'ensemble Souverain", sizes: ["Sur Mesure"] }}
                     />
 
                     {/* Preserved components for future use if needed:
