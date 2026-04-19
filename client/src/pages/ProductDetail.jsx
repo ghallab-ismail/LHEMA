@@ -84,9 +84,15 @@ const ProductDetail = () => {
                 setShowStickyButton(false);
             }
 
-            // Auto-open modal when reaching the bottom of the page
-            const isAtBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 50;
-            if (isAtBottom && !hasAutoOpened.current) {
+            // Auto-open modal when reaching the bottom of the page (and ensure they actually scrolled down)
+            const documentHeight = Math.max(
+                document.body.scrollHeight, document.documentElement.scrollHeight,
+                document.body.offsetHeight, document.documentElement.offsetHeight,
+                document.body.clientHeight, document.documentElement.clientHeight
+            );
+            
+            const isAtBottom = window.innerHeight + window.scrollY >= documentHeight - 50;
+            if (isAtBottom && window.scrollY > 150 && !hasAutoOpened.current) {
                 setIsModalOpen(true);
                 hasAutoOpened.current = true;
             }
@@ -133,12 +139,18 @@ const ProductDetail = () => {
             <div className="flex flex-col lg:flex-row min-h-screen">
                 {/* Left: Sticky Image Gallery */}
                 <div className="w-full lg:w-1/2 lg:h-screen lg:sticky lg:top-0 overflow-hidden relative group bg-[#FAF9F6]">
+                    
+                    {/* Ambient Blurred Background for Desktop to fill empty space */}
+                    <div 
+                        className="hidden lg:block absolute inset-0 bg-cover bg-center opacity-40 blur-[60px] scale-110 transition-all duration-700" 
+                        style={{ backgroundImage: `url(${product?.images[activeImage]})` }} 
+                    />
+
                     <Link to="/" className="absolute top-[80px] left-6 z-20 mix-blend-difference text-white">
                         <ArrowLeft className="w-6 h-6" />
                     </Link>
 
-                    {/* Desktop View: Static Image List or Fading Images */}
-                    <div className="hidden lg:block h-full w-full pt-[80px]">
+                    <div className="hidden lg:flex lg:items-center lg:justify-center h-full w-full pt-[80px] pb-10 relative z-10">
                         <motion.img
                             key={activeImage}
                             initial={{ opacity: 0 }}
@@ -146,7 +158,7 @@ const ProductDetail = () => {
                             transition={{ duration: 0.5 }}
                             src={product.images[activeImage]}
                             alt={product.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                         />
                     </div>
 

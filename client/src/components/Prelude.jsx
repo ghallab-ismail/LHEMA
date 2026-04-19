@@ -28,7 +28,7 @@ const Prelude = ({ onDiscover }) => {
     return (
         <section
             ref={scrollRef}
-            className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-lhema-cream"
+            className="relative min-h-[100dvh] w-full flex flex-col overflow-hidden bg-lhema-cream"
         >
             {/* ── Thin horizontal rule top ── */}
             <motion.div
@@ -58,13 +58,14 @@ const Prelude = ({ onDiscover }) => {
                 />
             ))}
 
-            {/* ── Main content ── */}
-            <motion.div
-                variants={container}
-                initial="hidden"
-                animate="show"
-                className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl"
-            >
+            {/* Main content wrapper to push footer down */}
+            <div className="flex-1 flex flex-col items-center justify-center w-full px-6 py-20 z-10 relative mt-8">
+                <motion.div
+                    variants={container}
+                    initial="hidden"
+                    animate="show"
+                    className="flex flex-col items-center text-center max-w-4xl"
+                >
                 {/* Season label */}
                 <motion.p
                     variants={fadeIn}
@@ -102,49 +103,53 @@ const Prelude = ({ onDiscover }) => {
 
                 <motion.p
                     variants={fadeUp}
-                    className="font-sans text-xs md:text-sm text-lhema-black/35 leading-relaxed max-w-md mb-14"
+                    className="font-sans text-xs md:text-sm text-lhema-black/35 leading-relaxed max-w-md"
                 >
                     L'alliance du Satin Duchesse et du Crêpe de Soie. Coupe sculptée à la main. Confectionné au Maroc, destiné à traverser les générations.
                 </motion.p>
-            </motion.div>
+                </motion.div>
+            </div>
 
-            {/* ── Scroll CTA — anchored above stats, no overlap ── */}
-            <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.4, duration: 0.8 }}
-                onClick={onDiscover}
-                className="absolute bottom-32 left-1/2 -translate-x-1/2 group flex flex-col items-center gap-2 cursor-pointer border-none bg-transparent z-10"
-                aria-label="Découvrir la collection"
-            >
-                <span className="font-sans text-[10px] uppercase tracking-[0.35em] text-lhema-black/50 group-hover:text-lhema-black transition-colors duration-500">
-                    Découvrir
-                </span>
-                <motion.span
-                    animate={{ y: [0, 5, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-                    className="block w-px h-6 bg-lhema-black/25 group-hover:bg-lhema-black/50 transition-colors duration-500 mx-auto"
-                />
-            </motion.button>
+            {/* Bottom elements wrapper */}
+            <div className="w-full flex flex-col items-center justify-end pb-14 z-10 relative shrink-0 gap-16">
+                {/* ── Scroll CTA ── */}
+                <motion.button
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.4, duration: 0.8 }}
+                    onClick={onDiscover}
+                    className="group flex flex-col items-center gap-2 cursor-pointer border-none bg-transparent"
+                    aria-label="Découvrir la collection"
+                >
+                    <span className="font-sans text-[10px] uppercase tracking-[0.35em] text-lhema-black/50 group-hover:text-lhema-black transition-colors duration-500">
+                        Découvrir
+                    </span>
+                    <motion.span
+                        animate={{ y: [0, 5, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+                        className="block w-px h-6 bg-lhema-black/25 group-hover:bg-lhema-black/50 transition-colors duration-500 mx-auto"
+                    />
+                </motion.button>
 
-            {/* ── Stats strip bottom ── */}
-            <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.6, duration: 0.8 }}
-                className="absolute bottom-14 left-0 right-0 flex justify-center gap-12 md:gap-20 px-6"
-            >
-                {[
-                    { value: '10', label: 'Pièces au monde' },
-                    { value: '100%', label: 'Fait à la main' },
-                    { value: '01', label: 'Seule collection' },
-                ].map(({ value, label }) => (
-                    <div key={label} className="text-center">
-                        <span className="block font-serif text-lg md:text-2xl text-lhema-black/80">{value}</span>
-                        <span className="block font-sans text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-lhema-black/35 mt-1">{label}</span>
-                    </div>
-                ))}
-            </motion.div>
+                {/* ── Stats strip bottom ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.6, duration: 0.8 }}
+                    className="flex justify-center gap-12 md:gap-20 px-6 w-full"
+                >
+                    {[
+                        { value: '10', label: 'Pièces au monde' },
+                        { value: '100%', label: 'Fait à la main' },
+                        { value: '01', label: 'Seule collection' },
+                    ].map(({ value, label }) => (
+                        <div key={label} className="text-center">
+                            <span className="block font-serif text-lg md:text-2xl text-lhema-black/80">{value}</span>
+                            <span className="block font-sans text-[9px] md:text-[10px] uppercase tracking-[0.25em] text-lhema-black/35 mt-1">{label}</span>
+                        </div>
+                    ))}
+                </motion.div>
+            </div>
 
             {/* ── Bottom rule ── */}
             <motion.div

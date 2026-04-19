@@ -6,8 +6,8 @@ const Bespoke = () => {
     const processSteps = [
         {
             icon: Ruler,
-            title: "Vos Mesures",
-            desc: "Un guide interactif pour transmettre vos dimensions avec une précision chirurgicale."
+            title: "L'Essayage Privé",
+            desc: "Notre Maison vient à vous. Une prise de mesures rigoureuse est effectuée lors d'une rencontre privée, avec une précision chirurgicale.."
         },
         {
             icon: PenTool,
@@ -31,7 +31,7 @@ const Bespoke = () => {
 
             <div className="relative mx-auto max-w-7xl">
                 <div className="grid lg:grid-cols-2 gap-20 md:gap-32 items-center">
-                    
+
                     {/* Left Column: The Craft Visual */}
                     <div className="order-2 lg:order-1 relative">
                         <motion.div
@@ -58,7 +58,7 @@ const Bespoke = () => {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             {/* Decorative measuring tape element mocked with CSS */}
                             <div className="absolute -bottom-6 -left-6 md:-left-12 bg-white p-6 md:p-10 shadow-xl border border-stone-100 flex items-center gap-6">
                                 <div className="w-12 h-12 flex items-center justify-center rounded-full bg-lhema-black text-white">
@@ -90,12 +90,12 @@ const Bespoke = () => {
                             <h2 className="font-serif text-4xl md:text-7xl text-lhema-black mb-10 leading-tight">
                                 Votre <span className="italic">Silhouette</span>,<br />Notre Seul Patron.
                             </h2>
-                            
+
                             <div className="space-y-12">
                                 <p className="font-sans text-lg md:text-xl text-lhema-black/70 leading-relaxed max-w-2xl font-light">
                                     Chez Maison Lhema, le prêt-à-porter n'existe pas. Chaque pièce est une création unique, taillée scrupuleusement selon vos propres mesures. Nous ne suivons pas les tailles standard ; nous suivons votre corps.
                                 </p>
-                                
+
                                 <div className="space-y-8">
                                     {processSteps.map((step, index) => (
                                         <motion.div
@@ -130,7 +130,7 @@ const Bespoke = () => {
                                 >
                                     <div className="flex items-center gap-4 text-lhema-black/80">
                                         <div className="flex -space-x-2">
-                                            {[1,2,3].map(i => (
+                                            {[1, 2, 3].map(i => (
                                                 <div key={i} className="w-8 h-8 rounded-full bg-lhema-gold border-2 border-white" />
                                             ))}
                                         </div>
