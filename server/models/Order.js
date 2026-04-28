@@ -64,13 +64,10 @@ const OrderSchema = new mongoose.Schema({
         type: [CraftingStepSchema],
         default: [
             { title: 'Demande Reçue', description: 'Votre commande a été enregistrée et confirmée.', status: 'completed', completedAt: new Date() },
-            { title: 'Sélection des Tissus', description: 'Nos artisans sélectionnent les plus beaux tissus pour votre pièce.', status: 'pending' },
-            { title: 'Patron & Coupe', description: 'Le patron est créé sur mesure et les tissus sont découpés avec précision.', status: 'pending' },
-            { title: 'Confection Artisanale', description: 'Votre pièce est cousue à la main par nos maîtres artisans.', status: 'pending' },
-            { title: 'Finitions & Détails', description: 'Les broderies, boutons et finitions de luxe sont ajoutés.', status: 'pending' },
-            { title: 'Contrôle Qualité', description: 'Chaque détail est inspecté pour garantir la perfection.', status: 'pending' },
-            { title: 'Emballage Premium', description: 'Votre pièce est soigneusement emballée dans notre packaging signature.', status: 'pending' },
-            { title: 'Expédition', description: 'Votre commande est en route vers vous.', status: 'pending' }
+            { title: 'Coupe & Préparation', description: 'Sélection des tissus et découpe sur mesure du patron.', status: 'pending' },
+            { title: 'Confection Artisanale', description: 'Votre pièce prend vie, cousue à la main par nos maîtres artisans.', status: 'pending' },
+            { title: 'Finitions & Contrôle', description: 'Ajout des détails luxueux et inspection minutieuse de la qualité.', status: 'pending' },
+            { title: 'Emballage & Expédition', description: 'Votre commande est emballée dans notre packaging signature et en route vers vous.', status: 'pending' }
         ]
     },
     estimatedDelivery: {
