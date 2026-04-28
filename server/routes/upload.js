@@ -15,10 +15,17 @@ cloudinary.config({
 // Configure multer-storage-cloudinary
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'lhema_products', // The name of the folder in Cloudinary
-    allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'gif'],
-  },
+  params: async (req, file) => {
+    // Extract extension and convert to lowercase to prevent Invalid Signature errors
+    let ext = file.originalname.split('.').pop().toLowerCase();
+    if (ext === 'jpeg') ext = 'jpg';
+    
+    return {
+      folder: 'lhema_products',
+      format: ext, // Force lowercase format
+      allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'gif']
+    };
+  }
 });
 
 const upload = multer({
