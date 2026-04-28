@@ -247,6 +247,33 @@ router.delete('/:id', auth, async (req, res) => {
     }
 });
 
+// @route   POST api/orders/bulk-delete
+// @desc    Bulk delete orders (Admin)
+// @access  Private
+router.post('/bulk-delete', auth, async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids)) {
+            return res.status(400).json({ msg: 'Please provide an array of order IDs' });
+        }
+
+        // Delete associated inquiries
+        const orders = await Order.find({ _id: { $in: ids } });
+        const inquiryIds = orders.filter(o => o.inquiryId).map(o => o.inquiryId);
+        
+        if (inquiryIds.length > 0) {
+            const Inquiry = require('../models/Inquiry');
+            await Inquiry.deleteMany({ _id: { $in: inquiryIds } });
+        }
+
+        await Order.deleteMany({ _id: { $in: ids } });
+        res.json({ msg: 'Orders deleted successfully' });
+    } catch (err) {
+        console.error('Error bulk deleting orders:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 // @route   PUT api/orders/track/:code/review
 // @desc    Submit customer review (Public)
 // @access  Public

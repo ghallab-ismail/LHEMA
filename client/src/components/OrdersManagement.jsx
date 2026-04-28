@@ -42,6 +42,8 @@ const OrdersManagement = () => {
     const [toast, setToast] = useState(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [orderToDelete, setOrderToDelete] = useState(null);
+    const [selectedOrders, setSelectedOrders] = useState([]);
+    const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
 
     const API = import.meta.env.VITE_API_URL;
     const getToken = () => localStorage.getItem('adminToken');
@@ -185,6 +187,7 @@ const OrdersManagement = () => {
 
             if (response.ok) {
                 setOrders(prev => prev.filter(o => o._id !== orderToDelete._id));
+                setSelectedOrders(prev => prev.filter(id => id !== orderToDelete._id));
                 if (expandedOrder === orderToDelete._id) setExpandedOrder(null);
                 showToast('Order deleted');
             }
@@ -195,6 +198,47 @@ const OrdersManagement = () => {
             setOrderToDelete(null);
         }
     };
+
+    const handleBulkDelete = async () => {
+        if (selectedOrders.length === 0) return;
+        try {
+            const response = await fetch(`${API}/api/orders/bulk-delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-auth-token': getToken() },
+                body: JSON.stringify({ ids: selectedOrders })
+            });
+
+            if (response.ok) {
+                setOrders(prev => prev.filter(o => !selectedOrders.includes(o._id)));
+                setSelectedOrders([]);
+                setIsBulkDeleteModalOpen(false);
+                showToast('Orders deleted');
+            }
+        } catch (err) {
+            console.error('Error bulk deleting orders:', err);
+        }
+    };
+
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            const ids = filteredOrders.map(o => o._id);
+            setSelectedOrders(prev => [...new Set([...prev, ...ids])]);
+        } else {
+            const ids = filteredOrders.map(o => o._id);
+            setSelectedOrders(prev => prev.filter(id => !ids.includes(id)));
+        }
+    };
+
+    const handleSelectOne = (e, id) => {
+        e.stopPropagation();
+        if (e.target.checked) {
+            setSelectedOrders(prev => [...prev, id]);
+        } else {
+            setSelectedOrders(prev => prev.filter(selectedId => selectedId !== id));
+        }
+    };
+
+    const isAllVisibleSelected = filteredOrders.length > 0 && filteredOrders.every(o => selectedOrders.includes(o._id));
 
     const handleUpdateOrderField = async (orderId, field, value) => {
         try {
@@ -409,6 +453,19 @@ const OrdersManagement = () => {
                 ))}
             </div>
 
+            {/* Orders List Header (Optional Select All) */}
+            {filteredOrders.length > 0 && (
+                <div className="flex items-center px-5 py-3 mb-3 rounded-xl bg-[#0F0F0F] border border-white/5">
+                    <input
+                        type="checkbox"
+                        checked={isAllVisibleSelected}
+                        onChange={handleSelectAll}
+                        className="w-4 h-4 mr-4 rounded border-white/20 bg-transparent text-white focus:ring-0 focus:ring-offset-0 accent-white cursor-pointer"
+                    />
+                    <span className="text-xs text-stone-500 font-medium uppercase tracking-wider">Select All Visible</span>
+                </div>
+            )}
+
             {/* Orders List */}
             {filteredOrders.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 text-stone-600">
@@ -416,7 +473,7 @@ const OrdersManagement = () => {
                     <p className="text-sm">{searchQuery || statusFilter !== 'all' ? 'No orders match your search.' : 'No orders yet.'}</p>
                 </div>
             ) : (
-                <div className="space-y-3">
+                <div className="space-y-3 pb-24">
                     {filteredOrders.map((order, i) => {
                         const isExpanded = expandedOrder === order._id;
                         const progress = getProgress(order);
@@ -427,13 +484,20 @@ const OrdersManagement = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.03 }}
-                                className="rounded-2xl bg-[#0F0F0F] border border-white/5 overflow-hidden hover:border-white/10 transition-all"
+                                className={`rounded-2xl bg-[#0F0F0F] border overflow-hidden transition-all ${selectedOrders.includes(order._id) ? 'border-white/20 bg-white/[0.02]' : 'border-white/5 hover:border-white/10'}`}
                             >
                                 {/* Order Row */}
                                 <div
                                     className="flex items-center gap-4 p-5 cursor-pointer group"
                                     onClick={() => setExpandedOrder(isExpanded ? null : order._id)}
                                 >
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedOrders.includes(order._id)}
+                                        onChange={(e) => handleSelectOne(e, order._id)}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="w-4 h-4 rounded border-white/20 bg-transparent text-white focus:ring-0 focus:ring-offset-0 accent-white cursor-pointer shrink-0"
+                                    />
                                     <ChevronRight className={`w-4 h-4 text-stone-500 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`} />
 
                                     {/* Tracking Code */}
@@ -852,6 +916,49 @@ const OrdersManagement = () => {
                 </div>
             )}
             
+            {/* Bulk Actions Toolbar */}
+            <AnimatePresence>
+                {selectedOrders.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                        className="fixed bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a1a]/90 backdrop-blur-md border border-white/10 rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.5)] p-3 md:p-4 flex items-center justify-between w-[calc(100%-2rem)] md:w-auto md:min-w-[300px] max-w-lg transition-all"
+                    >
+                        <div className="flex items-center gap-2 shrink-0">
+                            <span className="flex items-center justify-center w-6 h-6 rounded-full bg-white text-black text-xs font-bold">
+                                {selectedOrders.length}
+                            </span>
+                            <span className="text-xs md:text-sm font-medium text-white hidden sm:block">Selected</span>
+                        </div>
+
+                        <div className="h-8 w-[1px] bg-white/10 mx-2 md:mx-4 hidden sm:block shrink-0" />
+
+                        <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                            <button
+                                onClick={() => setIsBulkDeleteModalOpen(true)}
+                                className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 rounded-xl text-xs md:text-sm font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors whitespace-nowrap"
+                            >
+                                <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" /> <span className="hidden sm:inline">Delete</span>
+                            </button>
+                            <button
+                                onClick={() => setSelectedOrders([])}
+                                className="flex items-center justify-center p-2 rounded-xl text-stone-400 hover:text-white hover:bg-white/10 transition-colors shrink-0"
+                            >
+                                <X className="w-4 h-4 md:w-5 md:h-5" />
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <ConfirmDeleteModal 
+                isOpen={isBulkDeleteModalOpen}
+                onClose={() => setIsBulkDeleteModalOpen(false)}
+                onConfirm={handleBulkDelete}
+                clientName={`${selectedOrders.length} selected orders`}
+            />
+
             <ConfirmDeleteModal 
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
