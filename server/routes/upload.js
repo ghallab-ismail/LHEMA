@@ -1,46 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const { v2: cloudinary } = require('cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const auth = require('../middleware/auth');
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Configure multer storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadsDir);
-    },
-    filename: (req, file, cb) => {
-        // Generate unique filename: timestamp-random-originalname
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        const safeName = file.originalname
-            .replace(ext, '')
-            .replace(/[^a-zA-Z0-9]/g, '_')
-            .substring(0, 50);
-        cb(null, `${uniqueSuffix}-${safeName}${ext}`);
-    }
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// File filter: only allow images
-const fileFilter = (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-    if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(new Error('Only image files (JPEG, PNG, WebP, GIF) are allowed'), false);
-    }
-};
+// Configure multer-storage-cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'lhema_products', // The name of the folder in Cloudinary
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'gif'],
+  },
+});
 
 const upload = multer({
-    storage,
-    fileFilter,
+    storage: storage,
     limits: {
         fileSize: 10 * 1024 * 1024, // 10MB max per file
     }
@@ -56,8 +38,8 @@ router.post('/', auth, upload.array('images', 10), (req, res) => {
         }
 
         // Return an array of URLs for the uploaded files
-        const baseUrl = `${req.protocol}://${req.get('host')}`;
-        const urls = req.files.map(file => `${baseUrl}/uploads/${file.filename}`);
+        // req.files contains the uploaded files metadata from Cloudinary
+        const urls = req.files.map(file => file.path); // 'path' contains the secure Cloudinary URL
 
         res.json({ urls });
     } catch (err) {
