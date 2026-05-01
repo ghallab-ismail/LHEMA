@@ -76,29 +76,34 @@ const ProductDetail = () => {
     const isProductAvailable = product ? (product.isAvailable !== false && dynamicStock > 0) : false;
 
     useEffect(() => {
-        const handleScroll = () => {
-            // Show sticky button after scrolling a bit
-            if (window.scrollY > 400) {
-                setShowStickyButton(true);
-            } else {
-                setShowStickyButton(false);
-            }
+        let ticking = false;
 
-            // Auto-open modal when reaching the bottom of the page (and ensure they actually scrolled down)
-            const documentHeight = Math.max(
-                document.body.scrollHeight, document.documentElement.scrollHeight,
-                document.body.offsetHeight, document.documentElement.offsetHeight,
-                document.body.clientHeight, document.documentElement.clientHeight
-            );
-            
-            const isAtBottom = window.innerHeight + window.scrollY >= documentHeight - 50;
-            if (isAtBottom && window.scrollY > 150 && !hasAutoOpened.current) {
-                setIsModalOpen(true);
-                hasAutoOpened.current = true;
+        const handleScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    // Show sticky button after scrolling a bit
+                    if (window.scrollY > 400) {
+                        setShowStickyButton(true);
+                    } else {
+                        setShowStickyButton(false);
+                    }
+
+                    // Auto-open modal when reaching the bottom of the page
+                    // Simplified to prevent forced reflows by checking fewer properties
+                    const documentHeight = document.documentElement.scrollHeight;
+                    const isAtBottom = window.innerHeight + window.scrollY >= documentHeight - 50;
+                    
+                    if (isAtBottom && window.scrollY > 150 && !hasAutoOpened.current) {
+                        setIsModalOpen(true);
+                        hasAutoOpened.current = true;
+                    }
+                    ticking = false;
+                });
+                ticking = true;
             }
         };
 
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
@@ -159,6 +164,7 @@ const ProductDetail = () => {
                             src={product.images[activeImage]}
                             alt={product.name}
                             className="w-full h-full object-contain"
+                            fetchPriority={activeImage === 0 ? "high" : "auto"}
                         />
                     </div>
 
@@ -174,6 +180,7 @@ const ProductDetail = () => {
                                 exit={{ opacity: 0, x: -50 }}
                                 transition={{ duration: 0.3 }}
                                 className="w-full h-full object-cover absolute top-0 left-0 pt-[60px] cursor-grab active:cursor-grabbing"
+                                fetchPriority={activeImage === 0 ? "high" : "auto"}
                                 drag="x"
                                 dragConstraints={{ left: 0, right: 0 }}
                                 dragElastic={0.2}
