@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
 
 const CustomCursor = () => {
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const cursorX = useMotionValue(-100);
+    const cursorY = useMotionValue(-100);
     const [isHovering, setIsHovering] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         const moveCursor = (e) => {
             if (!isVisible) setIsVisible(true);
-            setMousePosition({ x: e.clientX, y: e.clientY });
+            cursorX.set(e.clientX - 8);
+            cursorY.set(e.clientY - 8);
         };
 
         const handleMouseOver = (e) => {
@@ -53,16 +55,16 @@ const CustomCursor = () => {
                     `}</style>
                     <motion.div
                         className="pointer-events-none fixed top-0 left-0 z-[9999] hidden md:block h-4 w-4 rounded-full bg-white mix-blend-difference"
+                        style={{
+                            x: cursorX,
+                            y: cursorY,
+                        }}
                         initial={{ opacity: 0 }}
                         animate={{
-                            x: mousePosition.x - 8,
-                            y: mousePosition.y - 8,
                             scale: isHovering ? 2.5 : 1,
                             opacity: 1
                         }}
                         transition={{
-                            x: { duration: 0 },
-                            y: { duration: 0 },
                             scale: { duration: 0.2, ease: "easeOut" },
                             opacity: { duration: 0.2 }
                         }}
