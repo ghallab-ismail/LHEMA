@@ -131,7 +131,7 @@ const ProductDetail = () => {
     );
 
     return (
-        <div className="bg-[#FAF9F6] min-h-screen text-stone-900 font-sans pb-24 lg:pb-0 relative">
+        <main className="bg-[#FAF9F6] min-h-screen text-stone-900 font-sans pb-24 lg:pb-0 relative">
             {/* The Navbar needs to be absolute or sticky so content goes under it/starts below it properly,
                 in the original code it's fixed. Let's make sure it has z-index and the content pushes down slightly. */}
             <div className="relative z-50">
@@ -150,7 +150,7 @@ const ProductDetail = () => {
                         style={{ backgroundImage: `url(${product?.images[activeImage]})` }} 
                     />
 
-                    <Link to="/" className="absolute top-[80px] left-6 z-20 mix-blend-difference text-white">
+                    <Link to="/" className="absolute top-[80px] left-6 z-20 mix-blend-difference text-white" aria-label="Retour à l'accueil">
                         <ArrowLeft className="w-6 h-6" />
                     </Link>
 
@@ -189,13 +189,16 @@ const ProductDetail = () => {
                     </div>
 
                     {/* Image Navigation Dots (Overlay) */}
-                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-10 bg-black/10 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center z-10 bg-black/10 px-1 rounded-full backdrop-blur-sm">
                         {product.images.map((_, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => setActiveImage(idx)}
-                                className={`w-2 h-2 rounded-full transition-all duration-300 ${activeImage === idx ? 'bg-white w-4' : 'bg-white/50'}`}
-                            />
+                                aria-label={`Afficher l'image ${idx + 1}`}
+                                className="w-12 h-12 flex items-center justify-center"
+                            >
+                                <span className={`block h-2 rounded-full transition-all duration-300 ${activeImage === idx ? 'bg-white w-4' : 'bg-white/50 w-2'}`} />
+                            </button>
                         ))}
                     </div>
                 </div>
@@ -392,7 +395,7 @@ const ProductDetail = () => {
 
             {/* Invisible element at the bottom to trigger the IntersectionObserver */}
             <div ref={bottomRef} className="absolute bottom-0 w-full h-1 pointer-events-none" />
-        </div>
+        </main>
     );
 };
 

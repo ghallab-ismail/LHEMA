@@ -48,6 +48,7 @@ const Navbar = ({ theme = 'light' }) => {
                 <button
                     onClick={() => setIsMenuOpen(true)}
                     className="group flex items-center gap-2"
+                    aria-label="Ouvrir le menu"
                 >
                     <MenuIcon strokeWidth={1} className={clsx("w-6 h-6 transition-colors", textColorClass)} />
                     <span className={clsx("hidden md:block font-sans text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500", textColorClass)}>
