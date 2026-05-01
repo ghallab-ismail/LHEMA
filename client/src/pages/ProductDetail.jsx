@@ -15,6 +15,7 @@ const ProductDetail = () => {
     const [showStickyButton, setShowStickyButton] = useState(false);
     const [completedCount, setCompletedCount] = useState(0);
     const hasAutoOpened = useRef(false);
+    const bottomRef = useRef(null);
 
     // Wake up the Render backend immediately when user lands on the product page
     useEffect(() => {
@@ -76,35 +77,33 @@ const ProductDetail = () => {
     const isProductAvailable = product ? (product.isAvailable !== false && dynamicStock > 0) : false;
 
     useEffect(() => {
-        let ticking = false;
-
         const handleScroll = () => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    // Show sticky button after scrolling a bit
-                    if (window.scrollY > 400) {
-                        setShowStickyButton(true);
-                    } else {
-                        setShowStickyButton(false);
-                    }
-
-                    // Auto-open modal when reaching the bottom of the page
-                    // Simplified to prevent forced reflows by checking fewer properties
-                    const documentHeight = document.documentElement.scrollHeight;
-                    const isAtBottom = window.innerHeight + window.scrollY >= documentHeight - 50;
-                    
-                    if (isAtBottom && window.scrollY > 150 && !hasAutoOpened.current) {
-                        setIsModalOpen(true);
-                        hasAutoOpened.current = true;
-                    }
-                    ticking = false;
-                });
-                ticking = true;
-            }
+            // Reading window.scrollY does not trigger forced reflows
+            setShowStickyButton(window.scrollY > 400);
         };
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    useEffect(() => {
+        // Use IntersectionObserver instead of reading documentHeight on scroll
+        // This completely eliminates layout thrashing (Forced Reflows)
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && window.scrollY > 150 && !hasAutoOpened.current) {
+                    setIsModalOpen(true);
+                    hasAutoOpened.current = true;
+                }
+            },
+            { rootMargin: "50px" } // Trigger 50px before reaching the actual bottom
+        );
+
+        if (bottomRef.current) {
+            observer.observe(bottomRef.current);
+        }
+
+        return () => observer.disconnect();
     }, []);
 
     const handleDragEnd = (event, info) => {
@@ -390,6 +389,9 @@ const ProductDetail = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Invisible element at the bottom to trigger the IntersectionObserver */}
+            <div ref={bottomRef} className="absolute bottom-0 w-full h-1 pointer-events-none" />
         </div>
     );
 };
