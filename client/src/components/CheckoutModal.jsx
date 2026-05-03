@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 const CheckoutModal = ({ isOpen, onClose, product }) => {
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'Sur Mesure', mesureOption: 'essayage' });
+    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'Sur Mesure', mensurations: '' });
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
     const [trackingCode, setTrackingCode] = useState('');
@@ -64,7 +64,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
     const handleCloseModal = () => {
         onClose();
         setStep(1);
-        setFormData({ name: '', whatsapp: '', city: '', size: availableSizes[0] || 'Sur Mesure', mesureOption: 'essayage' });
+        setFormData({ name: '', whatsapp: '', city: '', size: availableSizes[0] || 'Sur Mesure', mensurations: '' });
         setErrors({});
         setTrackingCode('');
         setCopied(false);
@@ -103,8 +103,12 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
             const productNameToSend = product?.name || "The Signature Cape";
 
             const finalSize = formData.size === 'Sur Mesure' 
-                ? `Sur Mesure (${formData.mesureOption === 'essayage' ? 'Essayage Privé' : 'Mesures Fournies'})` 
+                ? `Sur Mesure` 
                 : formData.size;
+            
+            const sizeWithMensurations = formData.mensurations?.trim() 
+                ? `${finalSize} - Mensurations: ${formData.mensurations.trim()}`
+                : finalSize;
 
             // Create inquiry (existing flow)
             const inquiryResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries`, {
@@ -112,7 +116,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...formData,
-                    size: finalSize,
+                    size: sizeWithMensurations,
                     productName: productNameToSend
                 }),
             });
@@ -126,7 +130,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                     customerName: formData.name,
                     whatsapp: formData.whatsapp,
                     city: formData.city,
-                    size: finalSize,
+                    size: sizeWithMensurations,
                     productName: productNameToSend,
                     inquiryId: inquiryData._id
                 }),
@@ -194,10 +198,9 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
 
                         {step === 1 ? (
                             <div className="text-center">
-                                <h3 className="font-serif text-2xl mb-2 text-black">Demande de Conciergerie</h3>
-                                <p className="font-sans text-xs text-stone-600 mb-8 tracking-wide">
-                                    Pour acquérir "{product?.name}", veuillez renseigner vos coordonnées.
-                                    Notre équipe privée vous contactera.
+                                <h3 className="font-serif text-2xl mb-2 text-black">Finaliser l'Acquisition</h3>
+                                <p className="font-sans text-xs text-stone-500 mb-8 tracking-wide px-2">
+                                    Veuillez renseigner vos coordonnées. Notre équipe vous contactera sur WhatsApp pour confirmer vos mensurations exactes.
                                 </p>
 
                                 <form onSubmit={handleSubmit} noValidate className="space-y-6 text-left">
@@ -279,95 +282,27 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                         )}
                                     </div>
 
-                                    <div className="pt-4">
-                                        <AnimatePresence mode="wait">
-                                            {formData.size === 'Sur Mesure' ? (
-                                                <motion.div
-                                                    initial={{ opacity: 0, height: 0 }}
-                                                    animate={{ opacity: 1, height: 'auto' }}
-                                                    exit={{ opacity: 0, height: 0 }}
-                                                    className="overflow-hidden"
-                                                >
-                                                    <div className="pb-6">
-                                                        <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-4 text-stone-800 font-semibold text-center">
-                                                            Service Sur-Mesure
-                                                        </label>
-                                                        <div className="grid grid-cols-2 gap-3">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleFieldChange('mesureOption', 'essayage')}
-                                                                className={`p-3 relative border text-center transition-all duration-300 ${formData.mesureOption === 'essayage' ? 'border-black bg-black text-white shadow-lg' : 'border-stone-200 text-stone-500 hover:border-stone-400 bg-white'}`}
-                                                            >
-                                                                <span className="block text-[10px] uppercase tracking-wider mb-1 font-semibold">Essayage Privé</span>
-                                                                <span className="block text-[9px] font-serif italic opacity-80">Un tailleur vient à vous</span>
-                                                                {formData.mesureOption === 'essayage' && (
-                                                                    <motion.div layoutId="active-indicator" className="absolute -bottom-[1px] left-0 right-0 h-[2px] bg-[#D4AF37]" />
-                                                                )}
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleFieldChange('mesureOption', 'fournies')}
-                                                                className={`p-3 relative border text-center transition-all duration-300 ${formData.mesureOption === 'fournies' ? 'border-black bg-black text-white shadow-lg' : 'border-stone-200 text-stone-500 hover:border-stone-400 bg-white'}`}
-                                                            >
-                                                                <span className="block text-[10px] uppercase tracking-wider mb-1 font-semibold">Mesures Fournies</span>
-                                                                <span className="block text-[9px] font-serif italic opacity-80">Je fournis mes mesures</span>
-                                                                {formData.mesureOption === 'fournies' && (
-                                                                    <motion.div layoutId="active-indicator" className="absolute -bottom-[1px] left-0 right-0 h-[2px] bg-[#D4AF37]" />
-                                                                )}
-                                                            </button>
-                                                        </div>
-                                                    </div>
+                                    <div>
+                                        <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
+                                            Vos Mensurations (Optionnel)
+                                        </label>
+                                        <textarea
+                                            placeholder="Ex: Taille (1m70), Poids (60kg), ou mensurations spécifiques. Vous pouvez aussi nous les fournir plus tard."
+                                            className={`${inputClass('mensurations')} resize-none text-xs`}
+                                            value={formData.mensurations}
+                                            onChange={(e) => handleFieldChange('mensurations', e.target.value)}
+                                            rows="2"
+                                        />
+                                    </div>
 
-                                                    <div className="py-5 mb-4 border-y border-stone-100/60 bg-stone-50/50">
-                                                        <div className="space-y-4 px-2">
-                                                            <p className="text-[11px] text-stone-500 font-sans leading-relaxed text-center italic transition-opacity duration-300">
-                                                                {formData.mesureOption === 'essayage'
-                                                                    ? '“Un essayage privé sera organisé pour vous présenter la pièce et prendre vos mesures exactes.”'
-                                                                    : '“Notre équipe vous contactera pour vous assister et vous guider dans la transmission de vos mesures.”'}
-                                                            </p>
-                                                            <div className="flex justify-center items-center gap-4">
-                                                                <div className="h-[1px] w-6 bg-stone-200" />
-                                                                <div className="w-1 h-1 rounded-full bg-stone-300" />
-                                                                <div className="h-[1px] w-6 bg-stone-200" />
-                                                            </div>
-                                                            <p className="text-[9px] text-stone-800 font-sans text-center tracking-[0.1em] uppercase font-semibold">
-                                                                {formData.mesureOption === 'essayage'
-                                                                    ? 'Les modalités de règlement seront finalisées lors de votre essayage privé.'
-                                                                    : 'Les modalités de règlement seront finalisées lors de notre échange.'}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </motion.div>
-                                            ) : (
-                                                <motion.div
-                                                    initial={{ opacity: 0, height: 0 }}
-                                                    animate={{ opacity: 1, height: 'auto' }}
-                                                    exit={{ opacity: 0, height: 0 }}
-                                                    className="overflow-hidden"
-                                                >
-                                                    <div className="py-6 my-2 border-y border-stone-100/60 bg-stone-50/30">
-                                                        <div className="space-y-4 px-2">
-                                                            <p className="text-[11px] text-stone-500 font-sans leading-relaxed text-center italic">
-                                                                “Un essayage privé sera organisé pour vous présenter la pièce et valider la coupe.”
-                                                            </p>
-                                                            <div className="flex justify-center items-center gap-4">
-                                                                <div className="h-[1px] w-6 bg-stone-200" />
-                                                                <div className="w-1 h-1 rounded-full bg-stone-300" />
-                                                                <div className="h-[1px] w-6 bg-stone-200" />
-                                                            </div>
-                                                            <p className="text-[10px] text-stone-800 font-sans text-center tracking-[0.1em] uppercase font-semibold">
-                                                                Les modalités de règlement seront finalisées lors de votre essayage privé.
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                        
+                                    <div className="pt-6">
+                                        <p className="text-[10px] text-stone-500 font-sans text-center tracking-widest uppercase mb-4">
+                                            Un acompte sera requis pour lancer la confection. Le reliquat sera réglé à la livraison.
+                                        </p>
                                         <button
                                             type="submit"
                                             disabled={submitting}
-                                            className="w-full bg-black text-white py-4 text-xs tracking-[0.2em] uppercase hover:bg-stone-800 transition-colors shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4"
+                                            className="w-full bg-black text-white py-4 text-xs tracking-[0.2em] uppercase hover:bg-stone-800 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                         >
                                             {submitting ? (
                                                 <>
@@ -377,7 +312,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                                     </svg>
                                                     Traitement en cours...
                                                 </>
-                                            ) : "Demander l'Acquisition"}
+                                            ) : "VALIDER MA COMMANDE"}
                                         </button>
                                     </div>
                                 </form>

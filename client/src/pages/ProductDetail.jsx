@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Star } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import CheckoutModal from '../components/CheckoutModal';
+import EssayagePriveModal from '../components/EssayagePriveModal';
 import { products as staticProducts } from '../data/products';
 
 const ProductDetail = () => {
@@ -12,6 +13,7 @@ const ProductDetail = () => {
     const [productLoading, setProductLoading] = useState(true);
     const [activeImage, setActiveImage] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEssayageModalOpen, setIsEssayageModalOpen] = useState(false);
     const [showStickyButton, setShowStickyButton] = useState(false);
     const [completedCount, setCompletedCount] = useState(0);
     const hasAutoOpened = useRef(false);
@@ -106,6 +108,15 @@ const ProductDetail = () => {
         return () => observer.disconnect();
     }, []);
 
+    const handleSurMesureClick = () => {
+        // Trigger the standard checkout/measurement form modal
+        setIsModalOpen(true);
+    };
+
+    const handleEssayagePriveClick = () => {
+        setIsEssayageModalOpen(true);
+    };
+
     const handleDragEnd = (event, info) => {
         const swipeThreshold = 50;
         if (info.offset.x < -swipeThreshold) {
@@ -139,6 +150,7 @@ const ProductDetail = () => {
             </div>
 
             <CheckoutModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} product={product} />
+            <EssayagePriveModal isOpen={isEssayageModalOpen} onClose={() => setIsEssayageModalOpen(false)} product={product} />
 
             <div className="flex flex-col lg:flex-row min-h-screen">
                 {/* Left: Sticky Image Gallery */}
@@ -352,7 +364,7 @@ const ProductDetail = () => {
                 </div>
             </div>
 
-            {/* Sticky Floating CTA */}
+            {/* Sticky Floating CTA - Dual-Path Conversion */}
             <AnimatePresence>
                 {showStickyButton && (
                     <motion.div
@@ -360,22 +372,28 @@ const ProductDetail = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 50 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed bottom-0 left-0 right-0 p-4 lg:p-6 bg-white/90 backdrop-blur-md border-t border-stone-200 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-40 flex justify-between items-center"
+                        className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-stone-200 z-40"
                     >
-                        <div className="hidden md:block">
-                            <h4 className="font-serif text-lg text-stone-900">{product.name}</h4>
-                            <p className="font-serif text-sm text-stone-500">{product.price.toLocaleString()} {product.currency || 'DH'}</p>
-                        </div>
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            disabled={!isProductAvailable}
-                            className={`w-full md:w-auto py-4 px-10 text-xs tracking-[0.2em] font-medium uppercase transition-all duration-300 shadow-xl ${isProductAvailable
-                                ? 'bg-[#1A1A1A] text-white hover:bg-black hover:shadow-2xl'
-                                : 'bg-stone-300 text-stone-500 cursor-not-allowed'
+                        <div className="flex flex-col items-center justify-center w-full p-4">
+                            <button
+                                onClick={handleSurMesureClick}
+                                disabled={!isProductAvailable}
+                                className={`w-full max-w-md py-4 px-6 font-sans text-sm tracking-wide font-medium uppercase transition-colors duration-300 ${
+                                    isProductAvailable 
+                                    ? 'bg-[#111111] text-white hover:bg-[#333333]' 
+                                    : 'bg-stone-300 text-stone-500 cursor-not-allowed'
                                 }`}
-                        >
-                            {product.isAvailable === false ? "Indisponible" : dynamicStock > 0 ? "Demander l'acquisition" : "Épuisé"}
-                        </button>
+                            >
+                                {product.isAvailable === false ? "Indisponible" : dynamicStock > 0 ? "COMMANDER SUR-MESURE" : "Épuisé"}
+                            </button>
+                            <button
+                                onClick={handleEssayagePriveClick}
+                                className="mt-3 text-xs sm:text-sm text-gray-500 font-serif relative group transition-colors duration-300 hover:text-black"
+                            >
+                                Résidente à Casablanca ou Rabat ? Demandez votre essayage privé.
+                                <span className="absolute left-0 bottom-0 w-full h-[0.5px] bg-gray-400 group-hover:bg-black transition-colors duration-300"></span>
+                            </button>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
