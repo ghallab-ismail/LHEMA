@@ -226,19 +226,6 @@ const ProductDetail = () => {
                                 <p className="font-serif text-2xl text-stone-900 font-medium">
                                     {product.price.toLocaleString()} {product.currency || 'DH'}
                                 </p>
-                                {product.isAvailable === false ? (
-                                    <span className="bg-stone-200/80 text-stone-600 text-[10px] font-bold px-3 py-1.5 rounded-sm uppercase tracking-widest">
-                                        Indisponible
-                                    </span>
-                                ) : dynamicStock > 0 ? (
-                                    <span className="bg-emerald-100/80 text-emerald-800 text-[10px] font-bold px-3 py-1.5 rounded-sm uppercase tracking-widest">
-                                        En Stock
-                                    </span>
-                                ) : (
-                                    <span className="bg-red-100/80 text-red-800 text-[10px] font-bold px-3 py-1.5 rounded-sm uppercase tracking-widest">
-                                        Rupture de stock
-                                    </span>
-                                )}
                             </div>
                         </div>
 
