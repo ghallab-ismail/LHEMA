@@ -39,7 +39,7 @@ const WhatsAppButton = () => {
 
     return (
         <div
-            className={`fixed right-8 z-50 flex items-center justify-end transition-all duration-500 ease-in-out ${isStickyVisible ? 'bottom-24 md:bottom-8' : 'bottom-8'
+            className={`fixed right-8 z-50 flex items-center justify-end transition-all duration-500 ease-in-out ${isStickyVisible ? 'bottom-32 md:bottom-24' : 'bottom-24'
                 }`}
         >
             <AnimatePresence>
@@ -64,7 +64,7 @@ const WhatsAppButton = () => {
                 aria-label="WhatsApp Contact"
                 type="button"
                 onClick={handleWhatsAppClick}
-                className="relative flex h-14 w-14 items-center justify-center rounded-full bg-lhema-black text-lhema-cream shadow-[0_0_40px_rgba(0,0,0,0.3)] transition-colors hover:bg-lhema-gold cursor-pointer"
+                className="relative flex h-12 w-12 items-center justify-center rounded-full bg-lhema-black text-lhema-cream shadow-sm transition-colors hover:bg-lhema-gold cursor-pointer"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 whileHover={{ scale: 1.1 }}
