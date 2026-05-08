@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star } from 'lucide-react';
+import { Star, Truck, RefreshCw, ShieldCheck, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ReactPixel from 'react-facebook-pixel';
 import Navbar from '../components/Navbar';
@@ -13,6 +13,27 @@ const OfferSouverain = () => {
     const [showStickyButton, setShowStickyButton] = useState(false);
     const hasAutoOpened = useRef(false);
     const bottomRef = useRef(null);
+
+    const [openAccordion, setOpenAccordion] = useState(null);
+    const toggleAccordion = (idx) => setOpenAccordion(openAccordion === idx ? null : idx);
+
+    const policies = [
+        {
+            title: "Livraison Privilège",
+            icon: <Truck className="w-5 h-5 text-[#D4AF37]" strokeWidth={1.5} />,
+            content: "Expédition rapide et sécurisée. La livraison est assurée par nos coursiers de confiance partout au Maroc. Vous avez la possibilité d'inspecter votre colis avant de régler."
+        },
+        {
+            title: "Paiement à la Livraison",
+            icon: <ShieldCheck className="w-5 h-5 text-[#D4AF37]" strokeWidth={1.5} />,
+            content: "Aucune avance n'est requise par carte bancaire. Vous réglez votre commande en espèces directement auprès du livreur lors de la réception de votre pièce."
+        },
+        {
+            title: "Échange Garanti",
+            icon: <RefreshCw className="w-5 h-5 text-[#D4AF37]" strokeWidth={1.5} />,
+            content: "L'art du sur-mesure exige la perfection. Si la taille ne correspond pas exactement à vos attentes, nous organisons un échange rapide et gratuit à notre charge."
+        }
+    ];
 
     // Hardcoded static product - Modify price here to test
     const product = {
@@ -245,6 +266,45 @@ const OfferSouverain = () => {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Policies Accordion */}
+                            <div className="w-full mt-16 pt-2">
+                                <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] mb-8 font-bold text-center">
+                                    L'Expérience Lhema
+                                </h2>
+                                <div className="border-t border-stone-200">
+                                    {policies.map((policy, idx) => (
+                                        <div key={idx} className="border-b border-stone-200">
+                                            <button 
+                                                onClick={() => toggleAccordion(idx)}
+                                                className="w-full flex items-center justify-between py-5 focus:outline-none group"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    {policy.icon}
+                                                    <span className="font-serif text-[15px] uppercase tracking-wider text-stone-900 group-hover:text-[#D4AF37] transition-colors">{policy.title}</span>
+                                                </div>
+                                                <ChevronDown className={`w-4 h-4 text-stone-400 transition-transform duration-300 ${openAccordion === idx ? 'rotate-180' : ''}`} />
+                                            </button>
+                                            <AnimatePresence>
+                                                {openAccordion === idx && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: "auto", opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        transition={{ duration: 0.3 }}
+                                                        className="overflow-hidden"
+                                                    >
+                                                        <p className="font-sans text-sm text-stone-600 leading-relaxed pb-5 pl-9 text-left">
+                                                            {policy.content}
+                                                        </p>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
                         </div>
                     </motion.div>
                 </div>
