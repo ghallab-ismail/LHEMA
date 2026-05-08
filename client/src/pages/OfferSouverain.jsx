@@ -37,7 +37,7 @@ const OfferSouverain = () => {
 
     // Hardcoded static product - Modify price here to test
     const product = {
-        name: "L'Ensemble Souverain",
+        name: "L'Ensemble \"Ghalia\"",
         price: 499, // <-- CHANGE PRICE HERE FOR TESTING
         currency: "MAD",
         isAvailable: true,

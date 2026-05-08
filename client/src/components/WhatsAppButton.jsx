@@ -22,7 +22,7 @@ const WhatsAppButton = () => {
 
     // Replace with actual number
     const phoneNumber = "212709555824";
-    const message = "Bonjour Maison Lhema, je suis intéressée par l'Ensemble Souverain";
+    const message = "Bonjour Maison Lhema, je suis intéressée par l'Ensemble Ghalia";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
     const handleWhatsAppClick = () => {

@@ -7,7 +7,7 @@ const Menu = ({ onClose }) => {
     const location = useLocation();
 
     const primaryLinks = [
-        { name: "L'ENSEMBLE SOUVERAIN", path: "/offre-souverain" }
+        { name: "L'ENSEMBLE \"GHALIA\"", path: "/offre-souverain" }
     ];
     
     const secondaryLinks = [
