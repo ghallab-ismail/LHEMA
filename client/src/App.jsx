@@ -38,7 +38,7 @@ function App() {
             // Initialize tracking scripts only after interaction or timeout
             Clarity.init("wbohg9nwgn");
             ReactGA.initialize("G-4PMB7MBZJ5");
-            ReactPixel.init('1304464341598639', { autoConfig: true, debug: false });
+            ReactPixel.init('800661182864004', { autoConfig: true, debug: false });
             
             // Cleanup event listeners
             ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'].forEach(event => {
