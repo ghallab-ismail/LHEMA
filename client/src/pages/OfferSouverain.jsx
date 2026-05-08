@@ -191,49 +191,59 @@ const OfferSouverain = () => {
                         transition={{ delay: 0.2, duration: 0.8 }}
                         className="max-w-xl mx-auto w-full"
                     >
-                        <div className="mb-6">
-                            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl mb-3 leading-tight">{product.name}</h1>
-
+                        <div className="w-full flex flex-col items-center md:items-start text-center md:text-left">
+                            {/* Stars First for premium feel */}
                             <div className="flex items-center gap-1 mb-4">
                                 {[...Array(5)].map((_, i) => (
-                                    <Star key={i} className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" strokeWidth={1} />
+                                    <Star key={i} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" strokeWidth={1} />
                                 ))}
                             </div>
 
-                            <div className="flex items-center gap-4 mb-2">
+                            {/* Product Title */}
+                            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl mb-6 leading-tight text-stone-900">
+                                {product.name}
+                            </h1>
+
+                            {/* Price & Stock Badge */}
+                            <div className="flex items-center gap-4 mb-10">
                                 <p className="font-serif text-2xl text-stone-900 font-medium">
                                     {product.price.toLocaleString()} {product.currency}
                                 </p>
-                                <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-200/50">
+                                <div className="flex items-center gap-1.5 bg-[#FAF9F6] text-stone-600 px-3 py-1 rounded-sm border border-stone-200">
                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                    <span className="font-sans text-[10px] uppercase tracking-wider font-semibold">En Stock</span>
+                                    <span className="font-sans text-[9px] uppercase tracking-widest font-semibold">En Stock</span>
                                 </div>
                             </div>
-                        </div>
 
+                            {/* Elegant Divider */}
+                            <div className="w-full h-px bg-gradient-to-r from-transparent via-stone-200 to-transparent md:bg-stone-200 md:bg-none mb-10"></div>
 
+                            {/* Intro / Catchphrase */}
+                            <h4 className="font-serif text-xl lg:text-2xl mb-4 text-stone-800 leading-snug">
+                                {product.description_title}
+                            </h4>
+                            <p className="text-stone-500 font-sans text-sm md:text-base leading-relaxed italic max-w-md mb-12">
+                                "{product.description_subtitle}"
+                            </p>
 
-                        {/* Description */}
-                        <div className="mb-12 mt-16">
-                            <div className="text-center mb-10">
-                                <h2 className="font-serif text-2xl lg:text-3xl text-stone-900 tracking-wide mb-4">Savoir-Faire & Composition</h2>
-                                <div className="w-12 h-[1px] bg-[#D4AF37] mx-auto"></div>
-                            </div>
-                            <div className="mb-10 text-center">
-                                <h4 className="font-serif text-xl lg:text-2xl mb-4 text-stone-800 leading-snug">{product.description_title}</h4>
-                                <p className="text-stone-500 font-sans text-sm md:text-base leading-relaxed max-w-md mx-auto italic">
-                                    "{product.description_subtitle}"
-                                </p>
-                            </div>
-                            <div className="bg-white p-6 lg:p-8 border border-stone-100 shadow-sm mt-8">
-                                <ul className="space-y-6">
+                            {/* Features Card */}
+                            <div className="w-full bg-white p-8 lg:p-10 border border-stone-100 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] relative overflow-hidden">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent"></div>
+                                <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] mb-8 font-bold text-center">
+                                    Savoir-Faire & Composition
+                                </h2>
+                                <div className="space-y-8 text-left">
                                     {product.features.map((feature, idx) => (
-                                        <li key={idx} className="flex flex-col gap-1 border-b border-stone-100 pb-5 last:border-0 last:pb-0">
-                                            <strong className="text-stone-900 font-serif text-[15px] block uppercase tracking-wider">{feature.title}</strong>
-                                            <span className="text-stone-600 font-sans text-sm leading-relaxed block">{feature.desc}</span>
-                                        </li>
+                                        <div key={idx} className="flex flex-col gap-1.5 border-b border-stone-100 pb-6 last:border-0 last:pb-0">
+                                            <strong className="text-stone-900 font-serif text-[15px] uppercase tracking-wider">
+                                                {feature.title}
+                                            </strong>
+                                            <span className="text-stone-600 font-sans text-sm leading-relaxed">
+                                                {feature.desc}
+                                            </span>
+                                        </div>
                                     ))}
-                                </ul>
+                                </div>
                             </div>
                         </div>
                     </motion.div>
