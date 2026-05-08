@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const CampaignCheckoutModal = ({ isOpen, onClose, product }) => {
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'M (42-45)' });
+    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'M (Épaules: 42-45 cm)' });
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
     const [trackingCode, setTrackingCode] = useState('');
@@ -14,15 +14,15 @@ const CampaignCheckoutModal = ({ isOpen, onClose, product }) => {
     const SIZE_LABELS = {
         'XS': 'XS',
         'S': 'S',
-        'M': 'M (42-45)',
-        'L': 'L (46-49)',
-        'XL': 'XL (50-53)',
-        'XXL': 'XXL (54-57)'
+        'M': 'M (Épaules: 42-45 cm)',
+        'L': 'L (Épaules: 46-49 cm)',
+        'XL': 'XL (Épaules: 50-53 cm)',
+        'XXL': 'XXL (Épaules: 54-57 cm)'
     };
 
     const getAvailableSizes = () => {
         if (!product?.sizes || product.sizes.length === 0) {
-            return ['M (42-45)', 'L (46-49)', 'XL (50-53)', 'XXL (54-57)'];
+            return ['M (Épaules: 42-45 cm)', 'L (Épaules: 46-49 cm)', 'XL (Épaules: 50-53 cm)', 'XXL (Épaules: 54-57 cm)'];
         }
         return product.sizes.filter(s => s !== 'Sur Mesure').map(s => SIZE_LABELS[s] || s);
     };
@@ -58,7 +58,7 @@ const CampaignCheckoutModal = ({ isOpen, onClose, product }) => {
     const handleCloseModal = () => {
         onClose();
         setStep(1);
-        setFormData({ name: '', whatsapp: '', city: '', size: availableSizes[0] || 'M (42-45)' });
+        setFormData({ name: '', whatsapp: '', city: '', size: availableSizes[0] || 'M (Épaules: 42-45 cm)' });
         setErrors({});
         setTrackingCode('');
     };
