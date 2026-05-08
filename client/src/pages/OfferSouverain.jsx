@@ -28,7 +28,7 @@ const OfferSouverain = () => {
             "https://res.cloudinary.com/dvtwcbaoh/image/upload/v1777417689/lhema_products/ywged7m1sdk3l21pwkh7.jpg",
             "https://res.cloudinary.com/dvtwcbaoh/image/upload/v1777417690/lhema_products/oy5gvqftqweqgkkbv1ti.jpg"
         ],
-        sizes: ["XS", "S", "M", "L", "XL", "XXL"],
+        sizes: ["M", "L", "XL", "XXL"],
         description_title: "L'Anatomie d'une Œuvre",
         description_subtitle: "Une création qui ne s'enfile pas, mais qui s'incarne. L'alliance absolue du satin français et de la soie, pensée pour dicter vos propres règles",
         features: [

@@ -276,7 +276,7 @@ const CampaignCheckoutModal = ({ isOpen, onClose, product }) => {
 
                                     <div className="pt-6">
                                         <p className="text-[10px] text-stone-500 font-sans text-center tracking-widest uppercase mb-4">
-                                            Un acompte sera requis pour lancer la confection. Le reliquat sera réglé à la livraison.
+                                            Paiement à la livraison
                                         </p>
                                         <button
                                             type="submit"
