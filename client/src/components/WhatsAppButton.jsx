@@ -39,7 +39,7 @@ const WhatsAppButton = () => {
 
     return (
         <div
-            className={`fixed right-8 z-50 flex items-center justify-end transition-all duration-500 ease-in-out ${isStickyVisible ? 'bottom-32 md:bottom-24' : 'bottom-24'
+            className={`fixed right-6 z-50 flex items-center justify-end transition-all duration-500 ease-in-out ${isStickyVisible ? 'bottom-28 md:bottom-10' : 'bottom-6 md:bottom-10'
                 }`}
         >
             <AnimatePresence>

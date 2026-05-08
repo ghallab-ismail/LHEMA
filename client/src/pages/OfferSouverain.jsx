@@ -29,16 +29,20 @@ const OfferSouverain = () => {
             "https://res.cloudinary.com/dvtwcbaoh/image/upload/v1777417690/lhema_products/oy5gvqftqweqgkkbv1ti.jpg"
         ],
         sizes: ["XS", "S", "M", "L", "XL", "XXL"],
-        description_title: "L'Élégance Exclusive : Votre Pièce d'Exception",
-        description_subtitle: "Découvrez le raffinement absolu avec une création conçue pour vous faire sentir unique.",
+        description_title: "L'Anatomie d'une Œuvre",
+        description_subtitle: "Une création qui ne s'enfile pas, mais qui s'incarne. L'alliance absolue du satin français et de la soie, pensée pour dicter vos propres règles",
         features: [
             {
-                title: "Le Satin Prestigieux",
-                desc: "Un tissu noble, fluide et brillant. C'est l'allié parfait pour vous envelopper d'élégance."
+                title: "LA TUNIQUE COUTURE EN SATIN DUCHESSE",
+                desc: "Une étoffe majestueuse d'origine française. Le Satin Duchesse, réputé pour sa tenue impeccable et son éclat subtil, sculpte votre silhouette avec noblesse. Il est sublimé par une ceinture délicate pour marquer votre taille avec une élégance absolue."
             },
             {
-                title: "Des Finitions Artisanales",
-                desc: "Les bordures et les côtés sont minutieusement travaillés à la main. Un détail raffiné qui fait de cette création une véritable pièce rare."
+                title: "LE PANTALON EN CRÊPE DE SOIE",
+                desc: "En parfaite harmonie avec la structure du haut, un pantalon d'une fluidité exceptionnelle. Le crêpe de soie caresse la peau, offrant un mouvement gracieux et aérien à chacun de vos pas. Un contraste de textures saisissant."
+            },
+            {
+                title: "L'EXCELLENCE DES FINITIONS",
+                desc: "Chaque détail de cet ensemble est minutieusement travaillé à la main. L'art du sur-mesure garantit un tombé parfait, pensé et ajusté exclusivement pour épouser vos mensurations."
             }
         ]
     };
