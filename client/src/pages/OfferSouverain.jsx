@@ -139,21 +139,34 @@ const OfferSouverain = () => {
                         </AnimatePresence>
                     </div>
 
-                    {/* Mobile Thumbnails */}
-                    <div className="lg:hidden w-full px-5 py-5 bg-white flex gap-4 overflow-x-auto hide-scrollbar border-b border-stone-200/60 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
-                        {product.images.map((img, idx) => (
-                            <button
-                                key={idx}
-                                onClick={() => setActiveImage(idx)}
-                                className={`relative shrink-0 aspect-[3/4] w-16 transition-all duration-500 ease-out ${activeImage === idx
-                                        ? 'ring-1 ring-[#D4AF37] ring-offset-4 ring-offset-white opacity-100 scale-100'
-                                        : 'opacity-40 grayscale-[20%] hover:opacity-70 scale-95'
-                                    }`}
-                            >
-                                <img src={img} alt={`${product.name} vue ${idx + 1}`} className="w-full h-full object-cover shadow-sm" />
-                                <div className="absolute inset-0 border border-black/5 pointer-events-none"></div>
-                            </button>
-                        ))}
+                    {/* Mobile Thumbnails Section */}
+                    <div className="lg:hidden relative w-full bg-white border-b border-stone-200/60 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
+                        {/* Elegant swipe instruction */}
+                        <div className="w-full flex items-center justify-center pt-4 pb-1">
+                            <span className="text-[9px] uppercase tracking-[0.3em] text-stone-400 font-sans flex items-center gap-2">
+                                Faites glisser pour découvrir 
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-70 animate-pulse"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </span>
+                        </div>
+
+                        {/* Fading edge to strongly indicate scrollability */}
+                        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent pointer-events-none z-10"></div>
+                        
+                        <div className="w-full pl-5 pr-12 py-4 flex gap-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory">
+                            {product.images.map((img, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setActiveImage(idx)}
+                                    className={`relative shrink-0 aspect-[3/4] w-[4.5rem] snap-center transition-all duration-500 ease-out rounded-sm ${activeImage === idx
+                                            ? 'ring-1 ring-[#D4AF37] ring-offset-4 ring-offset-white opacity-100 scale-100'
+                                            : 'opacity-50 grayscale-[15%] hover:opacity-80 scale-95'
+                                        }`}
+                                >
+                                    <img src={img} alt={`${product.name} vue ${idx + 1}`} className="w-full h-full object-cover shadow-sm rounded-sm" />
+                                    <div className="absolute inset-0 border border-black/10 pointer-events-none rounded-sm"></div>
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     {/* Image Nav Dots (Desktop Only) */}
