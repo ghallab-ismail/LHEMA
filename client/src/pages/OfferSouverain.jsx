@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ReactPixel from 'react-facebook-pixel';
 import Navbar from '../components/Navbar';
@@ -104,10 +104,6 @@ const OfferSouverain = () => {
                         className="hidden lg:block absolute inset-0 bg-cover bg-center opacity-40 blur-[60px] scale-110 transition-all duration-700"
                         style={{ backgroundImage: `url(${product.images[activeImage]})` }}
                     />
-
-                    <Link to="/" className="absolute top-[80px] left-6 z-20 mix-blend-difference text-white" aria-label="Retour à l'accueil">
-                        <ArrowLeft className="w-6 h-6" />
-                    </Link>
 
                     <div className="hidden lg:flex lg:items-center lg:justify-center h-full w-full pt-[80px] pb-10 relative z-10">
                         <motion.img
