@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ReactPixel from 'react-facebook-pixel';
 import Navbar from '../components/Navbar';
 import CampaignCheckoutModal from '../components/CampaignCheckoutModal';
 
@@ -41,6 +42,16 @@ const OfferSouverain = () => {
             }
         ]
     };
+
+    useEffect(() => {
+        // Fire Facebook Pixel ViewContent event
+        ReactPixel.track('ViewContent', {
+            content_name: product.name,
+            content_type: 'product',
+            value: product.price,
+            currency: product.currency,
+        });
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
