@@ -153,6 +153,17 @@ const OrderTracking = () => {
                         <p className="font-sans text-[10px] uppercase tracking-[0.3em] text-lhema-gold mb-4">
                             Maison Lhema
                         </p>
+                        
+                        {searchParams.get('success') === 'true' && (
+                            <div className="mb-8 flex flex-col items-center justify-center animate-fade-in">
+                                <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mb-4">
+                                    <Check className="w-8 h-8 text-emerald-600" />
+                                </div>
+                                <h2 className="font-serif text-2xl text-emerald-700 mb-2">Commande Reçue avec Succès !</h2>
+                                <p className="font-sans text-sm text-stone-500">Un conseiller vous contactera très bientôt sur WhatsApp.</p>
+                            </div>
+                        )}
+
                         <h1 className="font-serif text-4xl md:text-5xl text-lhema-black mb-4">
                             Suivi de Commande
                         </h1>

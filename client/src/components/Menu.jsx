@@ -7,13 +7,13 @@ const Menu = ({ onClose }) => {
     const location = useLocation();
 
     const primaryLinks = [
-        { name: "LA COLLECTION", path: "/collection" },
-        { name: "L'ESSAYAGE PRIVÉ", path: "/essayage-prive" },
-        { name: "ATELIER", path: "/atelier" },
+        // { name: "LA COLLECTION", path: "/collection" },
+        // { name: "L'ESSAYAGE PRIVÉ", path: "/essayage-prive" },
+        // { name: "ATELIER", path: "/atelier" },
     ];
     
     const secondaryLinks = [
-        { name: "LA MAISON", path: "/la-maison" },
+        // { name: "LA MAISON", path: "/la-maison" },
         { name: "SUIVI COMMANDE", path: "/suivi" }
     ];
 

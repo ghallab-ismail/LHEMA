@@ -75,13 +75,13 @@ function App() {
                     {/* Public Routes with Custom Cursor & WhatsApp */}
                     <Route element={<PublicLayout />}>
                         <Route path="/" element={<LandingPage />} />
-                        <Route path="/essayage-prive" element={<PrivateFitting />} />
-                        <Route path="/collection" element={<Collection />} />
-                        <Route path="/femme" element={<Femme />} />
-                        <Route path="/homme" element={<Homme />} />
-                        <Route path="/atelier" element={<Atelier />} />
-                        <Route path="/la-maison" element={<LaMaison />} />
-                        <Route path="/product/:id" element={<ProductDetail />} />
+                        {/* <Route path="/essayage-prive" element={<PrivateFitting />} /> */}
+                        {/* <Route path="/collection" element={<Collection />} /> */}
+                        {/* <Route path="/femme" element={<Femme />} /> */}
+                        {/* <Route path="/homme" element={<Homme />} /> */}
+                        {/* <Route path="/atelier" element={<Atelier />} /> */}
+                        {/* <Route path="/la-maison" element={<LaMaison />} /> */}
+                        {/* <Route path="/product/:id" element={<ProductDetail />} /> */}
                         <Route path="/offre-souverain" element={<OfferSouverain />} />
 
                         {/* Order Tracking */}
