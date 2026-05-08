@@ -13,6 +13,7 @@ const Collection = lazy(() => import('./pages/Collection'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const OfferSouverain = lazy(() => import('./pages/OfferSouverain'));
 const PrivateFitting = lazy(() => import('./pages/PrivateFitting'));
 const LegalPrivacy = lazy(() => import('./pages/LegalPrivacy'));
 const LegalExchange = lazy(() => import('./pages/LegalExchange'));
@@ -81,6 +82,7 @@ function App() {
                         <Route path="/atelier" element={<Atelier />} />
                         <Route path="/la-maison" element={<LaMaison />} />
                         <Route path="/product/:id" element={<ProductDetail />} />
+                        <Route path="/offre-souverain" element={<OfferSouverain />} />
 
                         {/* Order Tracking */}
                         <Route path="/suivi" element={<OrderTracking />} />
