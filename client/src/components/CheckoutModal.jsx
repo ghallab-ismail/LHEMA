@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const CheckoutModal = ({ isOpen, onClose, product }) => {
+    const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'Sur Mesure', mensurations: '' });
     const [errors, setErrors] = useState({});
