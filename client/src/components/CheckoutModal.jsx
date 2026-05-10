@@ -135,9 +135,8 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
 
             if (inquiryResponse.ok && orderResponse.ok) {
                 const orderData = await orderResponse.json();
-                setTrackingCode(orderData.trackingCode);
-                setStep(2);
-                setErrors({});
+                onClose();
+                navigate(`/suivi?code=${orderData.trackingCode}&success=true`);
             } else {
                 console.error('Submission failed');
             }
@@ -193,8 +192,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                             <X className="w-5 h-5" />
                         </button>
 
-                        {step === 1 ? (
-                            <div className="text-center">
+                        <div className="text-center">
                                 <h3 className="font-serif text-2xl mb-2 text-black">Finaliser l'Acquisition</h3>
                                 <p className="font-sans text-xs text-stone-500 mb-8 tracking-wide px-2">
                                     Veuillez renseigner vos coordonnées. Notre équipe vous contactera sur WhatsApp pour confirmer vos mensurations exactes.
@@ -319,98 +317,6 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                     </div>
                                 </form>
                             </div>
-                        ) : (
-                            <div className="text-center py-6">
-                                {/* Success checkmark */}
-                                <motion.div
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
-                                    className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-50 flex items-center justify-center"
-                                >
-                                    <Check className="w-8 h-8 text-emerald-600" />
-                                </motion.div>
-
-                                <h3 className="font-serif text-2xl mb-3 text-black">Demande Reçue</h3>
-                                <p className="font-sans text-sm text-stone-600 leading-relaxed mb-8">
-                                    Merci, {formData.name}. <br />
-                                    Un conseiller privé vous contactera bientôt sur WhatsApp.
-                                </p>
-
-                                {/* Tracking Code */}
-                                {trackingCode && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.3 }}
-                                        className="bg-stone-50 border border-stone-200 p-6 mb-6"
-                                    >
-                                        <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-stone-500 mb-3">
-                                            Votre Code de Suivi
-                                        </p>
-                                        <div className="flex items-center justify-center gap-3">
-                                            <span className="font-serif text-2xl text-black tracking-widest">
-                                                {trackingCode}
-                                            </span>
-                                            <button
-                                                onClick={handleCopyCode}
-                                                className="p-2 hover:bg-stone-200 rounded-lg transition-colors"
-                                                title="Copier le code"
-                                            >
-                                                {copied ? (
-                                                    <Check className="w-4 h-4 text-emerald-600" />
-                                                ) : (
-                                                    <Copy className="w-4 h-4 text-stone-400" />
-                                                )}
-                                            </button>
-                                        </div>
-                                        <p className="font-sans text-[10px] text-stone-400 mt-3">
-                                            Conservez ce code pour suivre la confection de votre pièce.
-                                        </p>
-                                    </motion.div>
-                                )}
-
-                                {/* Email collection */}
-                                {!emailSubmitted ? (
-                                    <form onSubmit={handleEmailSubmit} className="mb-8 max-w-sm mx-auto">
-                                        <p className="font-sans text-xs text-stone-500 mb-3">
-                                            Afin de rester au courant de l'avancement, laissez-nous votre email (optionnel) :
-                                        </p>
-                                        <div className="flex gap-2">
-                                            <input 
-                                                type="email" 
-                                                placeholder="votre@email.com" 
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                className="flex-1 bg-transparent border-b border-stone-300 py-2 text-sm text-black focus:outline-none focus:border-black transition-colors"
-                                            />
-                                            <button 
-                                                type="submit"
-                                                className="px-4 py-2 bg-black text-white text-[10px] uppercase tracking-[0.2em] hover:bg-stone-800 transition-colors"
-                                            >
-                                                Valider
-                                            </button>
-                                        </div>
-                                    </form>
-                                ) : (
-                                    <motion.p 
-                                        initial={{ opacity: 0, y: 5 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        className="text-emerald-600 text-xs font-sans mb-8"
-                                    >
-                                        Merci, votre email est enregistré.
-                                    </motion.p>
-                                )}
-
-                                <Link
-                                    to={`/suivi?code=${trackingCode}`}
-                                    onClick={handleCloseModal}
-                                    className="inline-block text-xs font-sans uppercase tracking-[0.15em] text-stone-500 hover:text-black transition-colors border-b border-stone-300 hover:border-black pb-1"
-                                >
-                                    Suivre ma commande →
-                                </Link>
-                            </div>
-                        )}
                     </motion.div>
                 </div>
             )}
