@@ -16,16 +16,16 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
     const SIZE_LABELS = {
         'XS': 'XS',
         'S': 'S',
-        'M': 'M (42-45)',
-        'L': 'L (46-49)',
-        'XL': 'XL (50-53)',
-        'XXL': 'XXL (54-57)',
+        'M': 'M (Épaules: 42-45 cm)',
+        'L': 'L (Épaules: 46-49 cm)',
+        'XL': 'XL (Épaules: 50-53 cm)',
+        'XXL': 'XXL (Épaules: 54-57 cm)',
         'Sur Mesure': 'Sur Mesure'
     };
 
     const getAvailableSizes = () => {
         if (!product?.sizes || product.sizes.length === 0) {
-            return ['M (42-45)', 'L (46-49)', 'XL (50-53)', 'XXL (54-57)', 'Sur Mesure'];
+            return ['M (Épaules: 42-45 cm)', 'L (Épaules: 46-49 cm)', 'XL (Épaules: 50-53 cm)', 'XXL (Épaules: 54-57 cm)', 'Sur Mesure'];
         }
         return product.sizes.map(s => SIZE_LABELS[s] || s);
     };
