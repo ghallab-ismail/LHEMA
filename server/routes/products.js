@@ -18,12 +18,37 @@ router.get('/', async (req, res) => {
     }
 });
 
+const mongoose = require('mongoose');
+
+const slugify = (text) => {
+    if (!text) return '';
+    return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')           // Replace spaces with -
+        .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+        .replace(/^-+/, '')             // Trim - from start of text
+        .replace(/-+$/, '');            // Trim - from end of text
+};
+
 // @route   GET /api/products/:id
-// @desc    Get single product by ID
+// @desc    Get single product by ID or slug
 // @access  Public
 router.get('/:id', async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const idOrSlug = req.params.id;
+        let product = null;
+
+        // Try searching by ID if it's a valid ObjectId
+        if (mongoose.Types.ObjectId.isValid(idOrSlug)) {
+            product = await Product.findById(idOrSlug);
+        }
+
+        // If not found by ID, try searching by slug
+        if (!product) {
+            const allProducts = await Product.find({});
+            product = allProducts.find(p => slugify(p.name) === idOrSlug);
+        }
+
         if (!product) return res.status(404).json({ msg: 'Product not found' });
         res.json(product);
     } catch (err) {

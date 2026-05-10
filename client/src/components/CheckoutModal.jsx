@@ -27,9 +27,6 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
         if (!product?.sizes || product.sizes.length === 0) {
             return ['M (42-45)', 'L (46-49)', 'XL (50-53)', 'XXL (54-57)', 'Sur Mesure'];
         }
-        if (product.sizes.includes('Sur Mesure')) {
-            return ['Sur Mesure'];
-        }
         return product.sizes.map(s => SIZE_LABELS[s] || s);
     };
 
@@ -282,22 +279,27 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                         )}
                                     </div>
 
-                                    <div>
-                                        <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
-                                            Vos Mensurations (Optionnel)
-                                        </label>
-                                        <textarea
-                                            placeholder="Ex: Taille (1m70), Poids (60kg), ou mensurations spécifiques. Vous pouvez aussi nous les fournir plus tard."
-                                            className={`${inputClass('mensurations')} resize-none text-xs`}
-                                            value={formData.mensurations}
-                                            onChange={(e) => handleFieldChange('mensurations', e.target.value)}
-                                            rows="2"
-                                        />
-                                    </div>
+                                    {product?.is_limited_edition && (
+                                        <div>
+                                            <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
+                                                Vos Mensurations (Optionnel)
+                                            </label>
+                                            <textarea
+                                                placeholder="Ex: Taille (1m70), Poids (60kg), ou mensurations spécifiques. Vous pouvez aussi nous les fournir plus tard."
+                                                className={`${inputClass('mensurations')} resize-none text-xs`}
+                                                value={formData.mensurations}
+                                                onChange={(e) => handleFieldChange('mensurations', e.target.value)}
+                                                rows="2"
+                                            />
+                                        </div>
+                                    )}
 
                                     <div className="pt-6">
                                         <p className="text-[10px] text-stone-500 font-sans text-center tracking-widest uppercase mb-4">
-                                            Un acompte sera requis pour lancer la confection. Le reliquat sera réglé à la livraison.
+                                            {product?.is_limited_edition 
+                                                ? "Un acompte sera requis pour lancer la confection. Le reliquat sera réglé à la livraison."
+                                                : "Paiement à la livraison"
+                                            }
                                         </p>
                                         <button
                                             type="submit"

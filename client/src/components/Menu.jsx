@@ -7,11 +7,15 @@ const Menu = ({ onClose }) => {
     const location = useLocation();
 
     const primaryLinks = [
-        { name: "L'ENSEMBLE GHALIA", path: "/offre-souverain" }
+        { name: "LA COLLECTION", path: "/collection" },
+        { name: "L'ENSEMBLE GHALIA", path: "/offre-souverain" },
+        { name: "L'ESSAYAGE PRIVÉ", path: "/essayage-prive" },
+        { name: "ATELIER", path: "/atelier" }
     ];
     
     const secondaryLinks = [
         { name: "ACCUEIL", path: "/" },
+        { name: "LA MAISON", path: "/la-maison" },
         { name: "SUIVI COMMANDE", path: "/suivi" }
     ];
 

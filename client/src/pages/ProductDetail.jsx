@@ -74,7 +74,14 @@ const ProductDetail = () => {
 
     // For static products with a preset completed_count, use it as floor
     const effectiveCompleted = Math.max(completedCount, product?.completed_count || 0);
-    const dynamicStock = product ? Math.max(0, product.total_edition - effectiveCompleted) : 0;
+    
+    // For limited editions, calculate dynamic stock. For regular products, use product.stock or default to a large number.
+    const dynamicStock = product 
+        ? (product.is_limited_edition 
+            ? Math.max(0, (product.total_edition || 10) - effectiveCompleted)
+            : (product.stock !== undefined ? product.stock : 999)) 
+        : 0;
+
     // Product is purchasable only if isAvailable is true AND there is stock
     const isProductAvailable = product ? (product.isAvailable !== false && dynamicStock > 0) : false;
 
@@ -200,13 +207,42 @@ const ProductDetail = () => {
                         </AnimatePresence>
                     </div>
 
-                    {/* Image Navigation Dots (Overlay) */}
-                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center justify-center z-10 bg-black/10 px-1 rounded-full backdrop-blur-sm">
+                    {/* Mobile Thumbnails Section */}
+                    <div className="lg:hidden relative w-full bg-white border-b border-stone-200/60 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
+                        {/* Elegant swipe instruction */}
+                        <div className="w-full flex items-center justify-center pt-4 pb-1">
+                            <span className="text-[9px] uppercase tracking-[0.3em] text-stone-400 font-sans flex items-center gap-2">
+                                Faites glisser pour découvrir 
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-70 animate-pulse"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </span>
+                        </div>
+
+                        {/* Fading edge to strongly indicate scrollability */}
+                        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent pointer-events-none z-10"></div>
+                        
+                        <div className="w-full pl-5 pr-12 py-4 flex gap-4 overflow-x-auto hide-scrollbar snap-x snap-mandatory">
+                            {product.images.map((img, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setActiveImage(idx)}
+                                    className={`relative shrink-0 aspect-[3/4] w-[4.5rem] snap-center transition-all duration-500 ease-out rounded-sm ${activeImage === idx
+                                            ? 'ring-1 ring-[#D4AF37] ring-offset-4 ring-offset-white opacity-100 scale-100'
+                                            : 'opacity-50 grayscale-[15%] hover:opacity-80 scale-95'
+                                        }`}
+                                >
+                                    <img src={img} alt={`${product.name} vue ${idx + 1}`} className="w-full h-full object-cover shadow-sm rounded-sm" />
+                                    <div className="absolute inset-0 border border-black/10 pointer-events-none rounded-sm"></div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Image Nav Dots (Desktop Only) */}
+                    <div className="hidden lg:flex absolute bottom-6 left-1/2 transform -translate-x-1/2 items-center justify-center z-10 bg-black/10 px-1 rounded-full backdrop-blur-sm">
                         {product.images.map((_, idx) => (
                             <button
                                 key={idx}
                                 onClick={() => setActiveImage(idx)}
-                                aria-label={`Afficher l'image ${idx + 1}`}
                                 className="w-12 h-12 flex items-center justify-center"
                             >
                                 <span className={`block h-2 rounded-full transition-all duration-300 ${activeImage === idx ? 'bg-white w-4' : 'bg-white/50 w-2'}`} />
@@ -241,8 +277,8 @@ const ProductDetail = () => {
                             </div>
                         </div>
 
-                        {/* Limited Edition — Numbered Grid */}
-                        {product.is_limited_edition && (() => {
+                        {/* Stock & Edition Visualization */}
+                        {product.is_limited_edition ? (() => {
                             const total = product.total_edition || 10;
                             const available = dynamicStock;
                             const sold = total - available;
@@ -325,7 +361,29 @@ const ProductDetail = () => {
                                     </div>
                                 </div>
                             );
-                        })()}
+                        })() : (
+                            <div className="mb-10 relative group">
+                                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent"></div>
+                                <div className="border border-[#D4AF37]/30 bg-gradient-to-b from-[#FFFDF9] to-[#FBF8F3] p-8 lg:p-10 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.08)] relative overflow-hidden text-center transition-all duration-500 hover:shadow-[0_15px_40px_-15px_rgba(212,175,55,0.2)]">
+                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.02] group-hover:opacity-[0.04] transition-opacity duration-700">
+                                        <span className="font-serif text-[120px] md:text-[180px] leading-none text-stone-900 select-none">∞</span>
+                                    </div>
+                                    <p className="font-sans text-[10px] md:text-[11px] uppercase tracking-[0.4em] text-[#D4AF37] mb-3 font-bold">Collection Permanente</p>
+                                    <h3 className="font-serif text-xl md:text-2xl text-stone-900 mb-4">Pièce Intemporelle</h3>
+                                    <div className="w-8 h-[1px] bg-[#D4AF37] mx-auto mb-4"></div>
+                                    <p className="font-sans text-sm text-stone-500 max-w-sm mx-auto leading-relaxed relative z-10">
+                                        Une création pensée pour durer, alliant excellence artisanale et élégance absolue. Disponible en quantité généreuse pour satisfaire votre quête de perfection.
+                                    </p>
+                                    <div className="mt-8 flex items-center justify-center gap-3">
+                                        <div className="relative flex h-3 w-3 items-center justify-center">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-40"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]"></span>
+                                        </div>
+                                        <span className="font-sans text-[10px] uppercase tracking-widest text-stone-700 font-medium">Disponible sur Commande</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Description & Features */}
                         <div className="mb-12 mt-16">
@@ -384,15 +442,17 @@ const ProductDetail = () => {
                                     : 'bg-stone-300 text-stone-500 cursor-not-allowed'
                                 }`}
                             >
-                                {product.isAvailable === false ? "Indisponible" : dynamicStock > 0 ? "COMMANDER SUR-MESURE" : "Épuisé"}
+                                {product.isAvailable === false ? "Indisponible" : dynamicStock > 0 ? (product.is_limited_edition ? "COMMANDER SUR-MESURE" : "COMMANDER") : "Épuisé"}
                             </button>
-                            <button
-                                onClick={handleEssayagePriveClick}
-                                className="mt-3 text-xs sm:text-sm text-gray-500 font-serif relative group transition-colors duration-300 hover:text-black"
-                            >
-                                Résidente à Casablanca ou Rabat ? Demandez votre essayage privé.
-                                <span className="absolute left-0 bottom-0 w-full h-[0.5px] bg-gray-400 group-hover:bg-black transition-colors duration-300"></span>
-                            </button>
+                            {product.is_limited_edition && (
+                                <button
+                                    onClick={handleEssayagePriveClick}
+                                    className="mt-3 text-xs sm:text-sm text-gray-500 font-serif relative group transition-colors duration-300 hover:text-black"
+                                >
+                                    Résidente à Casablanca ou Rabat ? Demandez votre essayage privé.
+                                    <span className="absolute left-0 bottom-0 w-full h-[0.5px] bg-gray-400 group-hover:bg-black transition-colors duration-300"></span>
+                                </button>
+                            )}
                         </div>
                     </motion.div>
                 )}

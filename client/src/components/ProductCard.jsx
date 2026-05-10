@@ -4,6 +4,18 @@ import { Link } from 'react-router-dom';
 const ProductCard = ({ product }) => {
     // Support both static products (id + local image imports) and DB products (_id + URL strings)
     const productId = product._id || product.id;
+    
+    const slugify = (text) => {
+        if (!text) return productId;
+        return text.toString().toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
+    };
+    
+    const slug = slugify(product.name);
     const imageUrl = product.images?.[0] || null;
 
     // Determine if sold out
@@ -14,7 +26,7 @@ const ProductCard = ({ product }) => {
             product.completed_count >= product.total_edition);
 
     return (
-        <Link to={`/product/${productId}`} className="group relative w-full cursor-pointer block">
+        <Link to={`/product/${slug}`} className="group relative w-full cursor-pointer block">
             {/* Image Container */}
             <div className="aspect-[4/5] w-full overflow-hidden bg-stone-100 relative">
                 {imageUrl ? (
@@ -31,7 +43,7 @@ const ProductCard = ({ product }) => {
                 )}
 
                 {/* ── Sold-out étiquette ── */}
-                {isSoldOut && (
+                {isSoldOut ? (
                     <>
                         {/* Subtle dark veil */}
                         <div className="absolute inset-0 bg-black/15 pointer-events-none" />
@@ -59,7 +71,19 @@ const ProductCard = ({ product }) => {
                             </div>
                         </div>
                     </>
-                )}
+                ) : product.is_limited_edition ? (
+                    <div className="absolute top-4 left-4 pointer-events-none">
+                        <div className="bg-[#1A1A1A]/95 backdrop-blur-sm border border-[#D4AF37]/40 text-white px-3 py-1.5 flex items-center gap-2 shadow-lg">
+                            <div className="relative flex h-1.5 w-1.5 items-center justify-center">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-60"></span>
+                                <span className="relative inline-flex rounded-full h-1 w-1 bg-[#D4AF37]"></span>
+                            </div>
+                            <span className="font-sans text-[8px] uppercase tracking-[0.3em] text-[#D4AF37] leading-none mt-[1px]">
+                                Limitée - 10 Pièces
+                            </span>
+                        </div>
+                    </div>
+                ) : null}
             </div>
 
             {/* Content */}
