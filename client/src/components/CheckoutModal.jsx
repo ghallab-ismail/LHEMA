@@ -137,7 +137,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
             if (inquiryResponse.ok && orderResponse.ok) {
                 const orderData = await orderResponse.json();
                 onClose();
-                navigate(`/suivi?code=${orderData.trackingCode}&success=true`);
+                navigate(`/suivi?code=${orderData.trackingCode}&success=true&returnUrl=${encodeURIComponent(window.location.pathname)}`);
             } else {
                 console.error('Submission failed');
             }

@@ -138,7 +138,7 @@ const OrderTracking = () => {
                 <div className="relative max-w-2xl mx-auto px-6 pt-32 pb-16 text-center">
                     {/* Back link */}
                     <Link
-                        to="/"
+                        to={searchParams.get('returnUrl') || "/"}
                         className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-stone-400 hover:text-lhema-black transition-colors mb-12"
                     >
                         <ArrowLeft className="w-3.5 h-3.5" />
