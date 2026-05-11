@@ -285,7 +285,7 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Right: Scrollable Details */}
-                <div className="w-full lg:w-1/2 px-6 py-10 lg:px-20 lg:py-24 flex flex-col pt-24 lg:pt-32">
+                <div className="w-full lg:w-1/2 px-6 py-8 lg:px-20 lg:py-24 flex flex-col lg:pt-32">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
