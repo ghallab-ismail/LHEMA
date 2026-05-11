@@ -303,11 +303,6 @@ const ProductDetail = () => {
                                 {product.is_limited_edition && <span className="text-xs font-serif text-stone-500 ml-2">(Édition Limitée)</span>}
                             </div>
 
-                            <div className="flex items-center gap-4 mb-2">
-                                <p className="font-serif text-2xl text-stone-900 font-medium">
-                                    {product.price.toLocaleString()} {product.currency || 'DH'}
-                                </p>
-                            </div>
                         </div>
 
                         {/* Stock & Edition Visualization */}
@@ -446,6 +441,29 @@ const ProductDetail = () => {
                                     </ul>
                                 </div>
                             )}
+
+                            {/* Price Reveal Section */}
+                            <div className="mt-20 mb-8 border border-[#D4AF37]/20 bg-white p-10 relative overflow-hidden text-center group shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] transition-all hover:shadow-[0_15px_50px_-15px_rgba(212,175,55,0.15)]">
+                                {/* Subtle Background Elements */}
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#D4AF37]/5 to-transparent rounded-bl-full pointer-events-none"></div>
+                                <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#D4AF37]/5 to-transparent rounded-tr-full pointer-events-none"></div>
+                                
+                                <div className="relative z-10">
+                                    <span className="font-sans text-[10px] uppercase tracking-[0.4em] text-[#D4AF37] mb-4 font-bold block">
+                                        L'Investissement
+                                    </span>
+                                    <p className="font-sans text-sm text-stone-500 max-w-sm mx-auto mb-8 leading-relaxed italic">
+                                        Acquérir une pièce Lhema, c'est investir dans un savoir-faire d'exception et une élégance intemporelle.
+                                    </p>
+                                    <div className="flex items-center justify-center gap-3">
+                                        <div className="w-12 h-px bg-stone-200"></div>
+                                        <p className="font-serif text-3xl lg:text-4xl text-stone-900 tracking-wide">
+                                            {product.price.toLocaleString()} <span className="text-xl lg:text-2xl text-stone-400 font-sans tracking-widest">{product.currency || 'MAD'}</span>
+                                        </p>
+                                        <div className="w-12 h-px bg-stone-200"></div>
+                                    </div>
+                                </div>
+                            </div>
 
                             {/* Policies Accordion */}
                             <div className="w-full mt-16 pt-2">
