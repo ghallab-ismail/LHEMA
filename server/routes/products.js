@@ -23,11 +23,13 @@ const mongoose = require('mongoose');
 const slugify = (text) => {
     if (!text) return '';
     return text.toString().toLowerCase()
-        .replace(/\s+/g, '-')           // Replace spaces with -
-        .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-        .replace(/^-+/, '')             // Trim - from start of text
-        .replace(/-+$/, '');            // Trim - from end of text
+        .normalize('NFD')                 // split an accented letter in the base letter and the accent
+        .replace(/[\u0300-\u036f]/g, '')  // remove all previously split accents
+        .replace(/\s+/g, '-')             // Replace spaces with -
+        .replace(/[^\w\-]+/g, '')         // Remove all non-word chars
+        .replace(/\-\-+/g, '-')           // Replace multiple - with single -
+        .replace(/^-+/, '')               // Trim - from start of text
+        .replace(/-+$/, '');              // Trim - from end of text
 };
 
 // @route   GET /api/products/:id

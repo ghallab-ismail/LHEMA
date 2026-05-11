@@ -47,7 +47,19 @@ const ProductDetail = () => {
 
     // Load product: try static first, then API
     useEffect(() => {
-        const staticProduct = staticProducts.find(p => p.id === parseInt(id) || p.id === id);
+        const slugify = (text) => {
+            if (!text) return '';
+            return text.toString().toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/[^\w\-]+/g, '')
+                .replace(/\-\-+/g, '-')
+                .replace(/^-+/, '')
+                .replace(/-+$/, '');
+        };
+
+        const staticProduct = staticProducts.find(p => p.id === parseInt(id) || p.id === id || (p.name && slugify(p.name) === id));
         if (staticProduct) {
             setProduct(staticProduct);
             setProductLoading(false);
