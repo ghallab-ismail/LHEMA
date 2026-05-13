@@ -20,6 +20,8 @@ const defaultForm = {
     description_subtitle: '',
     features: [{ title: '', desc: '' }],
     isAvailable: true,
+    hasColors: false,
+    colors: [],
 };
 
 const ProductModal = ({ isOpen, onClose, mode, initialData, onSubmit }) => {
@@ -50,6 +52,8 @@ const ProductModal = ({ isOpen, onClose, mode, initialData, onSubmit }) => {
                     description_subtitle: initialData.description_subtitle || '',
                     features: initialData.features?.length > 0 ? initialData.features : [{ title: '', desc: '' }],
                     isAvailable: initialData.isAvailable !== undefined ? initialData.isAvailable : true,
+                    hasColors: initialData.hasColors || false,
+                    colors: initialData.colors || [],
                 });
                 setShowAdvanced(true);
             } else {
@@ -90,6 +94,8 @@ const ProductModal = ({ isOpen, onClose, mode, initialData, onSubmit }) => {
                 stock: Number(formData.stock),
                 total_edition: Number(formData.total_edition),
                 features: cleanedFeatures,
+                hasColors: formData.hasColors,
+                colors: formData.hasColors ? formData.colors.filter(c => c.name.trim() !== '') : [],
             });
         } finally {
             setIsSubmitting(false);
@@ -358,6 +364,86 @@ const ProductModal = ({ isOpen, onClose, mode, initialData, onSubmit }) => {
                                 {formData.is_limited_edition ? 'Édition Limitée ✓' : 'Standard Edition'}
                             </button>
                         </div>
+
+                        {/* Colors Configuration */}
+                        <div>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, hasColors: !formData.hasColors })}
+                                className={`w-full py-3 px-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all border flex items-center justify-center gap-2 ${formData.hasColors
+                                        ? 'bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/30'
+                                        : 'bg-white/5 text-stone-400 border-white/10'
+                                    }`}
+                            >
+                                <span className={`w-2 h-2 rounded-full ${formData.hasColors ? 'bg-[#D4AF37]' : 'bg-stone-500'}`} />
+                                {formData.hasColors ? 'Produit avec Couleurs ✓' : 'Pas de variantes de couleur'}
+                            </button>
+                        </div>
+
+                        {formData.hasColors && (
+                            <div className="bg-[#111] border border-white/5 rounded-xl p-6">
+                                <label className="block text-xs uppercase tracking-wider text-stone-500 mb-4 font-medium">
+                                    Couleurs du Produit
+                                </label>
+                                <div className="space-y-4">
+                                    {formData.colors.map((color, index) => (
+                                        <div key={index} className="flex items-center gap-3 bg-[#1a1a1a] p-3 rounded-lg border border-white/10">
+                                            <input 
+                                                type="color" 
+                                                value={color.hex || '#000000'} 
+                                                onChange={(e) => {
+                                                    const updated = [...formData.colors];
+                                                    updated[index].hex = e.target.value;
+                                                    setFormData({ ...formData, colors: updated });
+                                                }}
+                                                className="w-8 h-8 rounded cursor-pointer border-0 p-0 bg-transparent shrink-0"
+                                            />
+                                            <input 
+                                                type="text"
+                                                value={color.hex || '#000000'}
+                                                onChange={(e) => {
+                                                    const updated = [...formData.colors];
+                                                    updated[index].hex = e.target.value;
+                                                    setFormData({ ...formData, colors: updated });
+                                                }}
+                                                className="w-24 bg-transparent border-b border-white/10 py-1 px-2 text-sm text-stone-400 font-mono focus:outline-none focus:border-white/30 uppercase"
+                                                placeholder="#000000"
+                                                maxLength={7}
+                                            />
+                                            <input 
+                                                type="text"
+                                                value={color.name}
+                                                onChange={(e) => {
+                                                    const updated = [...formData.colors];
+                                                    updated[index].name = e.target.value;
+                                                    setFormData({ ...formData, colors: updated });
+                                                }}
+                                                className="flex-1 min-w-[150px] bg-transparent border-b border-white/10 py-1 px-2 text-sm text-white focus:outline-none focus:border-white/30"
+                                                placeholder="Nom de la couleur (ex: Noir Corbeau)"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const updated = formData.colors.filter((_, i) => i !== index);
+                                                    setFormData({ ...formData, colors: updated });
+                                                }}
+                                                className="p-2 text-stone-600 hover:text-red-400 transition-colors"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData({ ...formData, colors: [...formData.colors, { name: '', hex: '#000000' }] })}
+                                        className="flex items-center gap-2 text-xs text-[#D4AF37] hover:text-[#e5c548] transition-colors"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        Ajouter une couleur
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Sizes */}
                         <div>

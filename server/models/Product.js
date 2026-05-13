@@ -21,6 +21,11 @@ const ProductSchema = new mongoose.Schema({
     description_subtitle: { type: String, default: '' },
     features: [FeatureSchema],
     isAvailable: { type: Boolean, default: true },
+    hasColors: { type: Boolean, default: false },
+    colors: [{
+        name: { type: String },
+        hex: { type: String }
+    }],
     createdAt: { type: Date, default: Date.now }
 });
 

@@ -413,6 +413,26 @@ const ProductDetail = () => {
                             </div>
                         )}
 
+                        {/* Available Colors */}
+                        {product.hasColors && product.colors?.length > 0 && (
+                            <div className="mt-8 mb-10 text-center">
+                                <h4 className="font-sans text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] mb-5 font-bold">
+                                    Nuances Disponibles
+                                </h4>
+                                <div className="flex flex-wrap items-center justify-center gap-6">
+                                    {product.colors.map(c => (
+                                        <div key={c.name} className="flex flex-col items-center gap-2 group cursor-default">
+                                            <div 
+                                                className="w-8 h-8 rounded-full shadow-sm ring-1 ring-stone-200 group-hover:scale-110 transition-transform duration-300"
+                                                style={{ backgroundColor: c.hex || '#000000' }}
+                                            />
+                                            <span className="font-serif italic text-xs text-stone-500">{c.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Description & Features */}
                         <div className="mb-12 mt-16">
                             <div className="text-center mb-10">

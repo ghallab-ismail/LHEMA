@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 const CheckoutModal = ({ isOpen, onClose, product }) => {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'Sur Mesure', mensurations: '' });
+    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'Sur Mesure', mensurations: '', color: '' });
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
     const [trackingCode, setTrackingCode] = useState('');
@@ -24,6 +24,16 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
         'Sur Mesure': 'Sur Mesure'
     };
 
+    const isLightColor = (hex) => {
+        if (!hex) return false;
+        const color = hex.replace('#', '');
+        const r = parseInt(color.substr(0, 2), 16);
+        const g = parseInt(color.substr(2, 2), 16);
+        const b = parseInt(color.substr(4, 2), 16);
+        const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return brightness > 155;
+    };
+
     const getAvailableSizes = () => {
         if (!product?.sizes || product.sizes.length === 0) {
             return ['M (Épaules: 42-45 cm)', 'L (Épaules: 46-49 cm)', 'XL (Épaules: 50-53 cm)', 'XXL (Épaules: 54-57 cm)', 'Sur Mesure'];
@@ -34,12 +44,21 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
     const availableSizes = getAvailableSizes();
 
     React.useEffect(() => {
-        if (isOpen && availableSizes.length > 0) {
-            if (!availableSizes.includes(formData.size)) {
-                setFormData(prev => ({ ...prev, size: availableSizes[0] }));
+        if (isOpen) {
+            let updates = {};
+            if (availableSizes.length > 0 && !availableSizes.includes(formData.size)) {
+                updates.size = availableSizes[0];
+            }
+            if (product?.hasColors && product?.colors?.length > 0) {
+                if (!product.colors.find(c => c.name === formData.color)) {
+                    updates.color = product.colors[0].name;
+                }
+            }
+            if (Object.keys(updates).length > 0) {
+                setFormData(prev => ({ ...prev, ...updates }));
             }
         }
-    }, [isOpen, product, availableSizes]);
+    }, [isOpen, product, availableSizes, formData.size, formData.color]);
 
     const validate = () => {
         const newErrors = {};
@@ -62,7 +81,7 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
     const handleCloseModal = () => {
         onClose();
         setStep(1);
-        setFormData({ name: '', whatsapp: '', city: '', size: availableSizes[0] || 'Sur Mesure', mensurations: '' });
+        setFormData({ name: '', whatsapp: '', city: '', size: availableSizes[0] || 'Sur Mesure', mensurations: '', color: product?.colors?.[0]?.name || '' });
         setErrors({});
         setTrackingCode('');
         setCopied(false);
@@ -104,9 +123,13 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                 ? `Sur Mesure` 
                 : formData.size;
             
-            const sizeWithMensurations = formData.mensurations?.trim() 
-                ? `${finalSize} - Mensurations: ${formData.mensurations.trim()}`
-                : finalSize;
+            let sizeWithMensurations = finalSize;
+            if (product?.hasColors && formData.color) {
+                sizeWithMensurations += ` - Couleur: ${formData.color}`;
+            }
+            if (formData.mensurations?.trim()) {
+                sizeWithMensurations += ` - Mensurations: ${formData.mensurations.trim()}`;
+            }
 
             // Create inquiry (existing flow)
             const inquiryResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries`, {
@@ -274,6 +297,31 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                                         ▼
                                                     </div>
                                                 </div>
+                                            </div>
+                                        )}
+                                        
+                                        {product?.hasColors && product?.colors?.length > 0 && (
+                                            <div className={availableSizes.length <= 1 ? "col-span-2" : ""}>
+                                                <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
+                                                    Couleur
+                                                </label>
+                                                <div className="flex flex-wrap gap-3 items-center mt-3">
+                                                    {product.colors.map(c => (
+                                                        <button
+                                                            key={c.name}
+                                                            type="button"
+                                                            onClick={() => handleFieldChange('color', c.name)}
+                                                            title={c.name}
+                                                            className={`w-7 h-7 rounded-full transition-all flex items-center justify-center ${formData.color === c.name ? 'ring-1 ring-black ring-offset-2 scale-110' : 'ring-1 ring-stone-200 hover:scale-105'}`}
+                                                            style={{ backgroundColor: c.hex || '#000000' }}
+                                                        >
+                                                            {formData.color === c.name && (
+                                                                <Check className={`w-4 h-4 ${isLightColor(c.hex) ? 'text-black' : 'text-white'}`} strokeWidth={3} />
+                                                            )}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                <div className="mt-2 text-[11px] text-stone-500 font-serif italic">{formData.color}</div>
                                             </div>
                                         )}
                                     </div>
