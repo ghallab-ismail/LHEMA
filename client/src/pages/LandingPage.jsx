@@ -67,7 +67,7 @@ const LandingPage = () => {
                     <Footer />
 
                     {/* Mobile Conversion */}
-                    <StickyCTA onReserve={() => setIsModalOpen(true)} />
+                    <StickyCTA />
 
                     {/* Global Effects */}
                     <NoiseOverlay />
