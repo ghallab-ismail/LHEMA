@@ -285,275 +285,228 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Right: Scrollable Details */}
-                <div className="w-full lg:w-1/2 px-6 py-8 lg:px-20 lg:py-24 flex flex-col lg:pt-32">
+                <div className="w-full lg:w-1/2 px-6 py-8 lg:px-16 lg:py-24 flex flex-col lg:pt-32 bg-[#FAF9F6] lg:bg-white lg:shadow-[-20px_0_40px_-20px_rgba(0,0,0,0.03)] z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2, duration: 0.8 }}
-                        className="max-w-xl mx-auto w-full"
+                        className="max-w-md mx-auto w-full"
                     >
-                        <div className="mb-6">
-                            <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl mb-3 leading-tight">{product.name}</h1>
+                        <div className="mb-10">
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-stone-500">Maison Lhema</span>
+                                {product.is_limited_edition && (
+                                    <>
+                                        <span className="w-1 h-1 rounded-full bg-[#D4AF37]"></span>
+                                        <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-[#D4AF37] font-medium">Édition Limitée</span>
+                                    </>
+                                )}
+                            </div>
+                            
+                            <h1 className="font-serif text-3xl md:text-4xl text-stone-900 mb-4 leading-tight">{product.name}</h1>
 
-                            {/* Premium Rating */}
-                            <div className="flex items-center gap-1 mb-4">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star key={i} className={`w-4 h-4 ${i < (product.stars !== undefined ? product.stars : 5) ? 'fill-[#D4AF37] text-[#D4AF37]' : 'text-stone-300'}`} strokeWidth={1} />
-                                ))}
-                                {product.is_limited_edition && <span className="text-xs font-serif text-stone-500 ml-2">(Édition Limitée)</span>}
+                            {/* Trust badges & Rating */}
+                            <div className="flex items-center justify-between mb-8 pb-8 border-b border-stone-200/60">
+                                <div className="flex items-center gap-1">
+                                    {[...Array(5)].map((_, i) => (
+                                        <Star key={i} className={`w-3.5 h-3.5 ${i < (product.stars !== undefined ? product.stars : 5) ? 'fill-stone-800 text-stone-800' : 'text-stone-300'}`} strokeWidth={1} />
+                                    ))}
+                                    <span className="text-[11px] font-sans text-stone-500 ml-2">Qualité Premium</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-[11px] font-sans text-stone-500">
+                                    <Truck className="w-3.5 h-3.5" /> Livraison Express
+                                </div>
                             </div>
 
-                            {/* Price Reveal Section */}
-                            <div className="mb-10 bg-gradient-to-r from-[#D4AF37]/5 to-transparent p-5 lg:p-6 border-l-2 border-[#D4AF37]">
-                                <span className="font-sans text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] mb-2 block font-bold">
-                                    L'Investissement
-                                </span>
-                                <p className="font-serif text-3xl lg:text-4xl text-stone-900 tracking-wide flex items-baseline gap-2">
-                                    {product.price.toLocaleString()} <span className="text-xl text-stone-400 font-sans tracking-widest">{product.currency || 'MAD'}</span>
+                            <div className="flex flex-col gap-1 mb-8">
+                                <p className="font-serif text-3xl text-stone-900 tracking-wide">
+                                    {product.price.toLocaleString()} <span className="text-lg text-stone-400 font-sans tracking-widest">{product.currency || 'MAD'}</span>
                                 </p>
-                                <p className="font-sans text-xs text-stone-500 mt-2 italic">
-                                    Acquérir une pièce Lhema, c'est investir dans un savoir-faire d'exception.
+                                <p className="text-[11px] font-sans text-stone-400 uppercase tracking-wider">
+                                    Paiement à la réception. Sans avance.
                                 </p>
                             </div>
-
                         </div>
 
-                        {/* Stock & Edition Visualization */}
+                        {/* Stock Visualization */}
                         {product.is_limited_edition ? (() => {
                             const total = product.total_edition || 10;
                             const available = dynamicStock;
-                            const sold = total - available;
+                            const percentage = Math.max(5, (available / total) * 100);
+                            
                             return (
-                                <div className="mb-10 relative">
-                                    {/* Top gold accent line */}
-                                    <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent"></div>
-                                    
-                                    <div className="border border-[#D4AF37]/30 bg-gradient-to-b from-[#FFFDF9] to-[#FBF8F3] p-6 lg:p-8 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.08)] relative overflow-hidden">
-                                        {/* Subtle background number watermark */}
-                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03]">
-                                            <span className="font-serif text-[180px] md:text-[220px] leading-none text-stone-900 select-none">{total}</span>
-                                        </div>
-
-                                        {/* Header */}
-                                        <div className="text-center mb-6 relative">
-                                            <p className="font-sans text-[9px] md:text-[10px] uppercase tracking-[0.4em] text-[#D4AF37] mb-2 font-bold">Édition Numérotée</p>
-                                            <h3 className="font-serif text-lg md:text-xl text-stone-900 mb-1">Collection Privée</h3>
-                                            <p className="font-sans text-xs text-stone-400">{total} exemplaires uniques au Maroc</p>
-                                        </div>
-
-                                        {/* Numbered Slots Grid */}
-                                        <div className="grid grid-cols-5 gap-2 md:gap-2.5 mb-6 max-w-xs mx-auto relative">
-                                            {Array.from({ length: total }).map((_, i) => {
-                                                const isSold = i < sold;
-                                                return (
-                                                    <motion.div
-                                                        key={i}
-                                                        initial={{ opacity: 0, scale: 0.85 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        transition={{ duration: 0.4, delay: 0.05 * i }}
-                                                        className={`aspect-square flex items-center justify-center relative group transition-all duration-500 ${
-                                                            isSold
-                                                                ? 'bg-stone-100 border border-stone-200/80'
-                                                                : 'bg-[#1A1A1A] border border-[#2C2C2C] shadow-sm hover:shadow-md hover:border-[#D4AF37]/40'
-                                                        }`}
-                                                    >
-                                                        {isSold ? (
-                                                            <>
-                                                                <span className="font-serif text-sm md:text-base text-stone-300 select-none">
-                                                                    {(i + 1).toString().padStart(2, '0')}
-                                                                </span>
-                                                                {/* Subtle diagonal line for sold */}
-                                                                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                                                                    <div className="absolute top-0 right-0 bottom-0 left-0">
-                                                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-px bg-stone-300/60 rotate-45"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <span className="font-serif text-sm md:text-base text-stone-400 group-hover:text-[#D4AF37] transition-colors duration-500 select-none">
-                                                                    {(i + 1).toString().padStart(2, '0')}
-                                                                </span>
-                                                                {/* Subtle gold corner accent on hover */}
-                                                                <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-transparent group-hover:border-[#D4AF37]/40 transition-all duration-500"></div>
-                                                                <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-transparent group-hover:border-[#D4AF37]/40 transition-all duration-500"></div>
-                                                            </>
-                                                        )}
-                                                    </motion.div>
-                                                );
-                                            })}
-                                        </div>
-
-                                        {/* Stock Counter */}
-                                        <div className="flex items-center justify-center gap-3 pt-4 border-t border-stone-200/60">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-2 h-2 bg-[#1A1A1A] rounded-full"></div>
-                                                <span className="font-sans text-[10px] uppercase tracking-widest text-stone-400">Disponible</span>
-                                            </div>
-                                            <span className="text-stone-300">·</span>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-2 h-2 bg-stone-200 rounded-full"></div>
-                                                <span className="font-sans text-[10px] uppercase tracking-widest text-stone-400">Acquis</span>
-                                            </div>
-                                        </div>
-                                        <p className="text-center font-sans text-sm text-stone-500 mt-3">
-                                            Pièces restantes : <span className="text-[#D4AF37] font-semibold text-lg">{available}</span> <span className="opacity-40 text-xs">/ {total}</span>
-                                        </p>
+                                <div className="mb-10 p-5 bg-[#F9F8F6] border border-stone-200/50 rounded-sm">
+                                    <div className="flex justify-between items-end mb-3">
+                                        <span className="font-sans text-[11px] uppercase tracking-wider text-stone-600 font-medium">
+                                            Disponibilité
+                                        </span>
+                                        <span className="font-sans text-[11px] text-[#D4AF37] font-semibold">
+                                            Plus que {available} pièce{available > 1 ? 's' : ''}
+                                        </span>
                                     </div>
+                                    <div className="h-1 w-full bg-stone-200/60 rounded-full overflow-hidden">
+                                        <motion.div 
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${percentage}%` }}
+                                            transition={{ duration: 1, delay: 0.5 }}
+                                            className="h-full bg-[#D4AF37]"
+                                        />
+                                    </div>
+                                    <p className="text-[10px] text-stone-400 mt-3 font-sans tracking-wide">
+                                        Sur une édition exclusive de {total} pièces.
+                                    </p>
                                 </div>
                             );
-                        })() : (
-                            <div className="mb-10 relative group">
-                                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent"></div>
-                                <div className="border border-[#D4AF37]/30 bg-gradient-to-b from-[#FFFDF9] to-[#FBF8F3] p-8 lg:p-10 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.08)] relative overflow-hidden text-center transition-all duration-500 hover:shadow-[0_15px_40px_-15px_rgba(212,175,55,0.2)]">
-                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.02] group-hover:opacity-[0.04] transition-opacity duration-700">
-                                        <span className="font-serif text-[120px] md:text-[180px] leading-none text-stone-900 select-none">∞</span>
-                                    </div>
-                                    <p className="font-sans text-[10px] md:text-[11px] uppercase tracking-[0.4em] text-[#D4AF37] mb-3 font-bold">Collection Permanente</p>
-                                    <h3 className="font-serif text-xl md:text-2xl text-stone-900 mb-4">Pièce Intemporelle</h3>
-                                    <div className="w-8 h-[1px] bg-[#D4AF37] mx-auto mb-4"></div>
-                                    <p className="font-sans text-sm text-stone-500 max-w-sm mx-auto leading-relaxed relative z-10">
-                                        Une création pensée pour durer, alliant excellence artisanale et élégance absolue. Disponible en quantité généreuse pour satisfaire votre quête de perfection.
-                                    </p>
-                                    <div className="mt-8 flex items-center justify-center gap-3">
-                                        <div className="relative flex h-3 w-3 items-center justify-center">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-40"></span>
-                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]"></span>
-                                        </div>
-                                        <span className="font-sans text-[10px] uppercase tracking-widest text-stone-700 font-medium">Disponible sur Commande</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                        })() : null}
 
                         {/* Available Colors */}
                         {product.hasColors && product.colors?.length > 0 && (
-                            <div className="mt-8 mb-10 text-center">
-                                <h4 className="font-sans text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] mb-5 font-bold">
-                                    Nuances Disponibles
-                                </h4>
-                                <div className="flex flex-wrap items-center justify-center gap-6">
+                            <div className="mb-10">
+                                <span className="font-sans text-[11px] uppercase tracking-wider text-stone-600 font-medium mb-4 block">
+                                    Nuances
+                                </span>
+                                <div className="flex items-center gap-4">
                                     {product.colors.map(c => (
-                                        <div key={c.name} className="flex flex-col items-center gap-2 group cursor-default">
+                                        <div key={c.name} className="flex flex-col items-center gap-2 group cursor-pointer">
                                             <div 
-                                                className="w-8 h-8 rounded-full shadow-sm ring-1 ring-stone-200 group-hover:scale-110 transition-transform duration-300"
-                                                style={{ backgroundColor: c.hex || '#000000' }}
-                                            />
-                                            <span className="font-serif italic text-xs text-stone-500">{c.name}</span>
+                                                className="w-8 h-8 rounded-full border border-stone-200 group-hover:border-[#D4AF37] transition-all duration-300 p-[3px]"
+                                            >
+                                                <div 
+                                                    className="w-full h-full rounded-full"
+                                                    style={{ backgroundColor: c.hex || '#000000' }}
+                                                />
+                                            </div>
+                                            <span className="font-sans text-[9px] uppercase tracking-wider text-stone-500">{c.name}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         )}
 
-                        {/* Description & Features */}
-                        <div className="mb-12 mt-16">
-                            <div className="text-center mb-10">
-                                <h2 className="font-serif text-2xl lg:text-3xl text-stone-900 tracking-wide mb-4">Savoir-Faire & Composition</h2>
-                                <div className="w-12 h-[1px] bg-[#D4AF37] mx-auto"></div>
-                            </div>
+                        {/* Main CTA */}
+                        <div className="mb-12">
+                            <button
+                                onClick={handleSurMesureClick}
+                                disabled={!isProductAvailable}
+                                className={`w-full py-4 px-6 font-sans text-xs tracking-[0.2em] font-medium uppercase transition-all duration-300 flex items-center justify-center gap-3 ${
+                                    isProductAvailable 
+                                    ? 'bg-[#111111] text-white hover:bg-[#222222] shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] transform hover:-translate-y-0.5 rounded-sm' 
+                                    : 'bg-stone-200 text-stone-400 cursor-not-allowed rounded-sm'
+                                }`}
+                            >
+                                {product.isAvailable === false ? "Indisponible" : dynamicStock > 0 ? "Commander Maintenant" : "Épuisé"}
+                                {isProductAvailable && <ArrowLeft className="w-4 h-4 rotate-180" />}
+                            </button>
+                            {product.is_limited_edition && (
+                                <div className="text-center mt-5">
+                                    <button
+                                        onClick={handleEssayagePriveClick}
+                                        className="text-[11px] text-stone-500 font-sans tracking-wide hover:text-stone-900 transition-colors underline underline-offset-4 decoration-stone-300 hover:decoration-stone-900"
+                                    >
+                                        Essayage privé à domicile (Casablanca / Rabat)
+                                    </button>
+                                </div>
+                            )}
+                        </div>
 
+                        {/* Description & Features */}
+                        <div className="mb-12 pt-8 border-t border-stone-200/60">
                             {product.description_title && (
-                                <div className="mb-10 text-center">
-                                    <h4 className="font-serif text-xl lg:text-2xl mb-4 text-stone-800 leading-snug">{product.description_title}</h4>
-                                    <p className="text-stone-500 font-sans text-sm md:text-base leading-relaxed max-w-md mx-auto italic">
-                                        "{product.description_subtitle}"
+                                <div className="mb-10">
+                                    <h3 className="font-serif text-xl mb-4 text-stone-900">{product.description_title}</h3>
+                                    <p className="text-stone-600 font-sans text-[13px] leading-relaxed">
+                                        {product.description_subtitle}
                                     </p>
                                 </div>
                             )}
 
                             {product.features && (
-                                <div className="bg-white p-6 lg:p-8 border border-stone-100 shadow-sm mt-8">
-                                    <ul className="space-y-6">
+                                <div className="mb-10 bg-[#F9F8F6] p-6 rounded-sm border border-stone-100">
+                                    <h4 className="font-sans text-[11px] uppercase tracking-wider text-stone-900 font-medium mb-5">Détails de la pièce</h4>
+                                    <ul className="space-y-4">
                                         {product.features.map((feature, idx) => (
-                                            <li key={idx} className="flex flex-col gap-1 border-b border-stone-100 pb-5 last:border-0 last:pb-0">
-                                                <strong className="text-stone-900 font-serif text-[15px] block uppercase tracking-wider">{feature.title}</strong>
-                                                <span className="text-stone-600 font-sans text-sm leading-relaxed block">{feature.desc}</span>
+                                            <li key={idx} className="flex gap-3 text-[13px]">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-stone-300 mt-1.5 flex-shrink-0"></span>
+                                                <div className="flex flex-col gap-0.5">
+                                                    <span className="text-stone-900 font-medium">{feature.title}</span>
+                                                    <span className="text-stone-500 leading-relaxed">{feature.desc}</span>
+                                                </div>
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
                             )}
-
-
-
-                            {/* Policies Accordion */}
-                            <div className="w-full mt-16 pt-2">
-                                <h2 className="font-sans text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] mb-8 font-bold text-center">
-                                    L'Expérience Lhema
-                                </h2>
-                                <div className="border-t border-stone-200">
-                                    {policies.map((policy, idx) => (
-                                        <div key={idx} className="border-b border-stone-200">
-                                            <button 
-                                                onClick={() => toggleAccordion(idx)}
-                                                className="w-full flex items-center justify-between py-5 focus:outline-none group"
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    {policy.icon}
-                                                    <span className="font-serif text-[15px] uppercase tracking-wider text-stone-900 group-hover:text-[#D4AF37] transition-colors">{policy.title}</span>
-                                                </div>
-                                                <ChevronDown className={`w-4 h-4 text-stone-400 transition-transform duration-300 ${openAccordion === idx ? 'rotate-180' : ''}`} />
-                                            </button>
-                                            <AnimatePresence>
-                                                {openAccordion === idx && (
-                                                    <motion.div
-                                                        initial={{ height: 0, opacity: 0 }}
-                                                        animate={{ height: "auto", opacity: 1 }}
-                                                        exit={{ height: 0, opacity: 0 }}
-                                                        transition={{ duration: 0.3 }}
-                                                        className="overflow-hidden"
-                                                    >
-                                                        <p className="font-sans text-sm text-stone-600 leading-relaxed pb-5 pl-9 text-left">
-                                                            {policy.content}
-                                                        </p>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
                         </div>
 
-
-                        {/* Action Button Removed - Using only Sticky CTA */}
+                        {/* Policies Accordion */}
+                        <div className="w-full pt-4">
+                            <h4 className="font-sans text-[11px] uppercase tracking-wider text-stone-900 font-medium mb-5">L'Expérience Lhema</h4>
+                            <div className="border-t border-stone-200/60">
+                                {policies.map((policy, idx) => (
+                                    <div key={idx} className="border-b border-stone-200/60">
+                                        <button 
+                                            onClick={() => toggleAccordion(idx)}
+                                            className="w-full flex items-center justify-between py-5 focus:outline-none group"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                {React.cloneElement(policy.icon, { className: "w-4 h-4 text-stone-800 transition-colors group-hover:text-[#D4AF37]" })}
+                                                <span className="font-sans text-[12px] uppercase tracking-wider text-stone-900 font-medium group-hover:text-stone-600 transition-colors">{policy.title}</span>
+                                            </div>
+                                            <div className="relative w-3 h-3 flex-shrink-0">
+                                                <span className={`absolute top-1/2 left-0 w-3 h-[1px] bg-stone-400 transition-transform duration-300 ${openAccordion === idx ? 'rotate-180 opacity-0' : ''}`}></span>
+                                                <span className={`absolute top-0 left-1/2 w-[1px] h-3 bg-stone-400 transition-transform duration-300 ${openAccordion === idx ? 'rotate-90' : ''}`}></span>
+                                            </div>
+                                        </button>
+                                        <AnimatePresence>
+                                            {openAccordion === idx && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: "auto", opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.3 }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <p className="font-sans text-[13px] text-stone-500 leading-relaxed pb-6 pl-8 text-left">
+                                                        {policy.content}
+                                                    </p>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
 
                     </motion.div>
                 </div>
             </div>
 
-            {/* Sticky Floating CTA - Dual-Path Conversion */}
+            {/* Sticky Floating CTA - Minimalist */}
             <AnimatePresence>
                 {showStickyButton && (
                     <motion.div
-                        initial={{ opacity: 0, y: 50 }}
+                        initial={{ opacity: 0, y: 100 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 50 }}
+                        exit={{ opacity: 0, y: 100 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-stone-200 z-40"
+                        className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-stone-200 z-40 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.05)]"
                     >
-                        <div className="flex flex-col items-center justify-center w-full p-4">
+                        <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+                            <div className="hidden sm:flex flex-col">
+                                <span className="font-serif text-sm text-stone-900">{product.name}</span>
+                                <span className="font-sans text-xs text-stone-500">{product.price.toLocaleString()} {product.currency || 'MAD'}</span>
+                            </div>
                             <button
                                 onClick={handleSurMesureClick}
                                 disabled={!isProductAvailable}
-                                className={`w-full max-w-md py-4 px-6 font-sans text-sm tracking-wide font-medium uppercase transition-colors duration-300 ${
+                                className={`w-full sm:w-auto flex-1 sm:flex-none py-3.5 px-8 font-sans text-[11px] tracking-[0.2em] font-medium uppercase transition-all duration-300 rounded-sm ${
                                     isProductAvailable 
                                     ? 'bg-[#111111] text-white hover:bg-[#333333]' 
-                                    : 'bg-stone-300 text-stone-500 cursor-not-allowed'
+                                    : 'bg-stone-200 text-stone-400 cursor-not-allowed'
                                 }`}
                             >
-                                {product.isAvailable === false ? "Indisponible" : dynamicStock > 0 ? (product.is_limited_edition ? "COMMANDER SUR-MESURE" : "COMMANDER") : "Épuisé"}
+                                {product.isAvailable === false ? "Indisponible" : dynamicStock > 0 ? "Commander" : "Épuisé"}
                             </button>
-                            {product.is_limited_edition && (
-                                <button
-                                    onClick={handleEssayagePriveClick}
-                                    className="mt-3 text-xs sm:text-sm text-gray-500 font-serif relative group transition-colors duration-300 hover:text-black"
-                                >
-                                    Résidente à Casablanca ou Rabat ? Demandez votre essayage privé.
-                                    <span className="absolute left-0 bottom-0 w-full h-[0.5px] bg-gray-400 group-hover:bg-black transition-colors duration-300"></span>
-                                </button>
-                            )}
                         </div>
                     </motion.div>
                 )}
