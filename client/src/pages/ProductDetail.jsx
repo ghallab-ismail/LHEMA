@@ -438,20 +438,52 @@ const ProductDetail = () => {
                                 </div>
                             )}
 
-                            {product.features && (
-                                <div className="mb-10 bg-[#F9F8F6] p-6 rounded-sm border border-stone-100">
-                                    <h4 className="font-sans text-[11px] uppercase tracking-wider text-stone-900 font-medium mb-5">Détails de la pièce</h4>
-                                    <ul className="space-y-4">
+                            {product.features && product.features.length > 0 && (
+                                <div className="mb-10">
+                                    {/* Section header */}
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
+                                        <h4 className="font-sans text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] font-medium whitespace-nowrap">
+                                            Détails de la Pièce
+                                        </h4>
+                                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
+                                    </div>
+
+                                    {/* Feature cards */}
+                                    <div className="space-y-4">
                                         {product.features.map((feature, idx) => (
-                                            <li key={idx} className="flex gap-3 text-[13px]">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-stone-300 mt-1.5 flex-shrink-0"></span>
-                                                <div className="flex flex-col gap-0.5">
-                                                    <span className="text-stone-900 font-medium">{feature.title}</span>
-                                                    <span className="text-stone-500 leading-relaxed">{feature.desc}</span>
+                                            <motion.div
+                                                key={idx}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true, margin: "-50px" }}
+                                                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                                                className="group relative bg-white border border-stone-100 hover:border-[#D4AF37]/30 rounded-sm p-5 transition-all duration-500 hover:shadow-[0_4px_20px_-4px_rgba(212,175,55,0.1)]"
+                                            >
+                                                <div className="flex gap-4">
+                                                    {/* Numbered badge */}
+                                                    <div className="flex-shrink-0">
+                                                        <div className="w-8 h-8 rounded-full border border-[#D4AF37]/30 group-hover:border-[#D4AF37]/60 flex items-center justify-center transition-all duration-500 group-hover:bg-[#D4AF37]/5">
+                                                            <span className="font-serif text-[11px] text-[#D4AF37]">
+                                                                {String(idx + 1).padStart(2, '0')}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    {/* Content */}
+                                                    <div className="flex-1 min-w-0">
+                                                        <h5 className="font-sans text-[12px] uppercase tracking-[0.15em] text-stone-900 font-semibold mb-2 group-hover:text-[#8B7535] transition-colors duration-300">
+                                                            {feature.title}
+                                                        </h5>
+                                                        <p className="font-sans text-[12px] text-stone-500 leading-[1.8] group-hover:text-stone-600 transition-colors duration-300">
+                                                            {feature.desc}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </li>
+                                                {/* Subtle bottom accent line */}
+                                                <div className="absolute bottom-0 left-5 right-5 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/0 group-hover:via-[#D4AF37]/20 to-transparent transition-all duration-700"></div>
+                                            </motion.div>
                                         ))}
-                                    </ul>
+                                    </div>
                                 </div>
                             )}
                         </div>
