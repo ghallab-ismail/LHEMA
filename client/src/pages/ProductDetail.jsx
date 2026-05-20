@@ -220,7 +220,7 @@ const ProductDetail = () => {
                     </div>
 
                     {/* Mobile View: Swipeable Carousel */}
-                    <div className="lg:hidden w-full h-[65vh] pt-[60px] relative overflow-hidden flex items-center justify-center">
+                    <div className="lg:hidden w-full h-[75vh] pt-[60px] relative overflow-hidden flex items-center justify-center">
                         <AnimatePresence initial={false} mode="wait">
                             <motion.img
                                 key={activeImage}

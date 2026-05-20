@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Trash2, Image as ImageIcon, AlertCircle, Star, ChevronDown, ChevronUp, Upload, Loader2 } from 'lucide-react';
+import { X, Plus, Trash2, Image as ImageIcon, AlertCircle, Star, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Upload, Loader2 } from 'lucide-react';
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Sur Mesure'];
 
@@ -421,6 +421,36 @@ const ProductModal = ({ isOpen, onClose, mode, initialData, onSubmit }) => {
                                                 className="flex-1 min-w-[150px] bg-transparent border-b border-white/10 py-1 px-2 text-sm text-white focus:outline-none focus:border-white/30"
                                                 placeholder="Nom de la couleur (ex: Noir Corbeau)"
                                             />
+                                            <div className="flex flex-col gap-0.5 mr-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (index > 0) {
+                                                            const updated = [...formData.colors];
+                                                            [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+                                                            setFormData({ ...formData, colors: updated });
+                                                        }
+                                                    }}
+                                                    className="p-1 text-stone-600 hover:text-white transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                                                    disabled={index === 0}
+                                                >
+                                                    <ChevronUp className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (index < formData.colors.length - 1) {
+                                                            const updated = [...formData.colors];
+                                                            [updated[index + 1], updated[index]] = [updated[index], updated[index + 1]];
+                                                            setFormData({ ...formData, colors: updated });
+                                                        }
+                                                    }}
+                                                    className="p-1 text-stone-600 hover:text-white transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                                                    disabled={index === formData.colors.length - 1}
+                                                >
+                                                    <ChevronDown className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                             <button
                                                 type="button"
                                                 onClick={() => {
@@ -528,14 +558,46 @@ const ProductModal = ({ isOpen, onClose, mode, initialData, onSubmit }) => {
                                                     e.target.style.opacity = '0.3';
                                                 }}
                                             />
-                                            {/* Delete overlay */}
-                                            <button
-                                                type="button"
-                                                onClick={() => removeImage(index)}
-                                                className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                                            >
-                                                <Trash2 className="w-5 h-5 text-red-400" />
-                                            </button>
+                                            {/* Reorder & Delete overlay */}
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            if (index > 0) {
+                                                                const updated = [...formData.images];
+                                                                [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+                                                                setFormData({ ...formData, images: updated });
+                                                            }
+                                                        }}
+                                                        className="p-1.5 bg-black/50 text-white rounded-full hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed"
+                                                        disabled={index === 0}
+                                                    >
+                                                        <ChevronLeft className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeImage(index)}
+                                                        className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            if (index < formData.images.length - 1) {
+                                                                const updated = [...formData.images];
+                                                                [updated[index + 1], updated[index]] = [updated[index], updated[index + 1]];
+                                                                setFormData({ ...formData, images: updated });
+                                                            }
+                                                        }}
+                                                        className="p-1.5 bg-black/50 text-white rounded-full hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed"
+                                                        disabled={index === formData.images.length - 1}
+                                                    >
+                                                        <ChevronRight className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
                                             {/* Image number badge */}
                                             <span className="absolute top-2 left-2 bg-black/60 text-white text-[10px] font-medium px-1.5 py-0.5 rounded">
                                                 {index + 1}
