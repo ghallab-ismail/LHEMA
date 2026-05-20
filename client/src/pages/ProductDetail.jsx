@@ -19,7 +19,7 @@ const ProductDetail = () => {
     const hasAutoOpened = useRef(false);
     const bottomRef = useRef(null);
 
-    const [openAccordion, setOpenAccordion] = useState(null);
+    const [openAccordion, setOpenAccordion] = useState(0);
     const toggleAccordion = (idx) => setOpenAccordion(openAccordion === idx ? null : idx);
 
     const policies = [
@@ -490,40 +490,83 @@ const ProductDetail = () => {
 
                         {/* Policies Accordion */}
                         <div className="w-full pt-4">
-                            <h4 className="font-sans text-[11px] uppercase tracking-wider text-stone-900 font-medium mb-5">L'Expérience Lhema</h4>
-                            <div className="border-t border-stone-200/60">
-                                {policies.map((policy, idx) => (
-                                    <div key={idx} className="border-b border-stone-200/60">
-                                        <button 
-                                            onClick={() => toggleAccordion(idx)}
-                                            className="w-full flex items-center justify-between py-5 focus:outline-none group"
+                            {/* Section header */}
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
+                                <h4 className="font-sans text-[10px] uppercase tracking-[0.3em] text-[#D4AF37] font-medium whitespace-nowrap">
+                                    L'Expérience Lhema
+                                </h4>
+                                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/40 to-transparent"></div>
+                            </div>
+
+                            <div className="space-y-3">
+                                {policies.map((policy, idx) => {
+                                    const isOpen = openAccordion === idx;
+                                    return (
+                                        <div 
+                                            key={idx} 
+                                            className={`relative bg-white border rounded-sm transition-all duration-500 overflow-hidden ${
+                                                isOpen 
+                                                    ? 'border-[#D4AF37]/30 shadow-[0_4px_20px_-4px_rgba(212,175,55,0.1)]' 
+                                                    : 'border-stone-100 hover:border-[#D4AF37]/20'
+                                            }`}
                                         >
-                                            <div className="flex items-center gap-4">
-                                                {React.cloneElement(policy.icon, { className: "w-4 h-4 text-stone-800 transition-colors group-hover:text-[#D4AF37]" })}
-                                                <span className="font-sans text-[12px] uppercase tracking-wider text-stone-900 font-medium group-hover:text-stone-600 transition-colors">{policy.title}</span>
-                                            </div>
-                                            <div className="relative w-3 h-3 flex-shrink-0">
-                                                <span className={`absolute top-1/2 left-0 w-3 h-[1px] bg-stone-400 transition-transform duration-300 ${openAccordion === idx ? 'rotate-180 opacity-0' : ''}`}></span>
-                                                <span className={`absolute top-0 left-1/2 w-[1px] h-3 bg-stone-400 transition-transform duration-300 ${openAccordion === idx ? 'rotate-90' : ''}`}></span>
-                                            </div>
-                                        </button>
-                                        <AnimatePresence>
-                                            {openAccordion === idx && (
-                                                <motion.div
-                                                    initial={{ height: 0, opacity: 0 }}
-                                                    animate={{ height: "auto", opacity: 1 }}
-                                                    exit={{ height: 0, opacity: 0 }}
-                                                    transition={{ duration: 0.3 }}
-                                                    className="overflow-hidden"
-                                                >
-                                                    <p className="font-sans text-[13px] text-stone-500 leading-relaxed pb-6 pl-8 text-left">
-                                                        {policy.content}
-                                                    </p>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </div>
-                                ))}
+                                            {/* Gold accent bar on left */}
+                                            <div className={`absolute left-0 top-0 bottom-0 w-[2px] bg-[#D4AF37] transition-all duration-500 ${isOpen ? 'opacity-100' : 'opacity-0'}`}></div>
+
+                                            <button 
+                                                onClick={() => toggleAccordion(idx)}
+                                                className="w-full flex items-center justify-between px-5 py-4 focus:outline-none group"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-500 ${
+                                                        isOpen 
+                                                            ? 'border-[#D4AF37]/60 bg-[#D4AF37]/5' 
+                                                            : 'border-stone-200 group-hover:border-[#D4AF37]/40'
+                                                    }`}>
+                                                        {React.cloneElement(policy.icon, { 
+                                                            className: `w-3.5 h-3.5 transition-colors duration-300 ${
+                                                                isOpen ? 'text-[#D4AF37]' : 'text-stone-400 group-hover:text-[#D4AF37]'
+                                                            }` 
+                                                        })}
+                                                    </div>
+                                                    <span className={`font-sans text-[11px] uppercase tracking-[0.15em] font-semibold transition-colors duration-300 ${
+                                                        isOpen ? 'text-stone-900' : 'text-stone-600 group-hover:text-stone-900'
+                                                    }`}>
+                                                        {policy.title}
+                                                    </span>
+                                                </div>
+                                                <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-500 ${
+                                                    isOpen 
+                                                        ? 'border-[#D4AF37]/40 bg-[#D4AF37]/5 rotate-45' 
+                                                        : 'border-stone-200 group-hover:border-[#D4AF37]/30'
+                                                }`}>
+                                                    <svg width="10" height="10" viewBox="0 0 10 10" className={`transition-colors duration-300 ${isOpen ? 'text-[#D4AF37]' : 'text-stone-400'}`}>
+                                                        <line x1="5" y1="1" x2="5" y2="9" stroke="currentColor" strokeWidth="1.2" />
+                                                        <line x1="1" y1="5" x2="9" y2="5" stroke="currentColor" strokeWidth="1.2" />
+                                                    </svg>
+                                                </div>
+                                            </button>
+                                            <AnimatePresence>
+                                                {isOpen && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: "auto", opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                                                        className="overflow-hidden"
+                                                    >
+                                                        <div className="px-5 pb-5 pl-[4.25rem]">
+                                                            <p className="font-sans text-[12px] text-stone-500 leading-[1.8]">
+                                                                {policy.content}
+                                                            </p>
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
 
