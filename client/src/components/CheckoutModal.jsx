@@ -301,27 +301,35 @@ const CheckoutModal = ({ isOpen, onClose, product }) => {
                                         )}
                                         
                                         {product?.hasColors && product?.colors?.length > 0 && (
-                                            <div className={availableSizes.length <= 1 ? "col-span-2" : ""}>
-                                                <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
+                                            <div className={availableSizes.length <= 1 ? "col-span-2" : "col-span-2"}>
+                                                <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-4 text-stone-800 font-semibold">
                                                     Couleur
                                                 </label>
-                                                <div className="flex flex-wrap gap-3 items-center mt-3">
+                                                <div className="flex flex-wrap items-center gap-5">
                                                     {product.colors.map(c => (
-                                                        <button
-                                                            key={c.name}
-                                                            type="button"
+                                                        <div 
+                                                            key={c.name} 
                                                             onClick={() => handleFieldChange('color', c.name)}
-                                                            title={c.name}
-                                                            className={`w-7 h-7 rounded-full transition-all flex items-center justify-center ${formData.color === c.name ? 'ring-1 ring-black ring-offset-2 scale-110' : 'ring-1 ring-stone-200 hover:scale-105'}`}
-                                                            style={{ backgroundColor: c.hex || '#000000' }}
+                                                            className="flex flex-col items-center gap-2 group cursor-pointer"
                                                         >
-                                                            {formData.color === c.name && (
-                                                                <Check className={`w-4 h-4 ${isLightColor(c.hex) ? 'text-black' : 'text-white'}`} strokeWidth={3} />
-                                                            )}
-                                                        </button>
+                                                            <div 
+                                                                className={`w-8 h-8 rounded-full border transition-all duration-300 p-[3px] ${formData.color === c.name ? 'border-[#D4AF37] scale-110' : 'border-stone-200 group-hover:border-[#D4AF37]'}`}
+                                                            >
+                                                                <div 
+                                                                    className="w-full h-full rounded-full flex items-center justify-center"
+                                                                    style={{ backgroundColor: c.hex || '#000000' }}
+                                                                >
+                                                                    {formData.color === c.name && (
+                                                                        <Check className={`w-3.5 h-3.5 ${isLightColor(c.hex) ? 'text-black' : 'text-white'}`} strokeWidth={3} />
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                            <span className={`font-sans text-[9px] uppercase tracking-wider transition-colors ${formData.color === c.name ? 'text-stone-900 font-medium' : 'text-stone-500'}`}>
+                                                                {c.name}
+                                                            </span>
+                                                        </div>
                                                     ))}
                                                 </div>
-                                                <div className="mt-2 text-[11px] text-stone-500 font-serif italic">{formData.color}</div>
                                             </div>
                                         )}
                                     </div>

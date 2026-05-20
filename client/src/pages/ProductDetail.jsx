@@ -367,7 +367,7 @@ const ProductDetail = () => {
                                 <span className="font-sans text-[11px] uppercase tracking-wider text-stone-600 font-medium mb-4 block">
                                     Nuances
                                 </span>
-                                <div className="flex items-center gap-4">
+                                <div className="flex flex-wrap items-center gap-4">
                                     {product.colors.map(c => (
                                         <div key={c.name} className="flex flex-col items-center gap-2 group cursor-pointer">
                                             <div 
@@ -379,6 +379,22 @@ const ProductDetail = () => {
                                                 />
                                             </div>
                                             <span className="font-sans text-[9px] uppercase tracking-wider text-stone-500">{c.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Available Sizes */}
+                        {product.sizes && product.sizes.length > 0 && (
+                            <div className="mb-10">
+                                <span className="font-sans text-[11px] uppercase tracking-wider text-stone-600 font-medium mb-4 block">
+                                    Tailles Disponibles
+                                </span>
+                                <div className="flex flex-wrap items-center gap-2">
+                                    {product.sizes.map(size => (
+                                        <div key={size} className="px-4 py-2 border border-stone-200 text-stone-600 text-[10px] uppercase font-sans tracking-widest rounded-sm bg-white">
+                                            {size}
                                         </div>
                                     ))}
                                 </div>
@@ -483,36 +499,7 @@ const ProductDetail = () => {
                 </div>
             </div>
 
-            {/* Sticky Floating CTA - Minimalist */}
-            <AnimatePresence>
-                {showStickyButton && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 100 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 100 }}
-                        transition={{ duration: 0.3 }}
-                        className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-stone-200 z-40 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.05)]"
-                    >
-                        <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-                            <div className="hidden sm:flex flex-col">
-                                <span className="font-serif text-sm text-stone-900">{product.name}</span>
-                                <span className="font-sans text-xs text-stone-500">{product.price.toLocaleString()} {product.currency || 'MAD'}</span>
-                            </div>
-                            <button
-                                onClick={handleSurMesureClick}
-                                disabled={!isProductAvailable}
-                                className={`w-full sm:w-auto flex-1 sm:flex-none py-3.5 px-8 font-sans text-[11px] tracking-[0.2em] font-medium uppercase transition-all duration-300 rounded-sm ${
-                                    isProductAvailable 
-                                    ? 'bg-[#111111] text-white hover:bg-[#333333]' 
-                                    : 'bg-stone-200 text-stone-400 cursor-not-allowed'
-                                }`}
-                            >
-                                {product.isAvailable === false ? "Indisponible" : dynamicStock > 0 ? "Commander" : "Épuisé"}
-                            </button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+
 
             {/* Invisible element at the bottom to trigger the IntersectionObserver */}
             <div ref={bottomRef} className="absolute bottom-0 w-full h-1 pointer-events-none" />
