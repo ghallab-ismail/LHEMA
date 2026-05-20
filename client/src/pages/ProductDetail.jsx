@@ -309,9 +309,11 @@ const ProductDetail = () => {
                             <div className="flex items-center justify-between mb-8 pb-8 border-b border-stone-200/60">
                                 <div className="flex items-center gap-1">
                                     {[...Array(5)].map((_, i) => (
-                                        <Star key={i} className={`w-3.5 h-3.5 ${i < (product.stars !== undefined ? product.stars : 5) ? 'fill-stone-800 text-stone-800' : 'text-stone-300'}`} strokeWidth={1} />
+                                        <Star key={i} className={`w-3.5 h-3.5 ${i < (product.stars !== undefined ? product.stars : 5) ? 'fill-[#D4AF37] text-[#D4AF37]' : 'text-stone-300'}`} strokeWidth={1} />
                                     ))}
-                                    <span className="text-[11px] font-sans text-stone-500 ml-2">Qualité Premium</span>
+                                    <span className="text-[11px] font-sans text-stone-500 ml-2">
+                                        {product.stars !== undefined ? product.stars : 5}/5 - Qualité Premium
+                                    </span>
                                 </div>
                                 <div className="flex items-center gap-1.5 text-[11px] font-sans text-stone-500">
                                     <Truck className="w-3.5 h-3.5" /> Livraison Express

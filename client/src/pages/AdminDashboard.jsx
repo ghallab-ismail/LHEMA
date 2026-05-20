@@ -23,7 +23,8 @@ import {
     Package,
     Tag,
     ImageOff,
-    Truck
+    Truck,
+    Star
 } from 'lucide-react';
 import OrdersManagement from '../components/OrdersManagement';
 import InquiryModal from '../components/InquiryModal';
@@ -641,7 +642,15 @@ const AdminDashboard = () => {
                                         {/* Card body */}
                                         <div className="p-4">
                                             <h3 className="text-white font-serif text-base mb-1 truncate">{product.name}</h3>
-                                            <p className="text-stone-400 text-sm font-medium">{product.price.toLocaleString()} MAD</p>
+                                            <p className="text-stone-400 text-sm font-medium mb-2">{product.price.toLocaleString()} MAD</p>
+                                            
+                                            <div className="flex items-center gap-1 mb-2">
+                                                {[...Array(5)].map((_, j) => (
+                                                    <Star key={j} className={`w-3 h-3 ${j < (product.stars !== undefined ? product.stars : 5) ? 'fill-[#D4AF37] text-[#D4AF37]' : 'text-stone-600'}`} strokeWidth={1} />
+                                                ))}
+                                                <span className="text-[10px] text-stone-500 ml-1">{product.stars !== undefined ? product.stars : 5}/5</span>
+                                            </div>
+
                                             {product.sizes && product.sizes.length > 0 && (
                                                 <div className="flex flex-wrap gap-1 mt-2">
                                                     {product.sizes.slice(0, 4).map(size => (

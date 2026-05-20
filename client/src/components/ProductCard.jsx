@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Star } from 'lucide-react';
 
 const ProductCard = ({ product }) => {
     // Support both static products (id + local image imports) and DB products (_id + URL strings)
@@ -103,6 +104,12 @@ const ProductCard = ({ product }) => {
                 <span className={`font-sans text-xs tracking-wide mt-1 ${isSoldOut ? 'text-stone-400 line-through decoration-stone-400/60' : 'text-primary-text'}`}>
                     {product.price?.toLocaleString()} {product.currency || 'MAD'}
                 </span>
+
+                <div className="flex items-center gap-1 mt-1">
+                    {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-3 h-3 ${i < (product.stars !== undefined ? product.stars : 5) ? 'fill-[#D4AF37] text-[#D4AF37]' : 'text-stone-300'}`} strokeWidth={1} />
+                    ))}
+                </div>
 
                 {isSoldOut && (
                     <span className="font-sans text-[9px] uppercase tracking-[0.3em] text-stone-400 mt-0.5">
