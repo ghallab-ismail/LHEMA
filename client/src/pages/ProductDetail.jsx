@@ -1,26 +1,158 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Star, Truck, RefreshCw, ShieldCheck, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Star, Truck, RefreshCw, ShieldCheck, ChevronDown, Check } from 'lucide-react';
 import Navbar from '../components/Navbar';
-import CheckoutModal from '../components/CheckoutModal';
 import EssayagePriveModal from '../components/EssayagePriveModal';
 import { products as staticProducts } from '../data/products';
 
 const ProductDetail = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [product, setProduct] = useState(null);
     const [productLoading, setProductLoading] = useState(true);
     const [activeImage, setActiveImage] = useState(0);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEssayageModalOpen, setIsEssayageModalOpen] = useState(false);
     const [showStickyButton, setShowStickyButton] = useState(false);
     const [completedCount, setCompletedCount] = useState(0);
-    const hasAutoOpened = useRef(false);
-    const bottomRef = useRef(null);
-
     const [openAccordion, setOpenAccordion] = useState(0);
     const toggleAccordion = (idx) => setOpenAccordion(openAccordion === idx ? null : idx);
+
+    // Form state
+    const [formData, setFormData] = useState({ name: '', whatsapp: '', city: '', size: 'Sur Mesure', mensurations: '', color: '' });
+    const [errors, setErrors] = useState({});
+    const [submitting, setSubmitting] = useState(false);
+
+    const SIZE_LABELS = {
+        'XS': 'XS',
+        'S': 'S',
+        'M': 'M (Épaules: 42-45 cm)',
+        'L': 'L (Épaules: 46-49 cm)',
+        'XL': 'XL (Épaules: 50-53 cm)',
+        'XXL': 'XXL (Épaules: 54-57 cm)',
+        'Sur Mesure': 'Sur Mesure'
+    };
+
+    const isLightColor = (hex) => {
+        if (!hex) return false;
+        const color = hex.replace('#', '');
+        const r = parseInt(color.substr(0, 2), 16);
+        const g = parseInt(color.substr(2, 2), 16);
+        const b = parseInt(color.substr(4, 2), 16);
+        const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+        return brightness > 155;
+    };
+
+    const getAvailableSizes = () => {
+        if (!product?.sizes || product.sizes.length === 0) {
+            return ['M (Épaules: 42-45 cm)', 'L (Épaules: 46-49 cm)', 'XL (Épaules: 50-53 cm)', 'XXL (Épaules: 54-57 cm)', 'Sur Mesure'];
+        }
+        return product.sizes.map(s => SIZE_LABELS[s] || s);
+    };
+
+    const availableSizes = getAvailableSizes();
+
+    useEffect(() => {
+        if (product) {
+            let updates = {};
+            if (availableSizes.length > 0 && !availableSizes.includes(formData.size)) {
+                updates.size = availableSizes[0];
+            }
+            if (product.hasColors && product.colors?.length > 0) {
+                if (!product.colors.find(c => c.name === formData.color)) {
+                    updates.color = product.colors[0].name;
+                }
+            }
+            if (Object.keys(updates).length > 0) {
+                setFormData(prev => ({ ...prev, ...updates }));
+            }
+        }
+    }, [product, availableSizes, formData.size, formData.color]);
+
+    const validate = () => {
+        const newErrors = {};
+        if (!formData.name.trim()) newErrors.name = 'Le nom est obligatoire.';
+        else if (formData.name.trim().length < 2) newErrors.name = 'Le nom doit contenir au moins 2 caractères.';
+
+        const cleanedPhone = formData.whatsapp.replace(/\s/g, '');
+        if (!cleanedPhone) newErrors.whatsapp = 'Le numéro WhatsApp est obligatoire.';
+        else if (!/^\+?\d{8,15}$/.test(cleanedPhone)) newErrors.whatsapp = 'Numéro invalide.';
+
+        if (!formData.city.trim()) newErrors.city = 'La ville est obligatoire.';
+        return newErrors;
+    };
+
+    const handleFieldChange = (field, value) => {
+        setFormData({ ...formData, [field]: value });
+        if (errors[field]) setErrors({ ...errors, [field]: '' });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const validationErrors = validate();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        setSubmitting(true);
+        try {
+            const productNameToSend = product?.name || "Produit sans nom";
+
+            const finalSize = formData.size === 'Sur Mesure' 
+                ? `Sur Mesure` 
+                : formData.size;
+            
+            let sizeWithMensurations = finalSize;
+            if (product?.hasColors && formData.color) {
+                sizeWithMensurations += ` - Couleur: ${formData.color}`;
+            }
+            if (formData.mensurations?.trim()) {
+                sizeWithMensurations += ` - Mensurations: ${formData.mensurations.trim()}`;
+            }
+
+            // Create inquiry
+            const inquiryResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/inquiries`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...formData,
+                    size: sizeWithMensurations,
+                    productName: productNameToSend
+                }),
+            });
+            const inquiryData = await inquiryResponse.json();
+
+            // Create order with tracking code
+            const orderResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    customerName: formData.name,
+                    whatsapp: formData.whatsapp,
+                    city: formData.city,
+                    size: sizeWithMensurations,
+                    productName: productNameToSend,
+                    inquiryId: inquiryData._id
+                }),
+            });
+
+            if (inquiryResponse.ok && orderResponse.ok) {
+                const orderData = await orderResponse.json();
+                navigate(`/suivi?code=${orderData.trackingCode}&success=true&returnUrl=${encodeURIComponent(window.location.pathname)}`);
+            } else {
+                console.error('Submission failed');
+            }
+            setSubmitting(false);
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            setSubmitting(false);
+        }
+    };
+
+    const inputClass = (field) =>
+        `w-full bg-transparent border-b py-3 text-black focus:outline-none transition-colors font-serif placeholder-stone-300 text-[13px] ${errors[field] ? 'border-red-400 focus:border-red-500' : 'border-stone-300 focus:border-[#D4AF37]'}`;
 
     const policies = [
         {
@@ -138,31 +270,6 @@ const ProductDetail = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    useEffect(() => {
-        // Use IntersectionObserver instead of reading documentHeight on scroll
-        // This completely eliminates layout thrashing (Forced Reflows)
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && window.scrollY > 150 && !hasAutoOpened.current) {
-                    setIsModalOpen(true);
-                    hasAutoOpened.current = true;
-                }
-            },
-            { rootMargin: "50px" } // Trigger 50px before reaching the actual bottom
-        );
-
-        if (bottomRef.current) {
-            observer.observe(bottomRef.current);
-        }
-
-        return () => observer.disconnect();
-    }, []);
-
-    const handleSurMesureClick = () => {
-        // Trigger the standard checkout/measurement form modal
-        setIsModalOpen(true);
-    };
-
     const handleEssayagePriveClick = () => {
         setIsEssayageModalOpen(true);
     };
@@ -199,7 +306,6 @@ const ProductDetail = () => {
                 <Navbar theme="dark" />
             </div>
 
-            <CheckoutModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} product={product} />
             <EssayagePriveModal isOpen={isEssayageModalOpen} onClose={() => setIsEssayageModalOpen(false)} product={product} />
 
             <div className="flex flex-col lg:flex-row min-h-screen">
@@ -377,18 +483,28 @@ const ProductDetail = () => {
                                 <span className="font-sans text-[11px] uppercase tracking-wider text-stone-600 font-medium mb-4 block">
                                     Nuances
                                 </span>
-                                <div className="flex flex-wrap items-center gap-4">
+                                <div className="flex flex-wrap items-center gap-5">
                                     {product.colors.map(c => (
-                                        <div key={c.name} className="flex flex-col items-center gap-2 group cursor-pointer">
+                                        <div 
+                                            key={c.name} 
+                                            onClick={() => handleFieldChange('color', c.name)}
+                                            className="flex flex-col items-center gap-2 group cursor-pointer"
+                                        >
                                             <div 
-                                                className="w-8 h-8 rounded-full border border-stone-200 group-hover:border-[#D4AF37] transition-all duration-300 p-[3px]"
+                                                className={`w-8 h-8 rounded-full border transition-all duration-300 p-[3px] ${formData.color === c.name ? 'border-[#D4AF37] scale-110' : 'border-stone-200 group-hover:border-[#D4AF37]'}`}
                                             >
                                                 <div 
-                                                    className="w-full h-full rounded-full"
+                                                    className="w-full h-full rounded-full flex items-center justify-center"
                                                     style={{ backgroundColor: c.hex || '#000000' }}
-                                                />
+                                                >
+                                                    {formData.color === c.name && (
+                                                        <Check className={`w-3.5 h-3.5 ${isLightColor(c.hex) ? 'text-black' : 'text-white'}`} strokeWidth={3} />
+                                                    )}
+                                                </div>
                                             </div>
-                                            <span className="font-sans text-[9px] uppercase tracking-wider text-stone-500">{c.name}</span>
+                                            <span className={`font-sans text-[9px] uppercase tracking-wider transition-colors ${formData.color === c.name ? 'text-stone-900 font-medium' : 'text-stone-500'}`}>
+                                                {c.name}
+                                            </span>
                                         </div>
                                     ))}
                                 </div>
@@ -402,40 +518,140 @@ const ProductDetail = () => {
                                     Tailles Disponibles
                                 </span>
                                 <div className="flex flex-wrap items-center gap-2">
-                                    {product.sizes.map(size => (
-                                        <div key={size} className="px-4 py-2 border border-stone-200 text-stone-600 text-[10px] uppercase font-sans tracking-widest rounded-sm bg-white">
-                                            {size}
-                                        </div>
-                                    ))}
+                                    {product.sizes.map(size => {
+                                        const fullSizeName = SIZE_LABELS[size] || size;
+                                        return (
+                                            <button 
+                                                key={size}
+                                                onClick={() => handleFieldChange('size', fullSizeName)}
+                                                className={`px-4 py-2 border text-[10px] uppercase font-sans tracking-widest rounded-sm transition-all duration-300 ${
+                                                    formData.size === fullSizeName 
+                                                        ? 'border-[#D4AF37] bg-[#D4AF37]/5 text-stone-900 font-medium' 
+                                                        : 'border-stone-200 text-stone-600 bg-white hover:border-[#D4AF37]/50'
+                                                }`}
+                                            >
+                                                {size}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
 
-                        {/* Main CTA */}
-                        <div className="mb-12">
-                            <button
-                                onClick={handleSurMesureClick}
-                                disabled={!isProductAvailable}
-                                className={`w-full py-4 px-6 font-sans text-xs tracking-[0.2em] font-medium uppercase transition-all duration-300 flex items-center justify-center gap-3 ${
-                                    isProductAvailable 
-                                    ? 'bg-[#111111] text-white hover:bg-[#222222] shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] transform hover:-translate-y-0.5 rounded-sm' 
-                                    : 'bg-stone-200 text-stone-400 cursor-not-allowed rounded-sm'
-                                }`}
-                            >
-                                {product.isAvailable === false ? "Indisponible" : dynamicStock > 0 ? "Commander Maintenant" : "Épuisé"}
-                                {isProductAvailable && <ArrowLeft className="w-4 h-4 rotate-180" />}
-                            </button>
-                            {product.is_limited_edition && (
-                                <div className="text-center mt-5">
-                                    <button
-                                        onClick={handleEssayagePriveClick}
-                                        className="text-[11px] text-stone-500 font-sans tracking-wide hover:text-stone-900 transition-colors underline underline-offset-4 decoration-stone-300 hover:decoration-stone-900"
-                                    >
-                                        Essayage privé à domicile (Casablanca / Rabat)
-                                    </button>
+                        {/* Inline Checkout Form */}
+                        {isProductAvailable ? (
+                            <div className="mb-12 bg-white p-6 border border-stone-100 rounded-sm shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
+                                <h3 className="font-serif text-xl mb-4 text-stone-900">Finaliser la Commande</h3>
+                                <form onSubmit={handleSubmit} noValidate className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div>
+                                            <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
+                                                Nom Complet
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className={inputClass('name')}
+                                                value={formData.name}
+                                                onChange={(e) => handleFieldChange('name', e.target.value)}
+                                            />
+                                            {errors.name && (
+                                                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-[10px] mt-1.5 font-sans">
+                                                    {errors.name}
+                                                </motion.p>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
+                                                Ville
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className={inputClass('city')}
+                                                value={formData.city}
+                                                onChange={(e) => handleFieldChange('city', e.target.value)}
+                                            />
+                                            {errors.city && (
+                                                <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-[10px] mt-1.5 font-sans">
+                                                    {errors.city}
+                                                </motion.p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
+                                            Numéro WhatsApp
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            placeholder="ex: 0612345678"
+                                            className={inputClass('whatsapp')}
+                                            value={formData.whatsapp}
+                                            onChange={(e) => handleFieldChange('whatsapp', e.target.value)}
+                                        />
+                                        {errors.whatsapp && (
+                                            <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="text-red-500 text-[10px] mt-1.5 font-sans">
+                                                {errors.whatsapp}
+                                            </motion.p>
+                                        )}
+                                    </div>
+
+                                    {product.is_limited_edition && (
+                                        <div>
+                                            <label className="block font-sans text-[10px] uppercase tracking-[0.2em] mb-2 text-stone-800 font-semibold">
+                                                Vos Mensurations (Optionnel)
+                                            </label>
+                                            <textarea
+                                                placeholder="Taille (1m70), Poids (60kg)..."
+                                                className={`${inputClass('mensurations')} resize-none`}
+                                                value={formData.mensurations}
+                                                onChange={(e) => handleFieldChange('mensurations', e.target.value)}
+                                                rows="2"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="pt-4">
+                                        <p className="text-[10px] text-stone-500 font-sans text-center tracking-widest uppercase mb-4">
+                                            {product?.is_limited_edition 
+                                                ? "Un acompte sera requis pour lancer la confection."
+                                                : "Paiement à la livraison. Sans avance."
+                                            }
+                                        </p>
+                                        <button
+                                            type="submit"
+                                            disabled={submitting}
+                                            className="w-full bg-[#111111] text-white py-4 text-xs tracking-[0.2em] uppercase hover:bg-[#222222] transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 rounded-sm"
+                                        >
+                                            {submitting ? (
+                                                <>
+                                                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Traitement en cours...
+                                                </>
+                                            ) : "VALIDER MA COMMANDE"}
+                                        </button>
+                                    </div>
+                                </form>
+                                {product.is_limited_edition && (
+                                    <div className="text-center mt-5">
+                                        <button
+                                            onClick={handleEssayagePriveClick}
+                                            className="text-[11px] text-stone-500 font-sans tracking-wide hover:text-stone-900 transition-colors underline underline-offset-4 decoration-stone-300 hover:decoration-stone-900"
+                                        >
+                                            Essayage privé à domicile (Casablanca / Rabat)
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="mb-12">
+                                <div className="w-full py-4 px-6 font-sans text-xs tracking-[0.2em] font-medium uppercase bg-stone-200 text-stone-400 cursor-not-allowed rounded-sm text-center">
+                                    {product.isAvailable === false ? "Indisponible" : "Épuisé"}
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
 
                         {/* Description & Features */}
                         <div className="mb-12 pt-8 border-t border-stone-200/60">
@@ -584,10 +800,6 @@ const ProductDetail = () => {
                 </div>
             </div>
 
-
-
-            {/* Invisible element at the bottom to trigger the IntersectionObserver */}
-            <div ref={bottomRef} className="absolute bottom-0 w-full h-1 pointer-events-none" />
         </main>
     );
 };
