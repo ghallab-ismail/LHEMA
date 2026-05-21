@@ -517,7 +517,7 @@ const ProductDetail = () => {
                                 <span className="font-sans text-[11px] uppercase tracking-wider text-stone-600 font-medium mb-4 block">
                                     Tailles Disponibles
                                 </span>
-                                <div className="flex flex-wrap items-center gap-2">
+                                <div className="flex flex-wrap items-center gap-2 mb-3">
                                     {product.sizes.map(size => {
                                         const fullSizeName = SIZE_LABELS[size] || size;
                                         return (
@@ -535,6 +535,19 @@ const ProductDetail = () => {
                                         );
                                     })}
                                 </div>
+                                {formData.size && formData.size.includes('(') && (
+                                    <div className="text-[11px] text-stone-500 font-sans tracking-wide mb-3">
+                                        Dimensions : {formData.size.split('(')[1].replace(')', '')}
+                                    </div>
+                                )}
+                                <a 
+                                    href={`https://wa.me/212709555824?text=${encodeURIComponent(`Bonjour Maison Lhema, j'ai besoin d'aide pour choisir ma taille pour l'article ${product?.name || ''}`)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[11px] text-[#D4AF37] font-sans tracking-wide hover:text-[#b5952f] transition-colors underline underline-offset-4 decoration-[#D4AF37]/30 hover:decoration-[#D4AF37]"
+                                >
+                                    Besoin d'aide pour choisir votre taille ? Contactez-nous
+                                </a>
                             </div>
                         )}
 
