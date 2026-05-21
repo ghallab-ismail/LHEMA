@@ -212,7 +212,7 @@ const ProductDetail = () => {
                         style={{ backgroundImage: `url(${product?.images[activeImage]})` }} 
                     />
 
-                    <Link to="/" className="absolute top-[80px] left-6 z-20 mix-blend-difference text-white" aria-label="Retour à l'accueil">
+                    <Link to="/collection" className="absolute top-[80px] left-6 z-20 mix-blend-difference text-white" aria-label="Retour à la collection">
                         <ArrowLeft className="w-6 h-6" />
                     </Link>
 
