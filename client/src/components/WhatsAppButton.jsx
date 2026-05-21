@@ -20,10 +20,7 @@ const WhatsAppButton = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Replace with actual number
     const phoneNumber = "212709555824";
-    const message = "Bonjour Maison Lhema, je suis intéressée par l'Ensemble Ghalia";
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
     const handleWhatsAppClick = () => {
         // Track the click for Facebook Pixel
@@ -32,6 +29,13 @@ const WhatsAppButton = () => {
             content_name: 'WhatsApp Contact Button',
             content_category: 'Social Contact'
         });
+        
+        // Construct dynamic message based on current product
+        let message = "Bonjour Maison Lhema, je suis intéressée par vos créations";
+        if (window.currentProductName) {
+            message = `Bonjour Maison Lhema, je suis intéressée par l'article : ${window.currentProductName}`;
+        }
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
         
         // Open WhatsApp
         window.open(whatsappUrl, '_blank');

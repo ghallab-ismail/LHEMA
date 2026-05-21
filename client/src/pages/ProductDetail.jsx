@@ -86,7 +86,13 @@ const ProductDetail = () => {
     }, [id]);
 
     useEffect(() => {
-        if (!product) return;
+        if (!product) {
+            window.currentProductName = null;
+            return;
+        }
+
+        // Set the global product name for the WhatsApp button
+        window.currentProductName = product.name;
 
         const fetchCompletedCount = async () => {
             try {
@@ -103,6 +109,10 @@ const ProductDetail = () => {
         };
 
         fetchCompletedCount();
+
+        return () => {
+            window.currentProductName = null;
+        };
     }, [product]);
 
     // For static products with a preset completed_count, use it as floor
